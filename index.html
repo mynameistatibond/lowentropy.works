@@ -1,62 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Low Entropy — AI Strategy Studio</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Organic thin fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600&family=Inter+Tight:wght@200;300;400&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Background layer with fixed dots -->
-  <div class="dot-grid"></div>
+  <!-- Floating color dots -->
+  <div class="dot green"></div>
+  <div class="dot coral"></div>
+  <div class="dot blue"></div>
+  <div class="dot blue2"></div>
+
+  <script>
+  // Scroll-based alignment
+  window.addEventListener('scroll', () => {
+    const dots = document.querySelectorAll('.dot');
+    const trigger = window.innerHeight * 0.5; // when halfway down the viewport
+    if (window.scrollY > trigger) {
+      dots.forEach(dot => dot.classList.add('aligned'));
+    } else {
+      dots.forEach(dot => dot.classList.remove('aligned'));
+    }
+  });
+</script>
 
   <header>
-    <div class="logo">LOW ENTROPY</div>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">Case Studies</a>
-      <a href="#">Articles</a>
-      <a href="#">Contact</a>
-    </nav>
-    <span class="status">🟠 open for work</span>
+    <div class="left">LOW ENTROPY WORKS</div>
+    <div class="center">
+      <a href="mailto:hi@lowentropy.works">hi@lowentropy.works</a><br>
+      <a href="#">linkedin</a>
+    </div>
+    <div class="right">
+      <a href="#">data science projects</a><br>
+      <a href="#">case studies</a><br>
+      <a href="#">about me</a><br>
+      <a href="#">contact</a>
+    </div>
   </header>
 
   <main>
     <section class="hero">
       <h1>Building order in intelligent systems.</h1>
-      <p>Guiding organizations through AI strategy, governance, and ethical product design.</p>
-      <a href="#" class="cta">See Case Studies</a>
+      <p>【AI STRATEGY】『PRODUCT & DATA』〈ETHICAL GOVERNANCE〉</p>
     </section>
-
-    <section class="focus">
-      <div class="focus-item">
-        <h3>AI Strategy</h3>
-        <p>Architecting clarity in complexity.</p>
-      </div>
-      <div class="focus-item">
-        <h3>Product & Data</h3>
-        <p>Translating intelligence into experience.</p>
-      </div>
-      <div class="focus-item">
-        <h3>Ethical Governance</h3>
-        <p>Designing responsibility into systems.</p>
-      </div>
-    </section>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+    <footer>
+      <div class="divider"></div>
+      <p>© Tatiana Bondarenko 2025</p>
+    </footer>
   </main>
-
-  <footer>
-    <h4>Let’s talk.</h4>
-    <p>Have a project in mind? I’d love to hear from you.</p>
-    <div class="contact">
-      <a href="#">LinkedIn</a>
-      <a href="mailto:hi@lowentropy.works">Email</a>
-      <a href="#">Newsletter</a>
-    </div>
-    <small>© Tatiana Bondarenko 2025</small>
-  </footer>
 </body>
 </html>

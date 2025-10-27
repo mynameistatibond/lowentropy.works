@@ -1,111 +1,90 @@
-/* Reset & base */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  background: #fffdfc;
-  color: #222;
-  text-align: center;
-  overflow-x: hidden;
+/* ——— Base & Font Setup ——— */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Top bar */
-.topbar {
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #fff;
+  color: #111;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ——— Fixed Dot Grid Background ——— */
+.dot-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(#ccc 0.5px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -1;
+}
+
+/* ——— Header ——— */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1.5rem 3rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(6px);
   font-size: 0.9rem;
-  color: #6060f9;
-}
-.status-dot {
-  width: 10px; height: 10px;
-  background: #ff4b2b;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 6px;
-}
-nav a {
-  margin-left: 1.5rem;
-  color: #6060f9;
-  text-decoration: none;
-  font-weight: 500;
-}
-nav a:hover { text-decoration: underline; }
-
-/* Hero */
-.intro h1 {
-  font-size: 8rem;
-  font-weight: 800;
-  color: #ff4b2b;
-  text-transform: lowercase;
-  margin-top: 2rem;
-}
-.intro p {
-  color: #3b3bff;
-  max-width: 550px;
-  margin: 1rem auto 3rem;
-  line-height: 1.6;
-}
-
-/* Wheel section */
-.wheel {
-  margin: 4rem auto;
-  display: flex;
-  justify-content: center;
-}
-.circle {
-  width: 400px; height: 400px;
-  border-radius: 50%;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(0,0,0,0.05);
-}
-.segment {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  color: #fff;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-.red { background: #ff4b2b; top: 50%; left: 0; transform-origin: 100% 0; transform: rotate(0deg) skewY(-45deg); }
-.blue { background: #6060f9; top: 0; right: 0; transform-origin: 0 100%; transform: rotate(90deg) skewY(-45deg); }
-.beige { background: #f4e7d4; bottom: 0; right: 0; transform-origin: 0 0; transform: rotate(180deg) skewY(-45deg); color: #000; }
-.center {
-  position: absolute;
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  background: #ff4b2b;
-  color: #fff;
-  font-weight: 700;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
 }
 
-/* Footer */
-footer {
-  background: #3b3bff;
-  color: white;
-  padding: 3rem 1rem;
+header .logo {
+  font-weight: 300;
+  letter-spacing: 0.2em;
 }
-footer h2 { font-size: 2rem; margin-bottom: 0.5rem; }
-footer p { margin-bottom: 1.5rem; font-size: 1.2rem; }
-.contact {
-  display: inline-block;
-  color: white;
+
+header nav a {
+  margin-left: 2rem;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
+  color: #111;
+  transition: opacity 0.2s ease;
 }
-.socials a {
-  color: #fff;
-  margin: 0 1rem;
-  font-size: 0.9rem;
-  text-decoration: none;
+
+header nav a:hover {
+  opacity: 0.5;
 }
-.socials a:hover { text-decoration: underline; }
+
+.status {
+  font-size: 0.8rem;
+  color: #e67e22;
+  font-weight: 300;
+}
+
+/* ——— Hero ——— */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.hero h1 {
+  font-family: "EB Garamond", serif;
+  font-weight: 400;
+  font-size: 3.5rem;
+  color: #e67e22; /* orange accent */
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 1

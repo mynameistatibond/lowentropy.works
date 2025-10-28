@@ -4,8 +4,8 @@
 /* ——— Font Colors ——— */
 :root {
   /* Brand Colors */
-  --clr-bg: #fffaf5;
-  --clr-text: #0000ff;
+  --clr-bg: #ffffff;
+  --clr-text: #000000;
 
   /* Accent Colors (your dots) */
   --clr-green: #82acff;

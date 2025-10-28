@@ -22,3 +22,24 @@ function updateDots() {
 window.addEventListener('scroll', updateDots);
 window.addEventListener('resize', updateDots);
 document.addEventListener('DOMContentLoaded', updateDots);
+function setActive(btn) {
+  lightBtn.classList.remove("active");
+  darkBtn.classList.remove("active");
+  btn.classList.add("active");
+}
+
+lightBtn.addEventListener("click", () => {
+  body.classList.remove("dark");
+  localStorage.setItem("theme", "light");
+  setActive(lightBtn);
+});
+
+darkBtn.addEventListener("click", () => {
+  body.classList.add("dark");
+  localStorage.setItem("theme", "dark");
+  setActive(darkBtn);
+});
+
+// On load, highlight correct icon
+if (savedTheme === "dark") setActive(darkBtn);
+else setActive(lightBtn);

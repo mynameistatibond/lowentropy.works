@@ -2,10 +2,12 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 /* ——— Font Colors ——— */
+
 :root {
-  /* Brand Colors */
-  --clr-bg: #ffffff;
+ /* Theme tokens */
+  --clr-bg: #ffffff;     /* default to light */
   --clr-text: #000000;
+  --clr-divider: #1a1a1a;
 
   /* Accent Colors (your dots) */
   --clr-green: #82acff;
@@ -13,19 +15,32 @@
   --clr-blue: #b0bef4;
   --clr-blue2: #5076ff;
 
-  /* UI Stuff */
-  --clr-divider: #3a3a3a;
+}
+
+/* Light */
+body[data-theme="light"] {
+  --clr-bg: #ffffff;
+  --clr-text: #000000;
+  --clr-divider: #1a1a1a;
+}
+
+/* Dark */
+body[data-theme="dark"] {
+  --clr-bg: #0800ff;
+  --clr-text: #ffffff;
+  --clr-divider: #ffffff66; /* soft divider in dark */
 }
 
 /* ——— FONT RESET ——— */
 body {
   font-family: "Shippori Mincho B1", serif;
-  background: var(--clr-bg);
-  color:var(--clr-text);
   -webkit-font-smoothing: antialiased;
   letter-spacing: 0.02em;
   display: flex;
   flex-direction: column;
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  transition: background-color 2s ease, color 2s ease;
 }
 
 main {
@@ -41,7 +56,7 @@ main {
   opacity: 0.8;
   z-index: 0;
   /* No CSS animation anymore */
-  transition: top 0.3s ease-out, left 0.3s ease-out; /* tiny smoothing */
+  transition: top 0.5s ease-out, left 0.5s ease-out; /* tiny smoothing */
 }
 
 /* Initial positions (start state) */
@@ -61,13 +76,14 @@ header {
   text-transform: uppercase;
   font-size: 0.7rem;
   color:var(--clr-text);
+  background: var(--clr-bg);
   letter-spacing: 0.15em;
   font-family: "Shippori Mincho B1", serif;
   font-weight: 400;
-  background: var(--clr-bg);
   position: sticky;
   top: 0;
   z-index: 10;
+  transition: background-color 2s ease, color 2s ease, border-color 2s ease;;
 }
 
 header a {
@@ -86,6 +102,11 @@ header a:hover {
 header .left, header .center, header .right {
   flex: 1;
 }
+header .left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem; /* tiny breathing room */
+}
 
 header .center {
   text-align: center;
@@ -94,6 +115,63 @@ header .center {
 header .right {
   text-align: right;
 }
+
+/* DARK LIGHT MODE TOGGLE"*/
+
+.brand {
+  font-family: "Shippori Mincho B1", serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.theme-toggle button {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+  font-family: "Shippori Mincho B1", serif;
+}
+
+/* === AI Magic Glow Pulse === */
+@keyframes glowPulse {
+  0%   { text-shadow: 0 0 0px currentColor; }
+  50%  { 
+    text-shadow: 
+      0 0 4px currentColor,
+      0 0 10px currentColor,
+      0 0 25px currentColor;
+  }
+  100% { text-shadow: 0 0 0px currentColor; }
+}
+
+.theme-toggle button.glow,
+.light-switcher.glow,
+.dark-switcher.glow {
+  animation: glowPulse 0.8s ease-in-out 3;
+}
+
+.theme-toggle button:hover {
+  opacity: 0.5;
+}
+
+.theme-toggle .separator {
+  font-size: 2rem;
+}
+
+.light-switcher.active,
+.dark-switcher.active {
+  opacity: 0.3;
+}
+
 
 
 /* ——— Hero ——— */
@@ -126,7 +204,7 @@ header .right {
 }
 
 /* ——— Section divider (dotted) ——— */
-.divider.dotted {
+/*.divider.dotted {
   width: 98%;
   margin: 0.3rem auto 0.8rem;
   border-top: 1px dotted var(--clr-divider);
@@ -142,7 +220,6 @@ header .right {
   padding: 1rem 1.2rem 2rem;
   max-width: 1500px;
   margin: 0 auto;
-  color: var(--clr-text);
   font-family: "Shippori Mincho B1", serif; /* same refined serif */
 }
 
@@ -210,7 +287,7 @@ header .right {
   font-family: "Shippori Mincho B1", serif;
   font-size: 0.8rem;
   letter-spacing: 0.02em;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s ease;
   display: inline-block;
   margin-top: 0.5rem;
   -webkit-text-stroke: 0.3px currentColor;
@@ -226,10 +303,10 @@ header .right {
 footer {
   position: relative;
   text-align: center;
-  padding: 4rem 1rem 2rem;
+  padding: 0rem 1rem 2rem;
   font-size: 0.8rem;
   color:var(--clr-text);
-  margin-top: 2rem;  /* pushes it below the main */
+  margin-top: 0rem;  /* pushes it below the main */
 }
 
 .divider {
@@ -253,6 +330,5 @@ footer {
   opacity: 1;
   text-decoration: underline;
 }
-
 
 

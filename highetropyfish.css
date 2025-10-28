@@ -1,0 +1,111 @@
+/* Reset because we don’t want your main CSS leaking here */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Comic Sans MS", "Papyrus", cursive; /* embrace chaos */
+  background: linear-gradient(135deg, #001f3f, #003366, #001a33);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+/* Header */
+.fish-header {
+  text-align: center;
+  padding: 2rem;
+  animation: wiggle 3s infinite ease-in-out;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(2deg); }
+}
+
+/* Card */
+.fish-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.fish-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  backdrop-filter: blur(4px);
+  border: 2px dashed #ff69b4;
+  text-align: center;
+  animation: float 4s infinite ease-in-out alternate;
+}
+
+@keyframes float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+/* Fish tank */
+.fish-tank {
+  position: relative;
+  width: 80vw;
+  height: 40vh;
+  border: 3px solid #4af;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(0, 100, 255, 0.15);
+}
+
+.fish {
+  width: 60px;
+  height: 30px;
+  background: orange;
+  border-radius: 50% 60% 50% 60%;
+  position: absolute;
+  top: 50%;
+  left: -80px;
+  transform: translateY(-50%);
+  animation: swim 6s linear infinite;
+}
+
+@keyframes swim {
+  from { left: -80px; }
+  to { left: 100%; }
+}
+
+.bubble {
+  position: absolute;
+  bottom: -20px;
+  width: 15px;
+  height: 15px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 50%;
+  animation: rise 4s infinite ease-in;
+}
+
+.bubble:nth-child(2) { left: 30%; animation-delay: 1s; }
+.bubble:nth-child(3) { left: 60%; animation-delay: 2s; }
+
+@keyframes rise {
+  0% { bottom: -20px; transform: scale(0.8); }
+  100% { bottom: 100%; transform: scale(1.4); }
+}
+
+/* Footer */
+footer {
+  padding: 1rem;
+}
+
+footer a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+}

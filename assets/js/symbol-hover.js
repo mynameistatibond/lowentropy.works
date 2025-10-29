@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!container) return;
 
   const items = document.querySelectorAll(".artifact-section li");
-  const glyphs = ["✦", "☽", "Σ", "Ψ", "Ł", "Ѻ", "✧", "🜃", "∋", "∀", "⋱",
-    "Ϟ", "⟐", "∴", "⋯", "𝔚", "𐌍", "Ŧ", "Ȑ", "Θ", "ℙ", "∷", "∷", "∵", "∿", "∉", "Ϟ" ];
+  const glyphs = ["✦", "☽", "Σ", "Ψ", "Ł", "Ѻ", "✧", "🜃", "∋", "∀", "⋱", "λ",
+    "Ϟ", "⟐", "∴", "⋯", "𝔚", "𐌍", "Ŧ", "Ȑ", "Θ", "ℙ", "∷", "∷", "∵", "∿", "∉", "⋗" ];
 
   function spawnSymbol() {
     const rect = container.getBoundingClientRect();

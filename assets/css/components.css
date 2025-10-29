@@ -133,13 +133,13 @@ header a:hover { opacity: 0.6; }
 }
 
 .artifact-section li {
-  display: flex;
+  display: grid;
   align-items: center;
+  grid-template-columns: auto 1fr auto;
   padding: 0.45rem 0;
   border-bottom: 0.5px solid var(--clr-divider);
   cursor: pointer;
   transition: opacity 0.25s ease;
-  column-gap: 0.6rem;
 }
 
 .artifact-section li:hover { opacity: 0.6; }
@@ -148,7 +148,77 @@ header a:hover { opacity: 0.6; }
   opacity: 0.65;
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
+  text-align: left;
 }
+.artifact-section li span:last-child {
+  text-align: right;
+}
+
+
+
+/* =========================================
+   Recommended Signals Table
+========================================= */
+
+.section-note {
+  font-size: 0.68rem;
+  opacity: 0.7;
+  margin-top: -0.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.signal-table {
+  width: 100%;
+  font-size: 0.78rem;
+}
+
+.signal-header {
+  display: grid;
+  grid-template-columns: 0.9fr 2.2fr 2.3fr;
+  opacity: 0.75;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.4rem;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+.signal-header span:last-child {
+  text-align: right;
+}
+
+.signal-table ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.signal-table li {
+  display: grid;
+  grid-template-columns: 0.9fr 2.2fr 2.2fr;
+  border-bottom: 0.5px solid var(--clr-divider);
+  padding: 0.45rem 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.signal-table li:hover {
+  opacity: 0.75;
+}
+
+.signal-table .col-source {
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.signal-table .col-note {
+  opacity: 0.75;
+}
+
+
+
+
+
 
 /* =========================================
    Components: Floating Symbols (spawned)
@@ -177,7 +247,7 @@ header a:hover { opacity: 0.6; }
 
 .rabbit-hole-link-wrap {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-top: 1.4rem;
 }
 

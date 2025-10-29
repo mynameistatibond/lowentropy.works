@@ -69,6 +69,7 @@ header .right { text-align: right; }
 
 .content .col-center-artifacts {
   padding-top: 6.25rem;
+  padding-left: 2rem;
 }
 
 
@@ -123,6 +124,11 @@ footer {
   .col-right-symbols {
     display: none;
   }
+  
+  .signal-table .col-note {
+    display: none; /* hide explanation on tiny screens */
+  }
 }
+
 
 

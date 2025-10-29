@@ -53,23 +53,33 @@ header .right { text-align: right; }
    Layout: Content Columns
 ========================================= */
 
+
 .content {
-  display: flex;
-  gap: 3rem;
-  padding: 1rem 1.2rem 2rem;
+  display: grid;
+  grid-template-columns: 1.3fr 2.5fr 0.5fr;
+  gap: 1rem;
+  padding: 1rem 1rem 2rem;
   max-width: 1500px;
   margin: 0 auto;
-  margin-bottom: 4rem;
 }
 
 .content .col-left-about {
-  flex: 1;
-  max-width: 38%;
+  max-width: 99%;
 }
 
-.content .col-right-artifacts {
-  flex: 2;
+.content .col-center-artifacts {
+  padding-top: 6.25rem;
 }
+
+
+/* Right glyph column must be a positioned, viewport-height container */
+.col-right-symbols {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  pointer-events: none; /* don’t block mouse */
+}
+
 
 /* =========================================
    Layout: Footer
@@ -90,3 +100,29 @@ footer {
   border-top: 0.5px solid var(--clr-divider);
   margin: 2rem auto;
 }
+
+
+
+/* =========================================
+   Mobile Layout
+========================================= */
+@media (max-width: 830px) {
+
+  /* Stack into one column */
+  .content {
+    grid-template-columns: 1fr;
+    padding-bottom: 1rem
+  }
+
+  /* Don’t push this section down so far on mobile */
+  .col-center-artifacts {
+    padding-top: 2rem;
+  }
+
+  /* Hide the glyph column on mobile */
+  .col-right-symbols {
+    display: none;
+  }
+}
+
+

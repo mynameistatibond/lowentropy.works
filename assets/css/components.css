@@ -63,7 +63,7 @@ header a:hover { opacity: 0.6; }
 }
 
 /* =========================================
-   Components: Content and Artifacts columns
+   Components: Content / Left Column
 ========================================= */
 
 .content .symbol-header {
@@ -84,7 +84,7 @@ header a:hover { opacity: 0.6; }
 
 /* headers within the left column*/
 .content h3 {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   margin: 2.4rem 0 0.4rem;
   letter-spacing: 0.06em;
@@ -92,16 +92,84 @@ header a:hover { opacity: 0.6; }
 }
 
 .content .services-list {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   list-style: none;
   max-width: 30rem;
 }
 
 .content .about-list {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 0.65rem;
 }
+
+
+/* =========================================
+   Components: Artifacts (right / center column)
+========================================= */
+
+.artifact-feed {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.artifact-section + .artifact-section {
+  margin-top: 2.2rem;
+}
+
+.artifact-section h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.8rem;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+.artifact-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.artifact-section li {
+  display: flex;
+  align-items: center;
+  padding: 0.45rem 0;
+  border-bottom: 0.5px solid var(--clr-divider);
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+  column-gap: 0.6rem;
+}
+
+.artifact-section li:hover { opacity: 0.6; }
+
+.artifact-section .date {
+  opacity: 0.65;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================
+   Components: Floating Symbols (spawned)
+========================================= */
+
+.symbol {
+  position: absolute;
+  font-size: 2.2rem;
+  opacity: 0;
+  transform: translateY(6px) scale(0.9);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
+.symbol.show {
+  opacity: 0.8;
+  transform: translateY(0) scale(1);
+}
+
+
 
 /* =========================================
    Components: CTA Link - Rabbit Hole
@@ -110,7 +178,7 @@ header a:hover { opacity: 0.6; }
 .rabbit-hole-link-wrap {
   display: flex;
   justify-content: flex-end;
-  margin-top: 0.7rem;
+  margin-top: 1.4rem;
 }
 
 .rabbit-hole-link {
@@ -133,10 +201,11 @@ header a:hover { opacity: 0.6; }
   bottom: 0.8rem;
   right: 2rem;
   font-size: 0.75rem;
-  opacity: 0.8;
+  text-decoration: none;
+  color: var(--clr-text);
 }
 
 .entropy-fish-link:hover {
   opacity: 1;
-  text-decoration: underline;
+  text-decoration: none;
 }

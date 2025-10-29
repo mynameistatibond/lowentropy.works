@@ -3,7 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!container) return;
 
   const items = document.querySelectorAll(".artifact-section li");
-  const glyphs = ["✦", "☽", "Σ", "Ψ", "Ł", "Ѻ", "⌘", "✧", "Ϟ", "⟐", "∴", "⋯"];
+  const glyphs = ["✦", "☽", "Σ", "Ψ", "Ł", "Ѻ", "✧", "🜃", "∋", "∀", "⋱",
+    "Ϟ", "⟐", "∴", "⋯", "𝔚", "𐌍", "Ŧ", "Ȑ", "Θ", "ℙ", "∷", "∷", "∵", "∿", "∉", "Ϟ" ];
 
   function spawnSymbol() {
     const rect = container.getBoundingClientRect();
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fade out, then remove
     setTimeout(() => {
       el.classList.remove("show");
-      setTimeout(() => el.remove(), 250);
+      setTimeout(() => el.remove(), 2000);
     }, 1100);
   }
 

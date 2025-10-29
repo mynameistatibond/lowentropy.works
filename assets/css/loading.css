@@ -18,8 +18,8 @@
   z-index: 9999;
   transform: translateY(0);
   transition:
-  transform 3s cubic-bezier(.2,1,.25,1.2),
-  opacity 2.5s ease-in-out;
+  transform 2.25s cubic-bezier(.2,1,.25,1.2),
+  opacity 2s ease-in-out;
 }
 
 #loader.hide {

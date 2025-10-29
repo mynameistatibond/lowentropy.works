@@ -1,0 +1,29 @@
+/* =========================================
+   Theme Tokens
+========================================= */
+
+:root {
+  --clr-bg: #ffffff;
+  --clr-text: #000000;
+  --clr-divider: #1a1a1a;
+
+  /* Accent Colors (dots) */
+  --clr-midblue: #82acff;
+  --clr-coral: #ffa998;
+  --clr-lightblue: #b0bef4;
+  --clr-cobaltblue: #5076ff;
+}
+
+/* Light Theme */
+body[data-theme="light"] {
+  --clr-bg: #ffffff;
+  --clr-text: #000000;
+  --clr-divider: #1a1a1a;
+}
+
+/* Dark Theme */
+body[data-theme="dark"] {
+  --clr-bg: #0800ff;
+  --clr-text: #ffffff;
+  --clr-divider: #ffffff66;
+}

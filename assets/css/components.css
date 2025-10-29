@@ -1,0 +1,142 @@
+/* =========================================
+   Components: Header Links
+========================================= */
+
+header a {
+  text-decoration: none;
+  color: var(--clr-text);
+  display: inline-block;
+  line-height: 1.6;
+  font-feature-settings: "liga" off;
+}
+
+header a:hover { opacity: 0.6; }
+
+/* =========================================
+   Components: Brand Name + Theme Toggle
+========================================= */
+
+.brand {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.theme-toggle button {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+}
+
+.theme-toggle .separator {
+  font-size: 2rem;
+}
+
+.light-switcher.active,
+.dark-switcher.active {
+  opacity: 0.3;
+}
+
+/* =========================================
+   Components: Hero Text
+========================================= */
+
+.hero h1 {
+  font-weight: 400;
+  font-size: clamp(1rem, 2vw, 2rem);
+  margin-bottom: 1.2rem;
+}
+
+.hero p {
+  font-family: "Inter Tight", sans-serif;
+  font-size: 0.77rem;
+  letter-spacing: 0.12em;
+}
+
+/* =========================================
+   Components: Philosophy
+========================================= */
+
+.content .symbol-header {
+  font-size: 1.2rem;
+  margin: 2rem 0;
+  text-align: center;
+  max-width: 24rem;
+}
+
+.content .intro {
+  text-align: center;
+  font-size: 1.3rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+/* headers within the left column*/
+.content h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 2.4rem 0 0.4rem;
+  letter-spacing: 0.06em;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+.content .services-list {
+  font-size: 0.8rem;
+  list-style: none;
+  max-width: 30rem;
+}
+
+.content .about-list {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin-bottom: 0.65rem;
+}
+
+/* =========================================
+   Components: CTA Link - Rabbit Hole
+========================================= */
+
+.rabbit-hole-link-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.rabbit-hole-link {
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  transition: opacity 0.25s ease;
+  -webkit-text-stroke: 0.3px currentColor;
+}
+
+.rabbit-hole-link:hover { opacity: 0.6; }
+
+/* =========================================
+   Components: Floating Link
+========================================= */
+
+.entropy-fish {
+  position: absolute;
+  bottom: 0.8rem;
+  right: 2rem;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.entropy-fish:hover {
+  opacity: 1;
+  text-decoration: underline;
+}

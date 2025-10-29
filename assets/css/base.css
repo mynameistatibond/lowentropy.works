@@ -1,0 +1,31 @@
+/* =========================================
+   Base Reset / Global
+========================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  height: 100%;
+}
+
+
+
+body {
+  font-family: "Shippori Mincho B1", serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.02em;
+  display: flex;
+  flex-direction: column;
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  min-height: 100%;
+  min-height: 100svh; /* future-safe mobile viewport */
+  transition: background-color 2s ease, color 2s ease;
+}
+
+main {
+  min-height: 150vh;
+}

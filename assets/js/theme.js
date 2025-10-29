@@ -1,21 +1,27 @@
-const body = document.body;
+// ===== THEME LOGIC =====
+
+// Reference <html> element
+const root = document.documentElement;
+
+// Buttons (if missing on a page, fail silently)
 const lightBtn = document.querySelector(".light-switcher");
 const darkBtn  = document.querySelector(".dark-switcher");
 
-// Determine system preference
+// System preference
 const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-// Look for saved preference
+// Saved user preference
 const savedTheme = localStorage.getItem("theme");
 
-// Decide initial theme
+// Pick initial theme
 let initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
 
-// Apply theme to document
-body.setAttribute("data-theme", initialTheme);
+// Apply to root <html>
+root.setAttribute("data-theme", initialTheme);
 
-// Apply active button state
+// Highlight active button
 function setActive(btn) {
+  if (!lightBtn || !darkBtn) return;
   lightBtn.classList.remove("active");
   darkBtn.classList.remove("active");
   btn.classList.add("active");
@@ -23,36 +29,37 @@ function setActive(btn) {
 
 setActive(initialTheme === "dark" ? darkBtn : lightBtn);
 
+// Small glow pulse
 function triggerGlow(btn) {
   btn.classList.remove("glow");
   void btn.offsetWidth;
   btn.classList.add("glow");
 }
 
-// LIGHT button clicked
-lightBtn.addEventListener("click", () => {
-  const current = body.getAttribute("data-theme");
+// Light button
+lightBtn?.addEventListener("click", () => {
+  const current = root.getAttribute("data-theme");
 
   if (current === "light") {
     triggerGlow(darkBtn);
     return;
   }
 
-  body.setAttribute("data-theme", "light");
+  root.setAttribute("data-theme", "light");
   localStorage.setItem("theme", "light");
   setActive(lightBtn);
 });
 
-// DARK button clicked
-darkBtn.addEventListener("click", () => {
-  const current = body.getAttribute("data-theme");
+// Dark button
+darkBtn?.addEventListener("click", () => {
+  const current = root.getAttribute("data-theme");
 
   if (current === "dark") {
     triggerGlow(lightBtn);
     return;
   }
 
-  body.setAttribute("data-theme", "dark");
+  root.setAttribute("data-theme", "dark");
   localStorage.setItem("theme", "dark");
   setActive(darkBtn);
 });

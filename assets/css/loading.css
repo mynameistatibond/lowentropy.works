@@ -1,0 +1,37 @@
+/* =========================================
+   Loading Overlay
+========================================= */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  background: var(--clr-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+/* hiding animation */
+.loader.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* spinner */
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid currentColor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  color: var(--clr-text);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

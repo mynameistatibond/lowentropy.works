@@ -1,5 +1,5 @@
 /* =========================================
-   Components: Header Links
+   Components: Header Links for LinkedIn, Email and Pages
 ========================================= */
 
 header a {
@@ -47,7 +47,7 @@ header a:hover { opacity: 0.6; }
 }
 
 /* =========================================
-   Components: Hero Text
+   Components: Hero Text - Building order in intelligent systems and subtext
 ========================================= */
 
 .hero h1 {
@@ -63,7 +63,7 @@ header a:hover { opacity: 0.6; }
 }
 
 /* =========================================
-   Components: Philosophy
+   Components: Content and Artifacts columns
 ========================================= */
 
 .content .symbol-header {
@@ -110,7 +110,7 @@ header a:hover { opacity: 0.6; }
 .rabbit-hole-link-wrap {
   display: flex;
   justify-content: flex-end;
-  margin-top: 0.5rem;
+  margin-top: 0.7rem;
 }
 
 .rabbit-hole-link {
@@ -128,7 +128,7 @@ header a:hover { opacity: 0.6; }
    Components: Floating Link
 ========================================= */
 
-.entropy-fish {
+.entropy-fish-link {
   position: absolute;
   bottom: 0.8rem;
   right: 2rem;
@@ -136,7 +136,7 @@ header a:hover { opacity: 0.6; }
   opacity: 0.8;
 }
 
-.entropy-fish:hover {
+.entropy-fish-link:hover {
   opacity: 1;
   text-decoration: underline;
 }

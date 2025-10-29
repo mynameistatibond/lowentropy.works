@@ -26,6 +26,10 @@ body {
   transition: background-color 2s ease, color 2s ease;
 }
 
+body.loading {
+  overflow: hidden;
+}
+
 main {
   min-height: 150vh;
 }

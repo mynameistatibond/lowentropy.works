@@ -38,7 +38,7 @@ header .right { text-align: right; }
 ========================================= */
 
 .hero {
-  height: 50vh;
+  height: 55vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -50,7 +50,7 @@ header .right { text-align: right; }
 }
 
 /* =========================================
-   Layout: Philosophy
+   Layout: Content Columns
 ========================================= */
 
 .content {
@@ -59,6 +59,7 @@ header .right { text-align: right; }
   padding: 1rem 1.2rem 2rem;
   max-width: 1500px;
   margin: 0 auto;
+  margin-bottom: 4rem;
 }
 
 .content .col-left-about {

@@ -2,37 +2,42 @@ const body = document.body;
 const lightBtn = document.querySelector(".light-switcher");
 const darkBtn  = document.querySelector(".dark-switcher");
 
+// Determine system preference
+const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+// Look for saved preference
+const savedTheme = localStorage.getItem("theme");
+
+// Decide initial theme
+let initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
+
+// Apply theme to document
+body.setAttribute("data-theme", initialTheme);
+
+// Apply active button state
 function setActive(btn) {
   lightBtn.classList.remove("active");
   darkBtn.classList.remove("active");
   btn.classList.add("active");
 }
 
-// Init from storage (default to light)
-const saved = localStorage.getItem("theme");
-const initial = saved === "dark" ? "dark" : "light";
-body.setAttribute("data-theme", initial);
-setActive(initial === "dark" ? darkBtn : lightBtn);
+setActive(initialTheme === "dark" ? darkBtn : lightBtn);
 
 function triggerGlow(btn) {
-  btn.classList.remove("glow"); // reset in case animation was still there
-  void btn.offsetWidth;         // force reflow so animation can restart
+  btn.classList.remove("glow");
+  void btn.offsetWidth;
   btn.classList.add("glow");
 }
 
-// Handlers
-
 // LIGHT button clicked
 lightBtn.addEventListener("click", () => {
-  const currentTheme = body.getAttribute("data-theme");
+  const current = body.getAttribute("data-theme");
 
-  if (currentTheme === "light") {
-    // already in light → hint dark
+  if (current === "light") {
     triggerGlow(darkBtn);
     return;
   }
 
-  // switch to light
   body.setAttribute("data-theme", "light");
   localStorage.setItem("theme", "light");
   setActive(lightBtn);
@@ -40,15 +45,13 @@ lightBtn.addEventListener("click", () => {
 
 // DARK button clicked
 darkBtn.addEventListener("click", () => {
-  const currentTheme = body.getAttribute("data-theme");
+  const current = body.getAttribute("data-theme");
 
-  if (currentTheme === "dark") {
-    // already in dark → hint light
+  if (current === "dark") {
     triggerGlow(lightBtn);
     return;
   }
 
-  // switch to dark
   body.setAttribute("data-theme", "dark");
   localStorage.setItem("theme", "dark");
   setActive(darkBtn);

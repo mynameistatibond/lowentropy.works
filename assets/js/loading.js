@@ -1,6 +1,6 @@
 document.body.classList.add("loading");
 
-window.addEventListener("load", () => {
+document.addEventListener("DOMContentLoaded", () => {
   const loader = document.getElementById("loader");
   loader.classList.add("hide");
   document.body.classList.remove("loading");

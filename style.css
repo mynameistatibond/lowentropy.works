@@ -10,10 +10,10 @@
   --clr-divider: #1a1a1a;
 
   /* Accent Colors (your dots) */
-  --clr-green: #82acff;
+  --clr-midblue: #82acff;
   --clr-coral: #ffa998;
-  --clr-blue: #b0bef4;
-  --clr-blue2: #5076ff;
+  --clr-lightblue: #b0bef4;
+  --clr-cobaltblue: #5076ff;
 
 }
 
@@ -57,13 +57,14 @@ main {
   z-index: 0;
   /* No CSS animation anymore */
   transition: top 0.5s ease-out, left 0.5s ease-out; /* tiny smoothing */
+  visibility: hidden;
 }
 
-/* Initial positions (start state) */
-.dot.green { background: var(--clr-green); top: 20%; left: 20%; }
-.dot.coral { background: var(--clr-coral); top: 40%; left: 37%; }
-.dot.blue  { background: var(--clr-blue); top: 45%; left: 75%; }
-.dot.blue2 { background: var(--clr-blue2); top: 74%; left: 10%; }
+/*  Dots BG Colors assigned */
+.dot.midblue { background: var(--clr-midblue);}
+.dot.coral { background: var(--clr-coral);}
+.dot.lightblue  { background: var(--clr-lightblue);}
+.dot.cobaltblue { background: var(--clr-cobaltblue);}
 
 
 /* ——— HEADER ——— */

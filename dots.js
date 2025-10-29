@@ -1,45 +1,34 @@
-// dots.js
+// dots.js — JS owns all positions now
 const dots = [
-  { el: document.querySelector('.dot.green'), start: { top: 20, left: 20 }, end: { top: 80, left: 40 } },
-  { el: document.querySelector('.dot.coral'), start: { top: 40, left: 37 }, end: { top: 80, left: 80 } },
-  { el: document.querySelector('.dot.blue'),  start: { top: 45, left: 75 }, end: { top: 80, left: 60 } },
-  { el: document.querySelector('.dot.blue2'), start: { top: 74, left: 10 }, end: { top: 80, left: 20 } }
+  { el: document.querySelector('.dot.midblue'),  start: { top: 20, left: 20 }, end: { top: 80, left: 40 } },
+  { el: document.querySelector('.dot.coral'),    start: { top: 40, left: 37 }, end: { top: 80, left: 80 } },
+  { el: document.querySelector('.dot.lightblue'),start: { top: 45, left: 75 }, end: { top: 80, left: 60 } },
+  { el: document.querySelector('.dot.cobaltblue'),start:{ top: 74, left: 10 }, end: { top: 80, left: 20 } }
 ];
 
-function lerp(a, b, t) { return a + (b - a) * t; }
+const clamp01 = x => Math.max(0, Math.min(1, x));
+const lerp = (a, b, t) => a + (b - a) * t;
 
-function updateDots() {
-  // how much scroll drives the animation (tweak 0.8 to feel)
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const t = Math.min(Math.max(window.scrollY / maxScroll, 0), 1); // clamp 0..1
+function scrollFraction() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  if (max <= 0) return 0;
+  return clamp01(window.scrollY / max);
+}
 
+function applyPositions(t) {
   dots.forEach(d => {
-    d.el.style.top  = lerp(d.start.top,  d.end.top,  t) + '%';
+    d.el.style.top = lerp(d.start.top, d.end.top, t) + '%';
     d.el.style.left = lerp(d.start.left, d.end.left, t) + '%';
+    d.el.style.visibility = 'visible';
   });
 }
 
-window.addEventListener('scroll', updateDots);
-window.addEventListener('resize', updateDots);
-document.addEventListener('DOMContentLoaded', updateDots);
-function setActive(btn) {
-  lightBtn.classList.remove("active");
-  darkBtn.classList.remove("active");
-  btn.classList.add("active");
+function onUpdate() {
+  applyPositions(scrollFraction());
 }
 
-lightBtn.addEventListener("click", () => {
-  body.classList.remove("dark");
-  localStorage.setItem("theme", "light");
-  setActive(lightBtn);
+document.addEventListener('DOMContentLoaded', () => {
+  onUpdate();
+  window.addEventListener('scroll', onUpdate, { passive: true });
+  window.addEventListener('resize', onUpdate);
 });
-
-darkBtn.addEventListener("click", () => {
-  body.classList.add("dark");
-  localStorage.setItem("theme", "dark");
-  setActive(darkBtn);
-});
-
-// On load, highlight correct icon
-if (savedTheme === "dark") setActive(darkBtn);
-else setActive(lightBtn);

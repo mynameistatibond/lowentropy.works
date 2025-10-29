@@ -6,12 +6,13 @@
   --clr-bg: #ffffff;
   --clr-text: #000000;
   --clr-divider: #1a1a1a;
+  --clr-cobalt:#0800ff;
 
   /* Accent Colors (dots) */
   --clr-midblue: #82acff;
   --clr-coral: #ffa998;
   --clr-lightblue: #b0bef4;
-  --clr-cobaltblue: #5076ff;
+  --clr-brightblue: #5076ff;
 }
 
 /* Light Theme */

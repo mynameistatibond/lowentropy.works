@@ -12,6 +12,14 @@ html {
 }
 
 
+body {
+  opacity: 0;
+  transition: opacity 0.7s ease-out;
+}
+
+body.ready {
+  opacity: 1;
+}
 
 body {
   font-family: "Shippori Mincho B1", serif;
@@ -26,9 +34,6 @@ body {
   transition: background-color 2s ease, color 2s ease;
 }
 
-body.loading {
-  overflow: hidden;
-}
 
 main {
   min-height: 150vh;

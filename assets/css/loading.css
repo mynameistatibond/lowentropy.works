@@ -1,37 +1,37 @@
 /* =========================================
-   Loading Overlay
+   Loader Overlay
 ========================================= */
 
-.loader {
+#loader {
   position: fixed;
   inset: 0;
-  background: var(--clr-bg);
+  background: var(--clr-cobalt);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
+  padding-bottom: 2.5rem; /* adjust to taste */
+  color: white;
+  font-family: "Shippori Mincho B1", serif;
+  font-size: 1.5;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   z-index: 9999;
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.7s ease;
+  transform: translateY(0);
+  transition:
+    transform 2s cubic-bezier(.19,1,.22,1),
+    opacity 2s ease-in-out;
 }
 
-/* hiding animation */
-.loader.hide {
+#loader.hide {
+  transform: translateY(-100%);
   opacity: 0;
-  pointer-events: none;
 }
 
-/* spinner */
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid currentColor;
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  color: var(--clr-text);
+.loader-symbol {
+  opacity: 1;
+  animation: loaderFadeIn 0.8s ease forwards 0.5s;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes loaderFadeIn {
+  to { opacity: 1; }
 }

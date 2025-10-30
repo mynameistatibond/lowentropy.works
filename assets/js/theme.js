@@ -1,7 +1,9 @@
 // ===== THEME LOGIC =====
 
-// Reference <html> element
-const root = document.documentElement;
+// Reference <body> element (fallback to <html> if body isn't available)
+// The CSS in this project targets body[data-theme="..."], so apply the
+// attribute to the body to ensure styles are picked up.
+const root = document.body || document.documentElement;
 
 // Buttons (if missing on a page, fail silently)
 const lightBtn = document.querySelector(".light-switcher");

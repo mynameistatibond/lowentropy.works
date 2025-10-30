@@ -1,3 +1,6 @@
+
+
+
 // dots.js — JS owns all positions now
 const dots = [
   { el: document.querySelector('.dot.midblue'),  start: { top: 20, left: 20 }, end: { top: 80, left: 40 } },

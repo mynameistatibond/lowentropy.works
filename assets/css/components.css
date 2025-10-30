@@ -215,20 +215,4 @@
 
 .rabbit-hole-link:hover { opacity: 0.6; }
 
-/* =========================================
-   Components: Floating Link
-========================================= */
 
-.entropy-fish-link {
-  position: absolute;
-  bottom: 0.8rem;
-  right: 2rem;
-  font-size: 0.75rem;
-  text-decoration: none;
-  color: var(--clr-text);
-}
-
-.entropy-fish-link:hover {
-  opacity: 1;
-  text-decoration: none;
-}

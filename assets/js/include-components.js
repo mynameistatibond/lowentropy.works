@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const map = {
     header: `${base}/assets/components/header.html`,
     footer: `${base}/assets/components/footer.html`,
-    'theme-switcher': `${base}/assets/components/theme-switcher.html`
+    'theme-switcher': `${base}/assets/components/theme-switcher.html`,
+    blank: `${base}/assets/components/blank.html`
   };
 
   await Promise.all([...targets].map(async (el) => {

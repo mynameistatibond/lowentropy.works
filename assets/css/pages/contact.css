@@ -114,7 +114,13 @@ header {
   opacity: 0.7;
 }
 
+/* =========================================
+   Footer: Not displayed on Contact page
+========================================= */
 
+footer {
+  display: none;
+}
 
 
 html, body {
@@ -123,23 +129,30 @@ html, body {
 }
 
 
-/* =========================================
-   Animation for theme switchher
-========================================= */
 
 
 
-@keyframes glowPulse {
-  0% { text-shadow: 0 0 0px currentColor; }
-  50% {
-    text-shadow:
-      0 0 4px currentColor,
-      0 0 10px currentColor,
-      0 0 25px currentColor;
-  }
-  100% { text-shadow: 0 0 0px currentColor; }
+/* Neutralize global defaults inside the tight grid */
+.contact-panel h1,
+.contact-panel h2,
+.contact-panel h3,
+.contact-panel h4 {
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.theme-toggle button.glow {
-  animation: glowPulse 0.8s ease-in-out 3;
+.contact-panel p {
+  margin-bottom: 0.5rem;
+}
+
+.contact-panel ul {
+  padding-left: 0;
+  margin-bottom: 0.5rem;
+}
+
+.contact-panel li {
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
 }

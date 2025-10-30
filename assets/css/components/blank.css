@@ -1,0 +1,153 @@
+/* =========================================
+   Blank State Component
+========================================= */
+
+.blank-state {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 220px); /* header + footer allowance */
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Orbit container */
+.blank-orbits {
+  position: relative; /* IMPORTANT: creates rotation center */
+  width: 800px;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+.orbit-2 {
+  transform: translateY(28px) rotate(9deg);
+}
+
+.orbit-3 {
+  transform: translateY(10px) rotate(-5deg);
+}
+
+.orbit-4 {
+  transform: translateY(45px) rotate(-23deg);
+}
+
+/* Orbiting glyphs */
+.glyph {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.75;
+  user-select: none;
+  z-index: 2;
+}
+
+/* Animations */
+@keyframes orbitOuter {
+  from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+
+@keyframes orbitInner {
+  from { transform: rotate(0deg) translateX(110px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(110px) rotate(-360deg); }
+}
+
+@keyframes orbitHello {
+  from { transform: rotate(0deg) translateX(248px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+}
+
+@keyframes orbitOneMore {
+  from { transform: rotate(0deg) translateX(320px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(404px) rotate(-360deg); }
+}
+
+@keyframes orbitSugar {
+  from { transform: rotate(0deg) translateX(480px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(520px) rotate(-360deg); }
+}
+
+
+/* Animation assignments */
+.g1 { animation: orbitOuter 24s linear infinite; animation-delay: -6s; }
+.g7 { animation: orbitOuter 27s linear infinite; animation-delay: -16s; }
+.g8 { animation: orbitOuter 24s linear infinite; animation-delay: -18s; }
+
+.g2 { animation: orbitInner 18s linear infinite; animation-delay: -4s; }
+.g4 { animation: orbitInner 23s linear infinite; animation-delay: -12s; }
+.g5 { animation: orbitInner 31s linear infinite; animation-delay: -10s; }
+
+
+
+.g3 { animation: orbitHello  18s linear infinite; animation-delay: -8s; }
+.g6 { animation: orbitHello  17s linear infinite; animation-delay: -2s; }
+.g9 { animation: orbitHello 25s linear infinite; animation-delay: -20s; }
+.g14 { animation: orbitHello 35s linear infinite; animation-delay: -6s; }
+
+
+
+.g10 { animation: orbitOneMore 33s linear infinite; animation-delay: -15s; }
+.g11 { animation: orbitOneMore 39s linear infinite; animation-delay: -25s; }
+.g12 { animation: orbitOneMore 19s linear infinite; animation-delay: -18s; }
+.g13 { animation: orbitOneMore 50s linear infinite; animation-delay: -10s; }
+.g15 { animation: orbitOneMore 43s linear infinite; animation-delay: -21s; }
+
+
+.g16 { animation: orbitSugar 33s linear infinite; animation-delay: -15s; }
+.g17 { animation: orbitSugar 29s linear infinite; animation-delay: -25s; }
+.g18 { animation: orbitSugar 41s linear infinite; animation-delay: -22s; }
+.g19 { animation: orbitSugar 57s linear infinite; animation-delay: -30s;}
+
+
+
+
+/* Inner content stack */
+.blank-inner {
+  max-width: 42ch;
+  z-index: 3; /* above everything */
+}
+
+.blank-inner h1 {
+  font-size: 1.3rem;
+  -webkit-text-stroke: 0.2px currentColor;
+  margin-bottom: 0.6rem;
+}
+
+.blank-inner p {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  opacity: 0.8;
+}
+
+
+
+
+.glyph {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.75;
+  user-select: none;
+  z-index: 2;
+}
+
+
+
+/* Cursor wake particles */
+.cursor-dot {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  background-color: var(--clr-text);
+  opacity: 0;
+  z-index: 9999;
+  transition:
+    transform 0.3s ease,
+    opacity 0.6s ease;
+}
+

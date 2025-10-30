@@ -11,10 +11,12 @@
     <link rel="stylesheet" href="assets/css/layout.css" />
     <link rel="stylesheet" href="assets/css/components.css" />
     <link rel="stylesheet" href="assets/css/animations.css" />
-    <link rel="stylesheet" href="assets/css/pages-home.css" />
     <link rel="stylesheet" href="assets/css/loading.css" />
-    <link rel="stylesheet" href="/assets/css/components/header.css">
     <link rel="stylesheet" href="assets/css/components/header.css">
+    <link rel="stylesheet" href="assets/css/components/footer.css">
+    <link rel="stylesheet" href="assets/css/pages-home.css" />
+
+
 
     
 
@@ -29,7 +31,7 @@
     <link rel="icon" type="image/png" href="assets/favicons/regular_128.png" />
 </head>
 
-<body class="loading">
+<body class="loading home">
 
   <!-- Loader -->
 <div id="loader">
@@ -50,7 +52,7 @@
 
 
   <!-- Main -->
-  <main>
+  <main class="home">
     <section class="hero">
       <h1>Building order in intelligent systems.</h1>
       <p>【AI STRATEGY】『PRODUCT & DATA』〈ETHICAL GOVERNANCE〉</p>
@@ -241,13 +243,8 @@
   </main>
 
   <!-- Footer -->
-  <footer>
-    <div class="divider"></div>
-    <p>© 2025 Tatiana Bondarenko - 0→1 design, code & content</p>
-    <a class="entropy-fish-link" href="https://lowentropy.works/highentropyfish" target="_blank" rel="noopener">
-      high entropy fish ⋊⋉
-    </a>
-  </footer>
+  <div data-include="footer"></div>
+
 
   <!-- Scripts -->
   <script src="assets/js/dots.js" defer></script>

@@ -1,19 +1,170 @@
 /* =========================================
-   Home Page: Floating Color Dots
+   Home Page: Typography Protection Layer
+   Preserves original component look
 ========================================= */
 
-.dot {
-  position: fixed;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  opacity: 0.8;
-  z-index: 0;
-  transition: top 0.5s ease-out, left 0.5s ease-out;
-  visibility: hidden;
+.home h1,
+.home h2,
+.home h3,
+.home h4,
+.home p,
+.home ul {
+  margin-bottom: 0;
+  padding-left: 0;
+  font-weight: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  -webkit-text-stroke: 0;
 }
 
-.dot.midblue     { background: var(--clr-midblue); }
-.dot.coral       { background: var(--clr-coral); }
-.dot.lightblue   { background: var(--clr-lightblue); }
-.dot.brightblue  { background: var(--clr-brightblue); }
+/* Hero ----------------------------------- */
+.home .hero h1 {
+  font-weight: 400;
+  font-size: clamp(1rem, 2vw, 2rem);
+  margin-bottom: 1.2rem;
+}
+
+.home .hero p {
+  font-family: "Inter Tight", sans-serif;
+  font-size: 0.77rem;
+  letter-spacing: 0.12em;
+}
+
+/* Content / Left Column ------------------ */
+.home .content .symbol-header {
+  font-size: 1.2rem;
+  margin: 2rem 0;
+  text-align: center;
+  max-width: 24rem;
+}
+
+.home .content .intro {
+  text-align: center;
+  font-size: 1.3rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+.home .content h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 2.4rem 0 0.4rem;
+  letter-spacing: 0.06em;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+.home .content .services-list,
+.home .content .about-list {
+  font-size: 0.9rem;
+  list-style: none;
+  max-width: 30rem;
+  line-height: 1.5;
+  margin-bottom: 0.65rem;
+}
+
+/* Artifacts ------------------------------- */
+.home .artifact-feed {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.home .artifact-section + .artifact-section {
+  margin-top: 2.2rem;
+}
+
+.home .artifact-section h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.8rem;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+.home .artifact-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home .artifact-section li {
+  display: grid;
+  align-items: center;
+  grid-template-columns: auto 1fr auto;
+  padding: 0.45rem 0;
+  border-bottom: 0.5px solid var(--clr-divider);
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+
+.home .artifact-section li:hover { opacity: 0.6; }
+
+.home .artifact-section .date {
+  opacity: 0.65;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.home .artifact-section li span:last-child {
+  text-align: right;
+}
+
+/* Recommended Signals Table --------------- */
+.home .section-note {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  margin-top: -0.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.home .signal-table {
+  width: 100%;
+  font-size: 0.78rem;
+}
+
+.home .signal-header {
+  display: grid;
+  grid-template-columns: 0.9fr 2.2fr 2.3fr;
+  opacity: 1;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.4rem;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+.home .signal-header span:last-child {
+  text-align: right;
+}
+
+.home .signal-table ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home .signal-table li {
+  display: grid;
+  grid-template-columns: 0.9fr 2.2fr 2.2fr;
+  border-bottom: 0.5px solid var(--clr-divider);
+  padding: 0.45rem 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.home .signal-table li:hover {
+  opacity: 0.75;
+}
+
+.home .signal-table .col-source {
+  opacity: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.home .signal-table .col-note {
+  opacity: 1;
+}

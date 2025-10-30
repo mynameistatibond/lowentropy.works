@@ -1,0 +1,135 @@
+/* =========================================
+   Layout: Header
+========================================= */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.2rem 2rem;
+  border-bottom: 0.5px solid var(--clr-divider);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  background: var(--clr-bg);
+  letter-spacing: 0.15em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: background-color 2s ease, color 2s ease, border-color 2s ease;
+}
+
+header .left,
+header .center,
+header .right {
+  flex: 1;
+}
+
+header .left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+header .center { text-align: center; }
+header .right { text-align: right; }
+
+
+/* =========================================
+   Components: Header Links for LinkedIn, Email and Pages
+========================================= */
+
+header a {
+  text-decoration: none;
+  color: var(--clr-text);
+  display: inline-block;
+  line-height: 1.6;
+  font-feature-settings: "liga" off;
+}
+
+header a:hover { opacity: 0.6; }
+
+/* =========================================
+   Components: Brand Name + Theme Toggle
+========================================= */
+
+.brand {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+
+.theme-toggle button {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+}
+
+
+
+.theme-toggle .separator {
+  font-size: 2rem;
+}
+
+.light-switcher.active,
+.dark-switcher.active {
+  opacity: 0.3;
+}
+
+
+
+/* Make brand clickable but aesthetically identical */
+.brand-home {
+  text-decoration: none;
+  color: var(--clr-text);
+  cursor: pointer;
+  transition: opacity 0.25s ease, text-shadow 0.3s ease;
+}
+
+/* Hover glow like the libutton */
+.brand-home:hover {
+  opacity: 1;
+  text-shadow: 0 0 10px currentColor;
+}
+
+
+/* Force brighter glow in dark mode */
+[data-theme="dark"] .brand-home:hover {
+  text-shadow:
+    0 0 6px currentColor,
+    0 0 14px currentColor,
+    0 0 28px currentColor;
+}
+
+
+
+
+/* =========================================
+   Animation for theme switchher
+========================================= */
+
+
+
+@keyframes glowPulse {
+  0% { text-shadow: 0 0 0px currentColor; }
+  50% {
+    text-shadow:
+      0 0 4px currentColor,
+      0 0 10px currentColor,
+      0 0 25px currentColor;
+  }
+  100% { text-shadow: 0 0 0px currentColor; }
+}
+
+.theme-toggle button.glow {
+  animation: glowPulse 0.8s ease-in-out 3;
+}

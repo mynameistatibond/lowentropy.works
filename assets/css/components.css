@@ -1,3 +1,50 @@
+/* =========================================
+   Components: Header Links for LinkedIn, Email and Pages
+========================================= */
+
+header a {
+  text-decoration: none;
+  color: var(--clr-text);
+  display: inline-block;
+  line-height: 1.6;
+  font-feature-settings: "liga" off;
+}
+
+header a:hover { opacity: 0.6; }
+
+/* =========================================
+   Components: Brand Name + Theme Toggle
+========================================= */
+
+.brand {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.theme-toggle button {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+}
+
+.theme-toggle .separator {
+  font-size: 2rem;
+}
+
+.light-switcher.active,
+.dark-switcher.active {
+  opacity: 0.3;
+}
 
 /* =========================================
    Components: Hero Text - Building order in intelligent systems and subtext
@@ -85,17 +132,29 @@
   margin: 0;
 }
 
+/* Keep original layout */
 .artifact-section li {
   display: grid;
   align-items: center;
   grid-template-columns: auto 1fr auto;
-  padding: 0.45rem 0;
+  padding: 0.1rem 0;
+  line-height: 0.85;  
   border-bottom: 0.5px solid var(--clr-divider);
-  cursor: pointer;
+  border-bottom-width: 0.1px; 
   transition: opacity 0.25s ease;
 }
 
-.artifact-section li:hover { opacity: 0.6; }
+/* Make entire row clickable */
+.artifact-section li > a {
+  display: contents; /* critical magic */
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.artifact-section li:hover {
+  opacity: 0.6;
+}
 
 .artifact-section .date {
   opacity: 0.65;
@@ -103,6 +162,8 @@
   font-variant-numeric: tabular-nums;
   text-align: left;
 }
+
+/* Right-align the last column */
 .artifact-section li span:last-child {
   text-align: right;
 }
@@ -115,7 +176,7 @@
 
 .section-note {
   font-size: 0.68rem;
-  opacity: 0.75;
+  opacity: 1;
   margin-top: -0.2rem;
   margin-bottom: 0.8rem;
 }
@@ -128,13 +189,14 @@
 .signal-header {
   display: grid;
   grid-template-columns: 0.9fr 2.2fr 2.3fr;
-  opacity: 1;
+  opacity: 0.75;
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: 0.4rem;
   -webkit-text-stroke: 0.2px currentColor;
 }
+
 .signal-header span:last-child {
   text-align: right;
 }
@@ -145,6 +207,7 @@
   margin: 0;
 }
 
+/* original layout stays */
 .signal-table li {
   display: grid;
   grid-template-columns: 0.9fr 2.2fr 2.2fr;
@@ -154,19 +217,28 @@
   cursor: pointer;
 }
 
+/* whole row clickable */
+.signal-table li > a {
+  display: contents; /* preserves exact grid layout */
+  text-decoration: none;
+  color: inherit;
+}
+
 .signal-table li:hover {
   opacity: 0.75;
 }
 
 .signal-table .col-source {
-  opacity: 1;
+  opacity: 0.75;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
 
 .signal-table .col-note {
-  opacity: 1;
+  opacity: 0.75;
+  text-align: right;
 }
+
 
 
 
@@ -214,5 +286,31 @@
 }
 
 .rabbit-hole-link:hover { opacity: 0.6; }
+
+/* =========================================
+   Components: Floating Link
+========================================= */
+
+.entropy-fish-link {
+  position: absolute;
+  bottom: 0.8rem;
+  right: 2rem;
+  font-size: 0.75rem;
+  text-decoration: none;
+  color: var(--clr-text);
+}
+
+.entropy-fish-link:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+
+
+
+
+
+
+
 
 

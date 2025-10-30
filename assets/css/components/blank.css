@@ -136,7 +136,7 @@
 
 
 
-/* Cursor wake particles */
+/* Cursor wake particles 
 .cursor-dot {
   position: fixed;
   width: 6px;
@@ -149,5 +149,16 @@
   transition:
     transform 0.3s ease,
     opacity 0.6s ease;
-}
+}*/
 
+
+
+/* Cursor wake trail canvas */
+
+
+#cursor-trail {
+  position: fixed;
+  inset: 0;
+  pointer-events: none !important;
+  z-index: 5 !important;
+}

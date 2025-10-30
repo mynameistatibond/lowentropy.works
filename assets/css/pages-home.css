@@ -34,10 +34,10 @@
 }
 
 /* palette (adjust if your theme needs other colors) */
-.dot.midblue   { background: #8ea7ff; }
-.dot.coral     { background: #ff7f73; }
-.dot.lightblue { background: #cfe2ff; }
-.dot.brightblue{ background: #7da6ff; }
+.dot.midblue   { background: #b4b4b4; }
+.dot.coral     { background: #e6e6e6; }
+.dot.lightblue { background: #d2d2d2; }
+.dot.brightblue{ background: #666666; }
 
 
 

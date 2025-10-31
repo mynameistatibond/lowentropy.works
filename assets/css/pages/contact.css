@@ -1,118 +1,136 @@
 
+
+
+html, body { height: auto; overflow: auto; }
+
 header {
   position: static !important;
 }
+
+
 
 /* =========================================
    Layout: Contact Page Specific
 ========================================= */
 
+/* fallback header height, works even if you don't set the var elsewhere */
+:root { --header-h: 60px; }  /* adjust after you eyeball it */
 
-.quadrant-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
+.quadrant-grid{
+  position: relative;              /* not absolute */
   width: 100vw;
-  height: 100vh;
+  min-height: calc(100vh - (var(--header-h)*2));
+  height: auto;
+  /*margin-top: var(--header-h);     /* sits below the header */
 
   display: grid;
-  grid-template-columns: 70vw 30vw;
-  grid-template-rows: 50vh 50vh;
+  grid-template-columns: 60vw 40vw;
+  grid-template-rows: minmax(40vh, 1fr) auto;  /* top flexible, bottom grows to content */
+  margin: 0; 
+  padding: 0; 
 }
+
+
+
+
 
 /* Optional: slight border lines for structure */
 .quadrant-grid div {
   border: none;
 }
 
-/* -- Typography of contacts --  */
 
 
 
-/* Typography balance */
-.contact-panel h1 {
-  font-size: 0.9rem;
+
+
+
+
+/* =========================================
+   Styles: Contact Page Specific
+========================================= */
+
+
+
+/* ── Contact block typography ───────────────────────────── */
+
+.q4{
+  margin-top: 2.2rem;
+  margin-left: 1.4rem;
+}
+
+/* Title */
+.contact-panel h1{
+  font-size: clamp(1.35rem, 1.1rem + 0.6vw, 1.6rem);
+  line-height: 1.2;
+  font-size: 1.3rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
+  letter-spacing: .02em;
+  margin: 0 0 .8rem 0;
   -webkit-text-stroke: 0.2px currentColor;
 }
 
-.contact-sub {
-  font-size: 0.8rem;
-  line-height: 1.3;
-  opacity: 0.8;
-  margin-bottom: 1.2rem;
-  max-width: 22ch;
+/* Subhead */
+.contact-sub{
+  font-size: .75rem;
+  line-height: 1.35;
+  opacity: .8;
+  margin-bottom: 1.4rem;
 }
 
-/* List tightened and minimal */
-.contact-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1rem 0;
-}
-
-.contact-list li {
-  margin: 0.15rem 0;
-  line-height: 1.1;
-}
-
-.contact-list a {
-  font-size: 0.85rem;
+/* Links */
+.contact-panel ul{ padding-left: 0; margin: 0 0 .6rem 0; }
+.contact-list{ list-style: none; padding: 0; margin: 0 0 .6rem 0; }
+.contact-list li{ margin: .25rem 0; line-height: 1.25; }
+.contact-list a{
+  font-size: .9rem;
   text-decoration: none;
   color: var(--clr-text);
 }
+.contact-list a:hover{ opacity: .6; }
 
-.contact-list a:hover {
-  opacity: 0.6;
-}
-
-/* Newsletter button refined */
-.libutton {
+/* Newsletter CTA */
+.libutton{
   display: inline-flex;
-  justify-content: center;
   align-items: center;
-  padding: 5px 10px;
-  margin: 0.5rem 0 1rem 0;
-  border-radius: 14px;
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
+  justify-content: center;
+  padding: 6px 12px;
+  margin: .9rem 0 1rem 0;
+  border-radius: 12px;
+  font-size: .78rem;
+  letter-spacing: .05em;
   border: 1px solid var(--clr-divider);
   background: var(--clr-bg);
   color: var(--clr-text);
   text-decoration: none;
-  transition: opacity 0.25s ease, text-shadow 0.3s ease;
-  width: auto;
+  transition: opacity .25s ease, text-shadow .3s ease;
 }
-
-.libutton:hover {
-  opacity: 0.7;
+.libutton:hover{
+  opacity: .7;
   text-shadow: 0 0 10px currentColor;
 }
-
-/* Force brighter glow in dark mode */
-[data-theme="dark"] .libutton:hover {
-  text-shadow:
-    0 0 6px currentColor,
-    0 0 14px currentColor,
-    0 0 28px currentColor;
+[data-theme="dark"] .libutton:hover{
+  text-shadow: 0 0 6px currentColor, 0 0 14px currentColor, 0 0 28px currentColor;
 }
 
-/* Subtle metadata */
-.location {
-  opacity: 0.5;
-  font-size: 0.7rem;
-  margin-bottom: 0.8rem;
+/* Meta */
+.location{
+  font-size: .78rem;
+  opacity: .62;
+  margin: .6rem 0 .4rem 0;
 }
-
-.note {
-  font-size: 0.75rem;
+.note{
+  font-size: .75rem;
   line-height: 1.35;
-  max-width: 24ch;
-  opacity: 0.7;
+  opacity: .72;
+  margin-top: 1rem;
 }
+
+
+
+
+
+
 
 /* =========================================
    Footer: Not displayed on Contact page
@@ -123,36 +141,61 @@ footer {
 }
 
 
-html, body {
+
+
+
+
+
+
+/* =========================================
+   Components: Voronoi Breathe Background
+========================================= */
+
+.voronoi-breathe{
+  position: relative;
+  width: 100%;
   height: 100%;
   overflow: hidden;
+
+  /* theme vars */
+  --v-width: 0.9px;
+  --v-stroke:  #5d5d5d;
 }
 
-
-
-
-
-/* Neutralize global defaults inside the tight grid */
-.contact-panel h1,
-.contact-panel h2,
-.contact-panel h3,
-.contact-panel h4 {
-  margin-bottom: 0.4rem;
-  font-size: 0.9rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+/* SVG fills container and clips edges so strokes don't touch frame */
+.voronoi-breathe svg{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  clip-path: inset(calc(var(--v-width, 2px) + 1px));
+  border: none; outline: none;
 }
 
-.contact-panel p {
-  margin-bottom: 0.5rem;
+/* Cells: IMPORTANT — give them the gradient fill here */
+.voronoi-breathe path{
+  fill: url(#cellShade) !important;   /* <-- ensures gradient is used */
+  stroke: var(--v-stroke);
+  stroke-width: var(--v-width);
+  vector-effect: non-scaling-stroke;
+  color: var(--v-shade);               /* currentColor for gradient stops */
+  opacity: .4;
 }
 
-.contact-panel ul {
-  padding-left: 0;
-  margin-bottom: 0.5rem;
+/* Dark theme */
+[data-theme="dark"] .voronoi-breathe{
+  --v-stroke: rgb(216, 216, 216);
 }
 
-.contact-panel li {
-  margin-bottom: 0.2rem;
-  line-height: 1.2;
-}
+/* Layout hygiene */
+.q1, .voronoi-breathe{ border: none; outline: none; }
+.quadrant-grid{ gap: 0; }
+
+
+
+
+
+
+
+
+
+

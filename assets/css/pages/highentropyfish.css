@@ -1,3 +1,12 @@
+/* TEMP SMOKE TEST */
+html::before {
+  content: "highentropyfish.css LOADED";
+  position: fixed; inset: 8px auto auto 8px;
+  font: 12px/1.2 monospace;
+  background: #000; color: #fff; padding: 4px 6px; z-index: 99999;
+}
+
+
 html, body {
   margin: 0;
   padding: 0;

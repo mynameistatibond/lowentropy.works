@@ -1,50 +1,4 @@
-/* =========================================
-   Components: Header Links for LinkedIn, Email and Pages
-========================================= */
 
-header a {
-  text-decoration: none;
-  color: var(--clr-text);
-  display: inline-block;
-  line-height: 1.6;
-  font-feature-settings: "liga" off;
-}
-
-header a:hover { opacity: 0.6; }
-
-/* =========================================
-   Components: Brand Name + Theme Toggle
-========================================= */
-
-.brand {
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-}
-
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-top: 0.2rem;
-}
-
-.theme-toggle button {
-  font-size: 1.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: inherit;
-}
-
-.theme-toggle .separator {
-  font-size: 2rem;
-}
-
-.light-switcher.active,
-.dark-switcher.active {
-  opacity: 0.3;
-}
 
 /* =========================================
    Components: Hero Text - Building order in intelligent systems and subtext
@@ -286,28 +240,6 @@ header a:hover { opacity: 0.6; }
 }
 
 .rabbit-hole-link:hover { opacity: 0.6; }
-
-/* =========================================
-   Components: Floating Link
-========================================= */
-
-.entropy-fish-link {
-  position: absolute;
-  bottom: 0.8rem;
-  right: 2rem;
-  font-size: 0.75rem;
-  text-decoration: none;
-  color: var(--clr-text);
-}
-
-.entropy-fish-link:hover {
-  opacity: 1;
-  text-decoration: none;
-}
-
-
-
-
 
 
 

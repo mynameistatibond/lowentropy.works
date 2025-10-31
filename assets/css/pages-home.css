@@ -19,27 +19,6 @@
 
 
 
-/* Floating Colored Dots — home only */
-.dot {
-  position: fixed;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  opacity: 0.85;
-  pointer-events: none;        /* never block links */
-  z-index: 1;                  /* below content (content is usually auto/2+) */
-  transform: translateZ(0);    /* GPU hint */
-  will-change: top, left, transform, opacity;
-  visibility: hidden;          /* JS will set to visible after first position */
-}
-
-/* palette (adjust if your theme needs other colors) */
-.dot.midblue   { background: #b4b4b4; }
-.dot.coral     { background: #e6e6e6; }
-.dot.lightblue { background: #d2d2d2; }
-.dot.brightblue{ background: #666666; }
-
-
 
 
 
@@ -194,3 +173,60 @@
 .home .signal-table .col-note {
   opacity: 1;
 }
+
+/* Signals: make the entire row the hit-area */
+.home .signal-table li > a{
+  display: contents;            /* preserves the grid layout, stretches hit-area */
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.home .signal-table { position: relative; z-index: 2; }
+
+
+
+
+
+
+
+/* --- Floating dots: always behind, never steal clicks --- */
+
+
+/* Floating Colored Dots — home only */
+.dot {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  opacity: 0.85;
+  pointer-events: none;        /* never block links */
+  transform: translateZ(0);    /* GPU hint */
+  will-change: top, left, transform, opacity;
+  visibility: hidden;          /* JS will set to visible after first position */
+}
+
+/* palette (adjust if your theme needs other colors) */
+.dot.midblue   { background: #b4b4b4; }
+.dot.coral     { background: #e6e6e6; }
+.dot.lightblue { background: #d2d2d2; }
+.dot.brightblue{ background: #666666; }
+
+
+
+
+.dot,
+.dots, .dots::before, .dots::after { 
+  pointer-events: none !important;
+}
+
+.dots {                 /* if your JS creates a wrapper; safe even if missing */
+  position: fixed;
+  inset: 0;
+  z-index: 0;          /* behind everything */
+}
+
+.dot {
+  position: fixed;
+  z-index: 0;          /* was 1 → push further back */
+}
+

@@ -1,24 +1,37 @@
+// include-components.js (load with `defer`)
 document.addEventListener('DOMContentLoaded', async () => {
-  // detect if current page is inside /pages/
-  const isPages = window.location.pathname.includes('/pages/');
-  const base = isPages ? '..' : '.';
+  // Use root-absolute paths so it works from anywhere
+  const ROOT = '/';
 
-  const targets = document.querySelectorAll('[data-include]');
+  // Known components; you can still pass a full URL in data-include
   const map = {
-    header: `${base}/assets/components/header.html`,
-    footer: `${base}/assets/components/footer.html`,
-    'theme-switcher': `${base}/assets/components/theme-switcher.html`,
-    blank: `${base}/assets/components/blank.html`
+    header:         `${ROOT}assets/components/header.html`,
+    footer:         `${ROOT}assets/components/footer.html`,
+    'theme-switcher': `${ROOT}assets/components/theme-switcher.html`,
+    blank:          `${ROOT}assets/components/blank.html`,
   };
 
-  await Promise.all([...targets].map(async (el) => {
-    const key = el.getAttribute('data-include');
-    const url = map[key];
-    if (!url) return;
-    const res = await fetch(url, { cache: 'no-cache' });
-    el.outerHTML = await res.text();
+  const targets = [...document.querySelectorAll('[data-include]')];
 
-// notify that components changed
-document.dispatchEvent(new Event('componentsLoaded'));
+  await Promise.all(targets.map(async el => {
+    try {
+      let spec = el.getAttribute('data-include').trim();
+
+      // Allow absolute/URL specs or map keys or fallback to /assets/components/<name>.html
+      const url = spec.startsWith('/') || spec.startsWith('http')
+        ? spec
+        : (map[spec] ?? `${ROOT}assets/components/${spec}.html`);
+
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
+      const html = await res.text();
+      el.outerHTML = html;             // Note: replaces the element (any listeners on it are lost)
+    } catch (err) {
+      console.warn('Include failed:', err);
+    }
   }));
+
+  // Fire once when all includes are done
+  document.dispatchEvent(new Event('componentsLoaded'));
 });

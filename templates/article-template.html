@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+    <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Low Entropy Works — AI & Data Strategy</title>
+
+        <!-- Styles -->
+            <link rel="stylesheet" href="../assets/css/base.css">
+            <link rel="stylesheet" href="../assets/css/theme.css">
+            <link rel="stylesheet" href="../assets/css/layout.css">
+            <link rel="stylesheet" href="../assets/css/loading.css">
+            <link rel="stylesheet" href="../assets/css/plotly.css">
+            <link rel="stylesheet" href="../assets/css/pages/article-template.css">
+            <link rel="stylesheet" href="../assets/css/components/header.css">
+            <link rel="stylesheet" href="../assets/css/components/footer.css">
+            
+
+
+
+
+
+
+
+            <!-- Fonts -->
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+            <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+            rel="stylesheet"/>
+
+            <!-- Favicon -->
+            <link rel="icon" type="image/png" href="../assets/favicons/regular_128.png" />
+    </head>
+
+<body class="loading">
+
+        <!-- Loader -->
+        <div id="loader">
+
+        </div>
+
+
+        <!-- Header -->
+        <div data-include="header"></div>
+
+
+
+
+
+        <main class="article">
+
+          <article class="article-shell">
+            <div class="article-hero">
+              <p class="article-eyebrow">Case Study · 2025-02</p>
+              <h1 class="article-title">Context-Aware Onboarding Flows</h1>
+              <p class="article-summary">Designing an onboarding that adapts to user language, intent, and momentum—without nagging or noise.</p>
+            </div>
+
+            <div class="rule"> . . . </div>
+
+            <section class="article-body">
+              <h2>Why this matters</h2>
+              <p>Most onboarding flows treat attention as infinite. We used lightweight signals—language, scroll intent, and action density—to offer the next helpful step only when it would be welcome.</p>
+
+              <figure>
+                <img src="../assets/bg/fish.png" alt="Wireframe of adaptive onboarding">
+                <figcaption>Early wireframe exploration. The prompt nudges appear only when intent is low.</figcaption>
+              </figure>
+
+              <h2>Signals → decisions</h2>
+              <p>We mapped inputs to small state transitions. Think of it like a thermostat for attention: don’t blast heat, maintain comfort.</p>
+
+              <pre><code>// tiny state sketch
+                  const signals = { lang: 'de', idleMs: 4200, clicks: 1 };
+                  const state = { step: 'collect_profile', nudge: null };
+
+                  if (signals.idleMs &gt; 3500)       state.nudge = 'tooltip';
+                  if (signals.clicks &gt; 3)          state.nudge = null;          // user is moving
+                  if (signals.lang === 'de')        state.locale = 'de-DE';       // route copy
+                </code></pre>
+
+              <div class="quote">“Onboarding shouldn’t shout. It should harmonize with the user’s current tempo.”</div>
+
+
+
+              <h2>Outcome snapshot</h2>
+                <p class="lede">The funnel below is a synthetic preview…</p>
+
+                <div class="plot-box">
+                  <div class="plotly surface" data-src="demo:line" data-height="340"></div>
+                </div>
+
+                <div class="plot-box">
+                  <div class="plotly" data-src='[{"type":"bar","x":["A","B","C"],"y":[3,6,4]}]' data-modebar="false"></div>
+                </div>
+
+                <div class="plot-box">
+                  <div class="plotly" data-src="/assets/articles/my-post/chart1.json"></div>
+                </div>
+
+                <div class="plotly" data-src='[
+                  {"type":"scatter","mode":"lines+markers","x":[0,1,2,3],"y":[0,1,0.8,1.6]},
+                  {"type":"scatter","mode":"lines+markers","x":[0,1,2,3],"y":[0.2,0.9,1.1,1.8]},
+                  {"type":"bar","x":["A","B","C"],"y":[3,6,4]},
+                  {"type":"bar","x":["A","B","C"],"y":[2,5,7]}
+                ]'></div>
+
+
+
+
+
+              <h3>Implementation notes</h3>
+              <ul>
+                <li>Kept all prompts under 14 words.</li>
+                <li>Localized first; animated later.</li>
+                <li>Logged drop-off with reasons, not just counts.</li>
+              </ul>
+            </section>
+
+            <div class="rule"></div>
+
+            <footer class="article-meta">
+              <span class="tag">#onboarding</span>
+              <span class="tag">#i18n</span>
+              <span class="tag">#behavior</span>
+            </footer>
+          </article>
+
+
+
+
+
+
+
+
+
+
+
+        </main>
+
+
+
+
+
+
+
+        <!-- Footer -->
+
+        <div data-include="footer"></div>
+
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="../assets/js/loading.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+    <script src="../assets/js/plotly-bootstrap.js" defer></script>
+    <script src="../assets/js/include-components.js"></script>
+
+    
+    </body>
+</html>

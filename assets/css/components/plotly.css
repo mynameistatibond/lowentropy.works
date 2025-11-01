@@ -1,0 +1,37 @@
+/* Plotly — minimal, theme-aware */
+
+/* Plotly text font */
+:root { --plot-font: var(--font-body, "Shippori Mincho B1", serif); }
+
+/* Container: currentColor is the trace tint */
+.plotly, [data-plotly]{
+  position: relative;
+  min-height: 260px;
+  color: var(--plot-trace);                 /* <-- JS reads this as trace color */
+  background: transparent;
+  border: 1px solid var(--plot-axis);
+  border-radius: 8px;
+  padding: 4px;
+  overflow: hidden;
+  transition: border-color .25s ease, background .25s ease;
+}
+
+/* Optional soft panel bg if you add class="plotly surface" */
+.plotly.surface { background: var(--plot-surface); }
+
+/* Modebar */
+.plotly .modebar{ filter: opacity(.8); transition: filter .2s ease; }
+.plotly:hover .modebar{ filter: opacity(1); }
+.plotly[data-modebar="false"] .modebar{ display: none !important; }
+
+/* Small screens */
+@media (max-width: 830px){
+  .plotly{ min-height: 220px; border-radius: 6px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .plotly.is-loading::after{ animation: none; }
+}
+
+

@@ -20,6 +20,10 @@ body[data-theme="light"] {
   --clr-bg: #ffffff;
   --clr-text: #000000;
   --clr-divider: #1a1a1a;
+  --plot-font: 'Shippori Mincho B1', serif;
+  --plot-axis: #000000;
+  --plot-grid: #000000c3;
+  --plot-trace: #000000af;
 }
 
 /* Dark Theme */
@@ -27,4 +31,14 @@ body[data-theme="dark"] {
   --clr-bg: #0800ff;
   --clr-text: #ffffff;
   --clr-divider: #ffffff66;
+  --plot-font: 'Shippori Mincho B1', serif;
+  --plot-axis: #ffffff;
+  --plot-grid: #ffffffc3;
+  --plot-trace: #ffffffaf;
 }
+
+
+
+
+
+

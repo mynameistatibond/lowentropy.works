@@ -1,7 +1,8 @@
-// ===== THEME LOGIC =====
+// ===== THEME LOGIC (with HTML/Body sync) =====
 
-// Reference <body> (fallback to <html>)
-const root = document.body || document.documentElement;
+// Reference both <html> and <body>
+const html = document.documentElement;
+const body = document.body;
 
 // System preference
 const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -12,8 +13,14 @@ const savedTheme = localStorage.getItem("theme");
 // Pick initial theme
 let initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
 
-// Apply to <body>/<html>
-root.setAttribute("data-theme", initialTheme);
+// Apply to BOTH html and body for CSS variable inheritance
+function setTheme(theme) {
+  html.setAttribute("data-theme", theme);
+  body.setAttribute("data-theme", theme);
+  console.log('Theme set to:', theme); // Debug
+}
+
+setTheme(initialTheme);
 
 // Small glow pulse
 function triggerGlow(btn) {
@@ -31,10 +38,10 @@ function setActive(btn, lightBtn, darkBtn) {
   btn.classList.add("active");
 }
 
-// core binding logic
+// Core binding logic
 function initThemeButtons() {
   const lightBtn = document.querySelector(".light-switcher");
-  const darkBtn  = document.querySelector(".dark-switcher");
+  const darkBtn = document.querySelector(".dark-switcher");
 
   // Bail if header not yet injected
   if (!lightBtn || !darkBtn) return;
@@ -48,35 +55,38 @@ function initThemeButtons() {
 
   // Light click
   lightBtn.addEventListener("click", () => {
-    const current = root.getAttribute("data-theme");
+    const current = body.getAttribute("data-theme");
 
     if (current === "light") {
       triggerGlow(darkBtn);
       return;
     }
 
-    root.setAttribute("data-theme", "light");
+    setTheme("light");
     localStorage.setItem("theme", "light");
     setActive(lightBtn, lightBtn, darkBtn);
   });
 
   // Dark click
   darkBtn.addEventListener("click", () => {
-    const current = root.getAttribute("data-theme");
+    const current = body.getAttribute("data-theme");
 
     if (current === "dark") {
       triggerGlow(lightBtn);
       return;
     }
 
-    root.setAttribute("data-theme", "dark");
+    setTheme("dark");
     localStorage.setItem("theme", "dark");
     setActive(darkBtn, lightBtn, darkBtn);
   });
 }
 
-// run when DOM ready
+// Run when DOM ready
 document.addEventListener("DOMContentLoaded", initThemeButtons);
 
-// run when components get injected
+// Run when components get injected
 document.addEventListener("componentsLoaded", initThemeButtons);
+
+
+

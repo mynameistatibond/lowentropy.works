@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Insurance Claims Fraud Detection — Data Preprocessing Report</title>
+
+    <!-- Styles (mirror article template structure) -->
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/loading.css">
+    <link rel="stylesheet" href="../assets/css/pages/article-template.css">
+    <link rel="stylesheet" href="../assets/css/components/header.css">
+    <link rel="stylesheet" href="../assets/css/components/footer.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/favicons/regular_128.png" />
+  </head>
+
+  <body class="loading">
+    <!-- Loader -->
+    <div id="loader"></div>
+
+    <!-- Header include -->
+    <div data-include="header"></div>
+
+    <main class="article">
+      <article class="article-shell">
+        <div class="article-hero">
+          <p class="article-eyebrow">Data Science · 2025-11-03</p>
+          <h1 class="article-title">Insurance Claims Fraud Detection — Data Preprocessing Report</h1>
+          <p class="article-summary">
+            This report documents the comprehensive preprocessing pipeline applied to the insurance claims dataset
+            (1,000 records, 40 original features). The pipeline converts raw inputs into a clean, model‑ready dataset
+            while preserving and enhancing fraud signals through targeted feature engineering and rigorous data quality controls.
+          </p>
+        </div>
+
+        <div class="rule"> . . . </div>
+
+        <section class="article-body">
+          <h2>Executive Summary</h2>
+          <p class="lede">
+            The dataset was cleaned, standardized, and enriched with domain‑aligned features (temporal structure,
+            claim composition, vehicle age, and time‑of‑day cycles). We removed identifiers and artifacts, encoded missingness,
+            and validated the integrity of critical targets and features. The result is a compact, information‑dense table designed
+            for downstream fraud modeling.
+          </p>
+
+          <h2>1. Data Loading &amp; Initial Assessment</h2>
+
+          <h3>1.1 Dataset Characteristics</h3>
+          <ul>
+            <li><strong>Original Size:</strong> 1,000 rows × 40 columns</li>
+            <li><strong>Memory Usage:</strong> ~1.28 MB (in‑memory friendly)</li>
+            <li><strong>Data Types:</strong> mixed numerical (≈17) and categorical (≈21)</li>
+            <li><strong>Target Variable:</strong> <code>fraud_reported</code> (Y/N → binary indicator)</li>
+          </ul>
+
+          <h3>1.2 Initial Data Quality Issues</h3>
+          <ul>
+            <li>Empty CSV artifact column (<code>_c39</code>) with 100% missing values</li>
+            <li>Placeholder tokens (<code>"?"</code>) in categorical fields</li>
+            <li>Mixed casing/whitespace in text columns</li>
+            <li>Negative values in <code>umbrella_limit</code> (domain violation)</li>
+            <li>High‑cardinality quasi‑identifiers (e.g., near‑unique ZIPs/locations)</li>
+          </ul>
+
+          <h2>2. Data Cleaning &amp; Quality Assurance</h2>
+
+          <h3>2.1 Structural Cleanup</h3>
+          <ul>
+            <li><strong>Removed empty column:</strong> dropped <code>_c39</code> (CSV export artifact).</li>
+            <li><strong>Normalized missing values:</strong> converted <code>"?"</code> → <code>NaN</code> in <code>collision_type</code>, <code>property_damage</code>, <code>police_report_available</code>.</li>
+          </ul>
+
+          <h3>2.2 Text Standardization</h3>
+          <ul>
+            <li>Trimmed leading/trailing whitespace across all text columns.</li>
+            <li>Normalized case for categorical values (consistent tokens).</li>
+            <li>Audited other missing representations (NA/NULL/None).</li>
+          </ul>
+
+          <h3>2.3 Domain Logic Enforcement</h3>
+          <ul>
+            <li><strong>Umbrella coverage:</strong> fixed negatives via absolute value on <code>umbrella_limit</code>.</li>
+            <li><strong>Target encoding:</strong> mapped <code>fraud_reported</code> Y/N → <code>{1,0}</code> with compact integer type.</li>
+          </ul>
+
+          <h2>3. Feature Engineering</h2>
+
+          <h3>3.1 Temporal Features</h3>
+          <ul>
+            <li><strong>Date parsing:</strong> converted <code>policy_bind_date</code> and <code>incident_date</code> to datetime.</li>
+            <li><strong>Policy duration:</strong> <code>days_since_bind</code> (incident date − bind date).</li>
+            <li><strong>Calendar signals:</strong> <code>incident_month</code>, <code>incident_dow</code> (0=Mon), <code>incident_weekend</code> (binary).</li>
+            <li><strong>Removed constant:</strong> dropped <code>incident_year</code> (all 2015).</li>
+          </ul>
+
+          <h3>3.2 Claim Amount Composition</h3>
+          <p>
+            Explored multiple representations (component totals vs. shares). Selected total + component shares to retain scale
+            while capturing composition:
+          </p>
+          <ul>
+            <li><code>injury_share = injury_claim / total_claim_amount</code></li>
+            <li><code>property_share = property_claim / total_claim_amount</code></li>
+            <li>Protected against division by zero (NaN handling).</li>
+          </ul>
+
+          <h3>3.3 Vehicle Information</h3>
+          <ul>
+            <li><strong>Vehicle age:</strong> <code>vehicle_age = 2015 − auto_year</code>.</li>
+            <li>Dropped raw <code>auto_year</code> after derivation to avoid redundancy.</li>
+          </ul>
+
+          <h3>3.4 Time‑of‑Day Cyclic Encoding</h3>
+          <ul>
+            <li><code>hour_sin = sin(2π × hour/24)</code>, <code>hour_cos = cos(2π × hour/24)</code>.</li>
+            <li>Added 4 interpreter‑friendly buckets: Night (0–5), Morning (6–11), Afternoon (12–17), Evening (18–23).</li>
+          </ul>
+
+          <h2>4. High‑Cardinality &amp; Quasi‑Identifier Management</h2>
+
+          <h3>4.1 Column Removal Strategy</h3>
+          <ul>
+            <li>Dropped identifiers/quasi‑identifiers: <code>policy_number</code>, <code>incident_location</code>, <code>insured_zip</code>.</li>
+            <li>Removed raw date columns post‑feature‑extraction.</li>
+          </ul>
+
+          <h3>4.2 Cardinality Analysis</h3>
+          <p>
+            Retained genuinely grouped categoricals with reasonable uniqueness ratios:
+            <code>auto_model</code> (~39 cats), <code>insured_hobbies</code> (~20 cats), <code>auto_make</code>, <code>insured_occupation</code> (~14 cats each).
+          </p>
+
+          <h2>5. Missing Value Treatment</h2>
+
+          <h3>5.1 Strategy</h3>
+          <p>
+            Treated missingness as potentially informative (common in fraud settings). Key columns with notable absence:
+            <code>collision_type</code>, <code>authorities_contacted</code>, <code>property_damage</code>, <code>police_report_available</code>.
+          </p>
+
+          <h3>5.2 Two‑Pronged Approach</h3>
+          <ul>
+            <li><strong>Missing flags:</strong> binary <code>_missing</code> indicators.</li>
+            <li><strong>Explicit category:</strong> filled <code>NaN</code> with <code>"Missing"</code> to ensure encoder compatibility.</li>
+          </ul>
+
+          <h2>6. Final Dataset Composition</h2>
+
+          <h3>6.1 Model‑Ready Feature Set</h3>
+          <ul>
+            <li><strong>Total features:</strong> ~38 columns (net of drops + engineering)</li>
+            <li><strong>Numerical:</strong> ~20 (incl. engineered)</li>
+            <li><strong>Categorical:</strong> ~18 (incl. time buckets)</li>
+            <li><strong>Target:</strong> binary <code>target</code> (fraud indicator)</li>
+          </ul>
+
+          <h3>6.2 Data Integrity Checks</h3>
+          <ul>
+            <li>Validated <code>target ∈ {0,1}</code>.</li>
+            <li>Confirmed completeness for <code>total_claim_amount</code>, share features, <code>days_since_bind</code>, and temporal encodings.</li>
+          </ul>
+
+          <h3>6.3 Memory Optimization</h3>
+          <ul>
+            <li>Down‑cast to compact numerics (<code>int8</code>, <code>int32</code>) where safe.</li>
+            <li>Kept object dtype only for true categoricals.</li>
+          </ul>
+
+          <h2>7. Key Preprocessing Decisions &amp; Rationale</h2>
+
+          <h3>7.1 Feature Selection Philosophy</h3>
+          <ul>
+            <li><strong>Removed:</strong> identifiers, near‑constant, and redundant columns.</li>
+            <li><strong>Retained:</strong> genuine categorical groupings with interpretable cardinality.</li>
+            <li><strong>Enhanced:</strong> temporal intelligence, claim composition, and vehicle age.</li>
+          </ul>
+
+          <h3>7.2 Missing Data Strategy</h3>
+          <ul>
+            <li>Captured absence explicitly (flags + category).</li>
+            <li>Reflected domain reality that missingness itself can be a fraud signal.</li>
+          </ul>
+
+          <h3>7.3 Engineering Priorities</h3>
+          <ul>
+            <li><strong>Interpretability:</strong> human‑readable buckets alongside mathematical transforms.</li>
+            <li><strong>Signal preservation:</strong> ratios + totals to keep scale and composition.</li>
+            <li><strong>Temporal patterns:</strong> duration and cyclic encodings.</li>
+          </ul>
+          <h2 id="feature-dictionary">Appendix: Feature Dictionary</h2>
+            <div class="table-scroll">
+              <table id="feature-dict" class="feature-dict"></table>
+            </div>
+
+          <h2>8. Next Steps for Modeling</h2>
+          <ol>
+            <li><strong>Categorical encoding:</strong> One‑Hot / Target / Frequency (evaluate per model family).</li>
+            <li><strong>Scaling:</strong> standardize numerics for linear models (within pipeline only).</li>
+            <li><strong>Train‑test split:</strong> stratified by target to respect class imbalance.</li>
+            <li><strong>Metrics focus:</strong> precision‑recall curves, PR‑AUC, and F<sub>2</sub> for recall‑weighted scenarios.</li>
+          </ol>
+        </section>
+
+        <div class="rule"></div>
+
+        <footer class="article-meta">
+          <span class="tag">#fraud-detection</span>
+          <span class="tag">#preprocessing</span>
+          <span class="tag">#feature-engineering</span>
+          <span class="tag">#ml</span>
+        </footer>
+      </article>
+    </main>
+
+    <!-- Footer include -->
+    <div data-include="footer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+    <script src="../assets/js/loading.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/include-components.js"></script>
+
+    <script>
+(function(){
+  // --- Adjust this path if you keep the original file name with spaces ---
+  // Recommended (renamed file):
+  const CSV_PATH = '../assets/data/feature_dictionary.csv';
+  // If you keep the original: const CSV_PATH = '../assets/data/Feature%20Dictionary%20-%20ChatGPT.csv';
+
+  // Minimal table styling (uses your CSS vars if present)
+  const style = document.createElement('style');
+  style.textContent = `
+    .table-scroll{overflow:auto;border:1px solid var(--plot-grid,#e5e7eb);border-radius:12px}
+    .feature-dict{width:100%;border-collapse:collapse;font-size:0.95rem}
+    .feature-dict th,.feature-dict td{padding:.6rem .8rem;border-bottom:1px solid var(--plot-grid,#e5e7eb);text-align:left;vertical-align:top}
+    .feature-dict thead th{position:sticky;top:0;background:var(--plot-surface,var(--clr-bg,#fff));z-index:1}
+    .feature-dict tbody tr:nth-child(odd){background:color-mix(in srgb, var(--plot-surface,#0000) 85%, transparent)}
+  `;
+  document.head.appendChild(style);
+
+  // Render helper
+  function renderTable(rows) {
+    const table = document.getElementById('feature-dict');
+    if (!table || !rows || !rows.length) return;
+
+    // Sort by first column (usually "feature" or similar)
+    const cols = Object.keys(rows[0]);
+    rows.sort((a,b) => (a[cols[0]]||'').localeCompare(b[cols[0]]||''));
+
+    // Build thead
+    const thead = table.createTHead();
+    const trh = thead.insertRow();
+    cols.forEach(c=>{
+      const th = document.createElement('th');
+      th.textContent = c;
+      trh.appendChild(th);
+    });
+
+    // Build tbody
+    const tbody = table.createTBody();
+    rows.forEach(r=>{
+      const tr = tbody.insertRow();
+      cols.forEach(c=>{
+        const td = tr.insertCell();
+        const val = (r[c] ?? '').toString().trim();
+
+        // Tiny enhancement: highlight the feature name column
+        if (c.toLowerCase().includes('feature') || c.toLowerCase()==='name') {
+          const strong = document.createElement('strong');
+          strong.textContent = val;
+          td.appendChild(strong);
+        } else {
+          td.textContent = val;
+        }
+      });
+    });
+  }
+
+  // Load CSV via d3
+  if (typeof d3 === 'undefined') {
+    console.warn('d3 not found. Include d3 before this script.');
+    return;
+  }
+  d3.csv(CSV_PATH).then(renderTable).catch(err=>{
+    console.error('Feature dictionary load failed:', err);
+  });
+})();
+</script>
+
+  </body>
+</html>

@@ -1,85 +1,136 @@
-
-
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-    <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Low Entropy Works — AI & Data Strategy</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Studies — Low Entropy Works</title>
 
-        <!-- Styles -->
-            <link rel="stylesheet" href="../assets/css/base.css">
-            <link rel="stylesheet" href="../assets/css/theme.css">
-            <link rel="stylesheet" href="../assets/css/layout.css">
-            <link rel="stylesheet" href="../assets/css/loading.css">
-            <link rel="stylesheet" href="../assets/css/components/header.css">
-            <link rel="stylesheet" href="../assets/css/components/footer.css">
-            <link rel="stylesheet" href="../assets/css/components/blank.css">
+  <!-- Styles: same stack as home (note ../ paths) -->
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/theme.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/animations.css" />
+  <link rel="stylesheet" href="../assets/css/loading.css" />
+  <link rel="stylesheet" href="../assets/css/components/header.css" />
+  <link rel="stylesheet" href="../assets/css/components/footer.css" />
+  <link rel="stylesheet" href="../assets/css/pages-home.css" />
+  <link rel="icon" type="image/png" href="../assets/favicons/regular_128.png" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
 
+<body class="loading home">
+  <!-- Loader -->
+  <div id="loader"><div class="loader-symbol">ŁѺ𝔚 Σ𐌍ŦȐΘℙΨ</div></div>
 
+  <!-- Header include -->
+  <div data-include="header"></div>
 
+  <main class="home">
+    <!-- Hero (kept minimal) -->
+    <section class="hero" style="height:auto; padding:2rem 0 0.5rem; margin: 4rem 0 6rem;">
+      <h1>Case studies: disciplined systems, measurable outcomes.</h1>
+      <p>Framing → constraints → decisions → outcomes.</p>
+    </section>
 
+    <section class="content">
+      <!-- Left column: explainer -->
+      <div class="col-left-about">
+  <div class="entropy-intro">
+    <p class="symbol-header">ŁѺ𝔚 Σ𐌍ŦȐΘℙΨ</p>
+    <p class="intro">
+      Curated product systems and ML work. Short, scan-friendly, and explicit about trade-offs.
+      The goal is low-entropy execution: predictable behavior from probabilistic systems.
+    </p>
+  </div>
 
-            <!-- Fonts -->
-            <link rel="preconnect" href="https://fonts.googleapis.com" />
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-            <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
-            rel="stylesheet"/>
+  <h3>Principles</h3>
+  <ul class="services-list">
+    <li>Signal over noise: only what changes decisions.</li>
+    <li>Trade-offs stated: precision/recall → real costs.</li>
+    <li>Privacy by design: mask → infer → re-inject.</li>
+    <li>Reality > slides: shipped constraints included.</li>
+  </ul>
 
-            <!-- Favicon -->
-            <link rel="icon" type="image/png" href="../assets/favicons/regular_128.png" />
-    </head>
+  <h3>Working state</h3>
+  <p class="about-list">
+    This library is a living document. New studies are added and older ones refined.
+    Some links may point to in-progress placeholders while the system evolves.
+  </p>
+</div>
 
-<body class="loading">
+      <!-- Center column: lists (identical structure to home) -->
+      <div class="col-center-artifacts">
+        <div class="artifact-feed">
 
-        <!-- Loader -->
-        <div id="loader">
-            <div class="loader-symbol">ŁѺ𝔚 Σ𐌍ŦȐΘℙΨ</div>
+          <div class="artifact-section">
+            <h4>Product Systems</h4>
+            <ul>
+              <li>
+                <a href="/pages/conversational_ai.html">
+                  <span class="date">2025-02</span>
+                  <span>Conversational AI — Building the World’s Smartest Translation Layer</span>
+                </a>
+              </li>
+              <li>
+                <a href="/pages/blank_page_reuse.html">
+                  <span class="date">2024-12</span>
+                  <span>Native Bridge (Intercom) — Real-Time Multilingual Support</span>
+                </a>
+              </li>
+              <li>
+                <a href="/pages/blank_page_reuse.html">
+                  <span class="date">2024-11</span>
+                  <span>Privacy-Preserving PII Pipeline — Mask → Infer → Re-inject</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="artifact-section">
+            <h4>Data Science & ML</h4>
+            <ul>
+              <li>
+                <a href="/pages/insurance_preprocessing_report.html">
+                  <span class="date">2025-11</span>
+                  <span>Insurance Fraud Detection — Data Preprocessing Report</span>
+                </a>
+              </li>
+              <li>
+                <a href="/pages/blank_page_reuse.html">
+                  <span class="date">2025-11</span>
+                  <span>Fraud Modeling — Baselines, PR-AUC, Threshold Tuning</span>
+                </a>
+              </li>
+              <li>
+                <a href="/pages/blank_page_reuse.html">
+                  <span class="date">2025-12</span>
+                  <span>Interpretability — SHAP Audits & Bias/Fairness Checks</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
         </div>
+      </div>
 
+      <!-- Right glyph column (symbol-hover.js targets this) -->
+      <div class="col-right-symbols">
+        <div class="symbols-panel"><span class="symbol">⋮</span></div>
+      </div>
+    </section>
+  </main>
 
-        <!-- Header -->
-        <div data-include="header"></div>
+  <!-- Footer include -->
+  <div data-include="footer"></div>
 
-
-        <main class="project">
-            <div data-include="blank"></div>
-        </main>
-
-
-        <!-- Footer -->
-
-        <div data-include="footer"></div>
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Cursor wake trail (canvas) -->
-<canvas id="cursor-trail"></canvas>
-
-
-
-
-
-    <script src="../assets/js/loading.js"></script>
-    <script src="../assets/js/theme.js"></script>
-    <script src="../assets/js/include-components.js"></script>
-    <script src="../assets/js/cursor-trail.js"></script>
-
-    
-    </body>
+  <!-- Scripts (same order as home; note ../ paths) -->
+  <script src="../assets/js/theme.js" defer></script>
+  <script src="../assets/js/loading.js" defer></script>
+  <script src="../assets/js/symbol-hover.js" defer></script>
+  <script src="../assets/js/include-components.js"></script>
+</body>
 </html>

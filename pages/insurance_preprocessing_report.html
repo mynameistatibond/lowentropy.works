@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../assets/css/theme.css">
     <link rel="stylesheet" href="../assets/css/layout.css">
     <link rel="stylesheet" href="../assets/css/loading.css">
+    <link rel="stylesheet" href="../assets/css/plotly.css" />
     <link rel="stylesheet" href="../assets/css/pages/article-template.css">
     <link rel="stylesheet" href="../assets/css/components/header.css">
     <link rel="stylesheet" href="../assets/css/components/footer.css">
@@ -52,6 +53,13 @@
             and validated the integrity of critical targets and features. The result is a compact, information‑dense table designed
             for downstream fraud modeling.
           </p>
+
+            <!-- Executive Summary: class balance -->
+            <figure>
+              <div id="plot-class-balance" class="plotly" data-src="demo:bar"></div>
+              <figcaption>Target balance after preprocessing (class imbalance matters for fraud).</figcaption>
+            </figure>
+
 
           <h2>1. Data Loading &amp; Initial Assessment</h2>
 
@@ -103,6 +111,31 @@
             <li><strong>Removed constant:</strong> dropped <code>incident_year</code> (all 2015).</li>
           </ul>
 
+
+              <pre><code># Core transforms (excerpt)
+              df['umbrella_limit'] = df['umbrella_limit'].abs()  # domain fix
+              df['target'] = df['fraud_reported'].map({'Y':1,'N':0}).astype('int8')
+
+              # Temporal
+              df['policy_bind_date'] = pd.to_datetime(df['policy_bind_date'])
+              df['incident_date'] = pd.to_datetime(df['incident_date'])
+              df['days_since_bind'] = (df['incident_date'] - df['policy_bind_date']).dt.days
+              df['incident_month'] = df['incident_date'].dt.month
+              df['incident_dow'] = df['incident_date'].dt.weekday
+              df['incident_weekend'] = (df['incident_dow'] >= 5).astype('int8')
+
+              # Claim composition
+              total = df['total_claim_amount'].replace(0, np.nan)
+              df['injury_share']   = df['injury_claim']   / total
+              df['property_share'] = df['property_claim'] / total
+
+              # Vehicle & hour cyclic
+              df['vehicle_age'] = 2015 - df['auto_year']
+              h = df['incident_hour_of_the_day']
+              df['hour_sin'] = np.sin(2*np.pi*h/24)
+              df['hour_cos'] = np.cos(2*np.pi*h/24)</code></pre>
+
+
           <h3>3.2 Claim Amount Composition</h3>
           <p>
             Explored multiple representations (component totals vs. shares). Selected total + component shares to retain scale
@@ -125,6 +158,20 @@
             <li><code>hour_sin = sin(2π × hour/24)</code>, <code>hour_cos = cos(2π × hour/24)</code>.</li>
             <li>Added 4 interpreter‑friendly buckets: Night (0–5), Morning (6–11), Afternoon (12–17), Evening (18–23).</li>
           </ul>
+
+
+          <!-- 3.4 Time-of-Day -->
+            <figure>
+              <div id="plot-hour-buckets" class="plotly" data-src="demo:bar"></div>
+              <figcaption>Incidents by 4 time-of-day buckets (Night / Morning / Afternoon / Evening).</figcaption>
+            </figure>
+
+            <figure>
+              <div id="plot-hour-cyclic" class="plotly" data-src="demo:line" data-height="320"></div>
+              <figcaption>Cyclic encoding shows continuity of hour-of-day on the unit circle (sin/cos).</figcaption>
+            </figure>
+
+
 
           <h2>4. High‑Cardinality &amp; Quasi‑Identifier Management</h2>
 
@@ -163,6 +210,14 @@
             <li><strong>Categorical:</strong> ~18 (incl. time buckets)</li>
             <li><strong>Target:</strong> binary <code>target</code> (fraud indicator)</li>
           </ul>
+
+
+            <!-- 6.1 Feature mix -->
+            <figure>
+              <div id="plot-feature-types" class="plotly" data-src="demo:bar"></div>
+              <figcaption>Final mix of numerical vs categorical vs engineered features.</figcaption>
+            </figure>
+
 
           <h3>6.2 Data Integrity Checks</h3>
           <ul>
@@ -226,11 +281,48 @@
     <div data-include="footer"></div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+   <!-- Core site scripts -->
+        <script src="../assets/js/loading.js"></script>
+        <script src="../assets/js/theme.js"></script>
+        <script src="../assets/js/include-components.js"></script>
 
-    <script src="../assets/js/loading.js"></script>
-    <script src="../assets/js/theme.js"></script>
-    <script src="../assets/js/include-components.js"></script>
+        <!-- Plotly + YOUR bootstrap -->
+        <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+        <script src="../assets/js/plotly-bootstrap.js" defer></script>
+
+
+
+<script>
+window.addEventListener('load', () => {
+  Plotly.d3.csv('../assets/data/insurance_claims_preprocessed.csv', (err, rows) => {
+    if (err) { console.error('CSV load error:', err); return; }
+
+    // Compute class counts from the real dataset
+    const fraud = rows.filter(r => +r.target === 1).length;
+    const notFraud = rows.length - fraud;
+
+    // Replace the demo bar chart with the actual balance
+    Plotly.react('plot-class-balance', [{
+      type: 'bar',
+      x: ['Not Fraud', 'Fraud'],
+      y: [notFraud, fraud],
+      marker: { color: getComputedStyle(document.documentElement)
+                  .getPropertyValue('--plot-trace') || '#30343F' }
+    }], {
+      title: 'Target Balance',
+      xaxis: { title: 'Class' },
+      yaxis: { title: 'Count' },
+      font: { family: 'Shippori Mincho B1' },
+      plot_bgcolor: 'rgba(0,0,0,0)',
+      paper_bgcolor: 'rgba(0,0,0,0)'
+    });
+  });
+});
+</script>
+
+
+
+
 
     <script>
 (function(){
@@ -298,6 +390,11 @@
   });
 })();
 </script>
+
+
+
+
+
 
   </body>
 </html>

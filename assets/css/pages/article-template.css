@@ -2,23 +2,27 @@
    Article Layout & Components
 ========================================= */
 
+/* Shared layout variables (one rail for folds + ledgers) */
+:root{
+  --fold-gutter: 1.35rem;   /* fixed column for the fold marker (›) */
+  --ledger-k-min: 14ch;     /* min width of the left label column   */
+  --ledger-k-max: 22ch;     /* max width of the left label column   */
+  --ledger-gap:   1rem;     /* gap between label and value          */
+  --ledger-marg:  1rem;     /* vertical margin around ledger groups */
+}
+
 .article {
   max-width: 46rem;
   margin: 0 auto;
   padding: 2rem 1.2rem 4rem;
 }
 
-.article-shell {
-  width: 100%;
-}
+.article-shell { width: 100%; }
 
 /* =========================================
    Article Hero
 ========================================= */
-
-.article-hero {
-  margin-bottom: 2rem;
-}
+.article-hero { margin-bottom: 2rem; }
 
 .article-eyebrow {
   font-size: 0.8rem;
@@ -47,7 +51,6 @@
 /* =========================================
    Article Body
 ========================================= */
-
 .article-body {
   font-size: 0.85rem;
   line-height: 1.65;
@@ -96,9 +99,7 @@
 }
 
 /* Figures */
-.article-body figure {
-  margin: 2rem 0;
-}
+.article-body figure { margin: 2rem 0; }
 
 .article-body figure img {
   width: 100%;
@@ -127,33 +128,62 @@
   opacity: 0.9;
 }
 
-/* Lists */
-.article-body ul {
-  margin: 1.2rem 0;
-  padding-left: 1.5rem;
-}
-
-.article-body li {
-  margin-bottom: 0.5rem;
-  line-height: 1.6;
-}
+/* Default lists (unchanged; for simple bullets) */
+.article-body ul { margin: 1.2rem 0; padding-left: 1.5rem; }
+.article-body li { margin-bottom: 0.5rem; line-height: 1.6; }
 
 /* =========================================
    Rule Divider
 ========================================= */
-
 .rule {
- font-size: 2rem;
- text-align: center;
- color: var(--clr-text);
- opacity: 0.4;
- margin: 0rem;
+  font-size: 2rem;
+  text-align: center;
+  color: var(--clr-text);
+  opacity: 0.4;
+  margin: 0;
 }
+
+/* Figures/inline helpers */
+.viz-placeholder{
+  position:relative;
+  border:1px dashed var(--plot-grid,#cbd5e1);
+  border-radius:14px;
+  min-height:180px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:1rem 0;
+  background:color-mix(in srgb, var(--plot-surface, #dfdfdf) 92%, transparent)
+}
+.viz-placeholder svg{ width:100%; height:100%; border-radius:14px }
+.viz-placeholder figcaption{
+  position:absolute; inset:auto 0 .5rem 0;
+  text-align:center; font-size:.9rem; color:var(--muted,#6b7280)
+}
+.inline-kpi{
+  display:inline-flex; gap:.5rem; align-items:baseline;
+  background:color-mix(in srgb, var(--plot-surface,#b8b8b8) 85%, transparent);
+  padding:.1rem .4rem; border-radius:.6rem;
+}
+
+.article-body table{ width:100%; border-collapse:collapse }
+.article-body th,.article-body td{
+  padding:.65rem .8rem; border-bottom:1px solid var(--plot-grid,#e5e7eb);
+  text-align:left; vertical-align:top
+}
+blockquote{
+  border-left:3px solid var(--plot-grid,#e5e7eb);
+  padding:.6rem 1rem; margin:1rem 0;
+  background:color-mix(in srgb, var(--plot-surface,#fff) 92%, transparent)
+}
+code, pre code{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace
+}
+.cta{ font-weight:600; margin-top:1.5rem }
 
 /* =========================================
    Article Meta / Footer
 ========================================= */
-
 .article-meta {
   display: flex;
   gap: 0.6rem;
@@ -169,31 +199,221 @@
   opacity: 0.75;
   transition: opacity 0.2s ease;
 }
+.tag:hover { opacity: 1; }
 
-.tag:hover {
-  opacity: 1;
+/* =========================================
+   Folds (details/summary) — unified left rail
+========================================= */
+details.fold > summary::-webkit-details-marker{ display:none; }
+details.fold > summary{
+  list-style:none;
+  display:flex;
+  align-items:baseline;
+  gap:.6rem;
+  padding:.35rem 0;
+  margin:0;
 }
+details.fold > summary::before{
+  content:"›";
+  opacity:.6;
+  flex:0 0 var(--fold-gutter); /* fixed marker column */
+  transform:translateY(.05em) rotate(0deg);
+  transition:transform .18s ease;
+}
+details.fold[open] > summary::before{ transform:translateY(.05em) rotate(90deg); }
+
+/* Body of the fold starts exactly under the summary text */
+details.fold .fold-body{
+  margin:.6rem 0 0 0;
+  padding-left: var(--fold-gutter);
+}
+
+/* =========================================
+   Ledger (lists + blocks) — single system
+========================================= */
+
+/* UL-based ledger */
+.article-body ul.ledger{
+  list-style:none;
+  margin: var(--ledger-marg) 0;
+  padding:0;
+}
+.article-body ul.ledger li{
+  display:grid;
+  grid-template-columns: minmax(var(--ledger-k-min), var(--ledger-k-max)) 1fr;
+  column-gap: var(--ledger-gap);
+  align-items:start;
+  margin:.5rem 0;
+  line-height:1.55;
+}
+
+/* DIV-based ledger (paragraph replacement) */
+.article-body .ledger-block{
+  display:grid;
+  grid-template-columns: minmax(var(--ledger-k-min), var(--ledger-k-max)) 1fr;
+  column-gap: var(--ledger-gap);
+  row-gap:.45rem;
+  margin: var(--ledger-marg) 0;
+}
+
+/* shared label/value styling */
+.article-body ul.ledger .k,
+.article-body .ledger-block .k{
+  font-weight:600;
+  letter-spacing:.003em;   /* tiny tracking so bold Mincho breathes */
+  text-wrap:balance;
+}
+.article-body ul.ledger .v,
+.article-body .ledger-block .v{
+  opacity:.92;
+  line-height:1.55;
+  word-break:normal;
+  overflow-wrap:normal;
+  hyphens:auto;
+}
+
+/* Keep ledgers inside folds aligned with the rail */
+details.fold .fold-body ul.ledger,
+details.fold .fold-body .ledger-block{ margin-left:0; }
+
+
+
+
+/* =========================================
+   Optional: Custom Glyph Bullets (opt-in)
+   Add class="sigil-*" on a <ul> to use.
+   Safe with ledgers & default lists.
+========================================= */
+
+.article-body ul.sigil-min,
+.article-body ul.sigil-cycle,
+.article-body ul.sigil-dash {
+  list-style: none;       /* kill default bullets only for these */
+  padding-left: 0;
+  margin: 1.1rem 0;
+}
+
+.article-body ul.sigil-min li,
+.article-body ul.sigil-cycle li,
+.article-body ul.sigil-dash li {
+  position: relative;
+  padding-left: 1.5rem;   /* bullet gutter */
+  margin: .4rem 0;
+  line-height: 1.6;
+}
+
+/* Default minimalist sigil (uniform) */
+.article-body ul.sigil-min li::before {
+  content: "∴";           /* pick your favorite: "Σ" "Ψ" "Ł" "✦" etc. */
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  font-size: .85rem;
+  opacity: .55;
+}
+
+/* Cycling set for gentle variety */
+.article-body ul.sigil-cycle li::before {
+  position: absolute; left: 0; top: 0.15rem; font-size: .9rem; opacity: .55;
+  content: "Σ";
+}
+.article-body ul.sigil-cycle li:nth-child(2)::before { content: "Ψ"; }
+.article-body ul.sigil-cycle li:nth-child(3)::before { content: "Ł"; }
+.article-body ul.sigil-cycle li:nth-child(4)::before { content: "Ѻ"; }
+.article-body ul.sigil-cycle li:nth-child(5)::before { content: "✦"; }
+.article-body ul.sigil-cycle li:nth-child(6)::before { content: "☽"; }
+.article-body ul.sigil-cycle li:nth-child(7)::before { content: "∴"; }
+.article-body ul.sigil-cycle li:nth-child(8)::before { content: "ℙ"; }
+.article-body ul.sigil-cycle li:nth-child(9)::before { content: "Θ"; }
+.article-body ul.sigil-cycle li:nth-child(10)::before { content: "✧"; }
+
+/* Ultra-quiet dash bullet */
+.article-body ul.sigil-dash li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  font-size: .8rem;
+  opacity: .4;
+}
+
+
+/* Single-sigil list: choose the bullet via --sigil */
+.article-body ul.sigil-list{
+  list-style: none;
+  margin: 1.1rem 0;
+  padding-left: 0;
+  --sigil: "∴";          /* fallback */
+  --sigil-size: .9rem;   /* tweak per list if needed */
+  --sigil-opacity: .55;
+  --sigil-top: .15rem;   /* vertical nudge */
+}
+
+.article-body ul.sigil-list li{
+  position: relative;
+  padding-left: 1.5rem;  /* gutter */
+  margin: .4rem 0;
+  line-height: 1.6;
+}
+
+.article-body ul.sigil-list li::before{
+  content: var(--sigil);
+  position: absolute;
+  left: 0;
+  top: var(--sigil-top);
+  font-size: var(--sigil-size);
+  opacity: var(--sigil-opacity);
+}
+
+
+
+
+
+
 
 /* =========================================
    Mobile Adjustments
 ========================================= */
-
 @media (max-width: 830px) {
-  .article {
-    padding: 1.5rem 1rem 3rem;
-  }
+  .article { padding: 1.5rem 1rem 3rem; }
+  .article-title { font-size: 1.6rem; }
+  .article-body h2 { font-size: 1.2rem; margin: 2rem 0 0.8rem; }
+  .article-body pre { padding: 1rem; font-size: 0.8rem; }
+}
 
-  .article-title {
-    font-size: 1.6rem;
+/* Ledger: mobile stacking (both types identical) */
+@media (max-width: 760px){
+  .article-body ul.ledger li,
+  .article-body .ledger-block{
+    grid-template-columns:1fr;
+    row-gap:.15rem;
   }
-
-  .article-body h2 {
-    font-size: 1.2rem;
-    margin: 2rem 0 0.8rem;
+  .article-body ul.ledger .v::before,
+  .article-body .ledger-block .v::before{
+    content:"— ";
+    opacity:.6;
   }
+}
 
-  .article-body pre {
-    padding: 1rem;
-    font-size: 0.8rem;
+
+
+/* About avatar — small, rounded, quiet */
+.avatar-circle{
+  float: right;
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: .2rem 0 .4rem 1rem; /* push off the title */
+  border: 1px solid color-mix(in srgb, var(--clr-text) 18%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--clr-text) 10%, transparent);
+}
+
+/* Stack above title on narrow viewports */
+@media (max-width: 680px){
+  .avatar-circle{
+    float: none;
+    display: block;
+    margin: 0 auto .8rem auto; /* center above title */
   }
 }

@@ -246,3 +246,77 @@
 
 
 
+/* ===== Minimal Toggles (site-wide) ===== */
+/* ==== Minimal Disclosure (site-wide) ==== */
+
+/* Container: just dividers */
+.fold {
+  border: 0;
+  margin: 1rem;
+  padding: 0;
+  border-bottom: 1px solid var(--clr-divider, rgba(0,0,0,.14));
+}
+.fold:first-of-type {
+  border-top: 1px solid var(--clr-divider, rgba(0,0,0,.14));
+}
+
+/* Summary header: flat, no box */
+.fold summary {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  padding: .7rem 0;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;                  /* same weight as your section heads */
+  letter-spacing: .005em;
+}
+.fold summary::-webkit-details-marker { display: none; }
+
+/* Chevron — thin, quiet */
+.fold summary::before {
+  content: "›";
+  transform: rotate(90deg);          /* closed chevron */
+  opacity: .45;
+  transition: transform .15s ease;
+  font-weight: 600;
+}
+.fold[open] summary::before {
+  transform: rotate(0deg);           /* open chevron */
+}
+
+/* Title inherits your typography */
+.fold .fold-title { font: inherit; }
+
+/* Body: match prose rhythm */
+.fold .fold-body {
+  padding: 0 0 .8rem 1.2rem;         /* subtle indent under the title */
+  line-height: 1.55;
+}
+.fold .fold-body > :first-child { margin-top: .25rem; }
+.fold .fold-body ul { margin: .25rem 0 .75rem 1.1rem; }
+.fold .fold-body li { margin: .2rem 0; }
+
+/* Controls as quiet inline links (no pills) */
+.fold-controls {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  margin: .75rem 0 .5rem;
+}
+.fold-controls .link-control {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--clr-text);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.fold-controls .sep { opacity: .5; user-select: none; }
+.fold-controls .link-control:hover { text-decoration: underline; }
+.fold-controls .link-control:focus-visible {
+  outline: 1px dashed var(--clr-divider, rgba(0,0,0,.35));
+  outline-offset: 2px;
+}

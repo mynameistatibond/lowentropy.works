@@ -1,84 +1,288 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-    <head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Low Entropy Works — AI & Data Strategy</title>
+    <title>About — Tatiana Bondarenko | Low Entropy Works</title>
 
-        <!-- Styles -->
-            <link rel="stylesheet" href="../assets/css/base.css">
-            <link rel="stylesheet" href="../assets/css/theme.css">
-            <link rel="stylesheet" href="../assets/css/layout.css">
-            <link rel="stylesheet" href="../assets/css/loading.css">
-            <link rel="stylesheet" href="../assets/css/components/header.css">
-            <link rel="stylesheet" href="../assets/css/components/footer.css">
-            <link rel="stylesheet" href="../assets/css/components/blank.css">
+    <!-- Styles: reuse your article template + components (for toggles) -->
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/loading.css">
+    <link rel="stylesheet" href="../assets/css/pages/article-template.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/components/header.css">
+    <link rel="stylesheet" href="../assets/css/components/footer.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/favicons/regular_128.png" />
+  </head>
+
+  <body class="loading">
+    <!-- Loader -->
+    <div id="loader"></div>
+
+    <!-- Header include -->
+    <div data-include="header"></div>
+
+    <main class="article">
+      <article class="article-shell">
+        <!-- HERO -->
+        <div class="article-hero">
+            <img
+                class="avatar-circle"
+                src="../assets/photos/avatar.jpg"
+                alt="Tatiana Bondarenko"
+                width="112" height="112"
+                loading="lazy" decoding="async"
+                />
+
+          <p class="article-eyebrow">About</p>
 
 
-
-
-
-
-            <!-- Fonts -->
-            <link rel="preconnect" href="https://fonts.googleapis.com" />
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-            <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
-            rel="stylesheet"/>
-
-            <!-- Favicon -->
-            <link rel="icon" type="image/png" href="../assets/favicons/regular_128.png" />
-    </head>
-
-<body class="loading">
-
-        <!-- Loader -->
-        <div id="loader">
-            <div class="loader-symbol">ŁѺ𝔚 Σ𐌍ŦȐΘℙΨ</div>
+          <h1 class="article-title" style="margin-top: 0.8rem;">
+            Tatiana Bondarenko <br>
+            <span class="text-md" style="opacity:.75;margin-top: 0.8rem; letter-spacing:.01em; font-size: 1.1rem;">
+            AI Product Manager · Leipzig, Germany
+            </span>
+          </h1>
+          <p class="article-summary">
+            Most AI products are high-entropy systems: unpredictable outputs, unexplainable decisions, broken trust.
+            My work focuses on the opposite - building ML that behaves with intention and ships under real-world constraints.
+          </p>
         </div>
 
+        <div class="rule"> . . . </div>
 
-        <!-- Header -->
-        <div data-include="header"></div>
+        <!-- BODY -->
+        <section class="article-body">
+          <h2>Signal Extraction from Noise</h2>
+          <p>
+            The practice: privacy-preserving architectures; multi-model orchestration; precision/recall trade-offs mapped to business costs;
+            compliance-aware AI in regulated environments. The outcome: products that work in production, not just in demos.
+          </p>
+          <p>
+            I'm Tatiana - an AI Product Manager who ships ML systems to production, optimizes models for business constraints,
+            and makes AI behave predictably in high-stakes environments.
+          </p>
 
+          
 
-        <main class="project">
-            <div data-include="blank"></div>
-        </main>
+          <ul class="sigil-list" style="--sigil:'✧'">
+            <li><strong>Current:</strong> 500h Sorbonne-accredited Data Science certification, fraud detection models, case studies.</li>
+            <li><strong>Previously:</strong> 6.5 years at Native (AI-powered B2B platform) and Emplifi (SaaS analytics).</li>
+            <li><strong>Based in:</strong> Leipzig (UTC+1)</li>
+            <li><strong>Fluent:</strong> English (C2) · German (C1) · Russian (C2)</li>
+          </ul>
 
+            <p class="cta">
+            <a class="rabbit-hole-link"
+                href="/assets/data/AI%20PM%20Tatiana%20Bondarenko%20A4.pdf"
+                target="_blank" rel="noopener">
+                ⟶  Download full CV (PDF)
+            </a>
+            - updated Nov 2025
+            </p>
 
-        <!-- Footer -->
-
-        <div data-include="footer"></div>
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Cursor wake trail (canvas) -->
-<canvas id="cursor-trail"></canvas>
-
-
-
+            <div class="rule"> . . . </div>
 
 
+          <h2>Open To</h2>
+          <ul class="sigil-list" style="--sigil:'✧'">
+            <li>AI PM roles (full-time, hybrid/remote in EU)</li>
+            <li>Fractional product leadership for 0→1 AI features</li>
+            <li>Consulting on responsible AI, model evaluation, EU AI Act</li>
+          </ul>
+          <p><strong>Best fit:</strong> Teams building real AI/ML (not wrappers). Care about privacy, compliance, and explainability. Need someone technical enough to evaluate models and strategic enough to ship.</p>
+
+            <div class="rule"> . . . </div>
+
+
+
+          <!-- Rabbit hole header -->
+          <h2>Down the rabbit hole ⋗ </h2>
+
+          <!-- Controls -->
+          <div class="fold-controls">
+            <button class="link-control" data-fold-action="open">open all</button>
+            <span class="sep">·</span>
+            <button class="link-control" data-fold-action="close">close all</button>
+          </div>
+
+          <!-- Wonderland toggles (clear labels inside) -->
+          <details class="fold">
+            <summary><span class="fold-title">“Drink Me” — Who I Am</span></summary>
+            <div class="fold-body">
+              <p>
+                I operate where product strategy meets data science. My job is to turn probabilistic systems into predictable user experiences.
+                That means insisting on measurement, designing for privacy by default, and aligning model decisions with business risk.
+              </p>
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary><span class="fold-title">“The White Rabbit” — Current Work</span></summary>
+            <div class="fold-body">
+              
+                <ul class="ledger">
+                <li><span class="k">Completing</span><span class="v">advanced ML training (ensembles, hyper-parameter tuning, MLOps fundamentals).</span></li>
+                <li><span class="k">Building</span><span class="v">production-style models and publishing case studies here.</span></li>
+                <li><span class="k">Exploring</span><span class="v">fractional product leadership & responsible-AI advisory.</span></li>
+                <li><span class="k">Available for</span><span class="v">AI PM roles, contract work, strategic consulting (EU-based, remote/hybrid).</span></li>
+                </ul>
+
+
+
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary><span class="fold-title">“Cheshire Cat” — The Approach</span></summary>
+            <div class="fold-body">
+
+                <div class="ledger-block">
+                <div class="k">Context-aware ML orchestration</div>
+                <div class="v">Not one model, the right model for the context (formality, language pair, latency/cost/accuracy constraints).</div>
+
+                <div class="k">Privacy-preserving architecture</div>
+                <div class="v">PII detection & masking pre-inference; re-injection post-translation; zero leaks in production.</div>
+
+                <div class="k">Model evaluation as product thinking</div>
+                <div class="v">Precision vs recall drives fraud costs vs false-positive pain; ROC/PR curves inform thresholds; SHAP audits what the model actually learned.</div>
+
+                <div class="k">Rapid iteration under constraints</div>
+                <div class="v">MVPs in &lt;30 days for FedRAMP-adjacent contexts; A/B threshold tests; feature-flag rollouts.</div>
+                </div>
+
+
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary><span class="fold-title">“Mad Hatter’s Table” — What’s Been Shipped</span></summary>
+            <div class="fold-body">
+              
+
+                <ul class="ledger">
+                    <li><span class="k">Multi-engine translation platform</span><span class="v">4 commercial ML providers orchestrated, 100+ languages, ~40% fewer manual overrides.</span></li>
+                    <li><span class="k">Privacy-preserving ML pipeline</span><span class="v">real-time entity masking, &lt;500&nbsp;ms latency, zero third-party PII exposure.</span></li>
+                    <li><span class="k">Product-led growth systems</span><span class="v">20× activation via Stripe automation & self-serve; 25% support-load reduction.</span></li>
+                    <li><span class="k">High-trust client enablement</span><span class="v">U.S. Air Force & SBIR orgs; GDPR/ISO/FedRAMP-adjacent compliance.</span></li>
+                    <li><span class="k">End-to-end ML</span><span class="v">insurance fraud detection (EDA → FE → SMOTE → threshold tuning → Streamlit).</span></li>
+                    <li><span class="k">This platform</span><span class="v">Vanilla JS/HTML/CSS, GitHub Actions CI/CD, custom components.</span></li>
+                </ul>
+
+
+
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary><span class="fold-title">“Looking-Glass Toolkit” — Technical Foundation</span></summary>
+            <div class="fold-body">
+
+
+                <div class="ledger-block">
+                <div class="k">500h Sorbonne-accredited DS certification</div>
+                <div class="v">(completion Dec 2025): evaluation, precision/recall optimization, FE, interpretability (SHAP), ensembles, imbalance handling, deployment.</div>
+
+                <div class="k">3.5 years AI/ML product management</div>
+                <div class="v">B2B SaaS: conversational AI, NLP feature design, multi-model orchestration, real-time inference.</div>
+
+                <div class="k">Hands-on stack</div>
+                <div class="v">Python, scikit-learn, XGBoost, pandas, SQL, PostHog, Mixpanel, Streamlit, Docker basics, GitHub Actions, REST APIs, Figma.</div>
+
+                <div class="k">Domain expertise</div>
+                <div class="v">Privacy-preserving ML, entity recognition, model monitoring, anomaly detection, A/B testing, EU AI Act thinking.</div>
+                </div>
+
+
+
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary><span class="fold-title">“Queen of Hearts” — Philosophy in Practice</span></summary>
+            <div class="fold-body">
+              
+
+                <ul class="ledger">
+                    <li><span class="k">Signal over noise</span><span class="v">cut what doesn’t matter; clarity compounds.</span></li>
+                    <li><span class="k">Structure over chaos</span><span class="v">predictable systems, unsurprising UX, unambiguous requirements.</span></li>
+                    <li><span class="k">Intention over accident</span><span class="v">thresholds and decisions have real user costs.</span></li>
+                    <li><span class="k">Execution over strategy</span><span class="v">MVPs beat perfect plans.</span></li>
+                    <li><span class="k">Ethics over velocity</span><span class="v">optimize without harming; responsible AI as structure, not theater.</span></li>
+                </ul>
+
+
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary><span class="fold-title">“Wonderland Use-Cases” — What This Enables</span></summary>
+            <div class="fold-body">
+
+
+                <div class="ledger-block">
+                <div class="k">AI/ML teams</div>
+                <div class="v">Bridge DS ↔ product; write technical PRDs; debug precision/recall trade-offs; explain decisions to non-technical stakeholders.</div>
+
+                <div class="k">0→1 launches</div>
+                <div class="v">Ship in weeks under GDPR/ISO/FedRAMP-adjacent constraints; structure ambiguity into executable plans.</div>
+
+                <div class="k">Regulated environments</div>
+                <div class="v">Privacy patterns, EU AI Act compliance thinking, zero-incident track record.</div>
+
+                <div class="k">Cross-functional leadership</div>
+                <div class="v">Coordinate distributed eng/ML/design; maintain velocity without sacrificing quality.</div>
+                </div>
+
+
+
+            </div>
+          </details>
+
+          <h3>A final note</h3>
+          <p>
+            The universe trends toward disorder. Products are pockets of order. Good AI is predictable behavior carved from probabilistic chaos.
+            Low entropy is the practice of building systems that work — and don’t make the world worse. That’s the work.
+          </p>
+        </section>
+
+        <div class="rule"></div>
+
+        <footer class="article-meta">
+          <span class="tag">#about</span>
+          <span class="tag">#ai-product</span>
+          <span class="tag">#responsible-ai</span>
+        </footer>
+      </article>
+    </main>
+
+    <!-- Footer include -->
+    <div data-include="footer"></div>
+
+    <!-- Scripts -->
     <script src="../assets/js/loading.js"></script>
     <script src="../assets/js/theme.js"></script>
     <script src="../assets/js/include-components.js"></script>
-    <script src="../assets/js/cursor-trail.js"></script>
-
-    
-    </body>
+    <script>
+      // Minimal “open all / close all” for .fold disclosures (no extra CSS)
+      (function(){
+        const folds = () => Array.from(document.querySelectorAll('details.fold'));
+        document.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-fold-action]');
+          if (!btn) return;
+          const action = btn.getAttribute('data-fold-action');
+          folds().forEach(d => d.open = (action === 'open'));
+        });
+      })();
+    </script>
+  </body>
 </html>

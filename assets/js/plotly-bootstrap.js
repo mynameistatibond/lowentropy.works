@@ -2,7 +2,7 @@
 (() => {
   const root = document.documentElement;
 
-  // ----- utils
+  // ---------- utils
   const cssVar = (el, name, fb) => {
     const v = getComputedStyle(el).getPropertyValue(name);
     return (v && v.trim()) || fb;
@@ -10,7 +10,26 @@
   const themeEl = () =>
     document.body.hasAttribute('data-theme') ? document.body : document.documentElement;
 
-  // Resolve a usable font-family string (handles var(...) cases)
+  // NEW: read data-layout overrides safely
+  const layoutOverrides = (el) => {
+    const raw = el.getAttribute('data-layout');
+    if (!raw) return {};
+    try { return JSON.parse(raw); } catch { return {}; }
+  };
+
+  // NEW: shallow deep-merge good enough for Plotly layout objects
+  const merge = (base, over) => {
+    const out = { ...base };
+    for (const k in over) {
+      const v = over[k];
+      if (v && typeof v === 'object' && !Array.isArray(v))
+        out[k] = merge(base[k] || {}, v);
+      else
+        out[k] = v;
+    }
+    return out;
+  };
+
   const resolvePlotFont = (tn) => {
     const raw = cssVar(tn, '--plot-font', '');
     if (raw && !raw.includes('var(')) return raw;
@@ -18,10 +37,9 @@
         || 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
   };
 
-  // ----- theme tokens (axis/grid from theme node, trace tint from token with currentColor fallback)
   function tokens(el){
     const tn  = themeEl();
-    const csEl = getComputedStyle(el); // for currentColor fallback
+    const csEl = getComputedStyle(el);
     return {
       font: resolvePlotFont(tn),
       axis: cssVar(tn, '--plot-axis', '#666'),
@@ -30,33 +48,30 @@
     };
   }
 
-  // ----- minimal differentiators (single theme color; style does the separation)
   const LINE_DASHES = ['solid','dot','dash','longdash','dashdot','longdashdot'];
   const MARKERS     = ['circle','square','diamond','x','triangle-up','triangle-down'];
-  const BAR_PATS    = ['', '/', '\\', 'x', '-', '.', '|', '+']; // Plotly bar patterns
+  const BAR_PATS    = ['', '/', '\\', 'x', '-', '.', '|', '+'];
 
   function differentiateTraces(data, tint) {
     let lineIdx = 0, barIdx = 0;
-
     data.forEach(tr => {
       if (tr.type === 'bar') {
         tr.marker = tr.marker || {};
-        tr.marker.color = tr.marker.color || tint;         // keep theme color
+        tr.marker.color = tr.marker.color || tint;
         tr.marker.line = tr.marker.line || {};
-        tr.marker.line.width = tr.marker.line.width ?? 1;  // subtle edge
+        tr.marker.line.width = tr.marker.line.width ?? 1;
         tr.marker.pattern = tr.marker.pattern || {};
         tr.marker.pattern.shape = tr.marker.pattern.shape || BAR_PATS[barIdx % BAR_PATS.length];
         tr.opacity = tr.opacity ?? 0.9;
         barIdx++;
-      } else { // scatter/line
+      } else {
         tr.line = tr.line || {};
-        tr.line.color = tr.line.color || tint;             // keep theme color
+        tr.line.color = tr.line.color || tint;
         tr.line.width = tr.line.width ?? 2.5;
         tr.line.dash  = tr.line.dash  || LINE_DASHES[lineIdx % LINE_DASHES.length];
-
         if (tr.mode && tr.mode.includes('markers')) {
           tr.marker = tr.marker || {};
-          tr.marker.color  = tr.marker.color  || tint;     // keep theme color
+          tr.marker.color  = tr.marker.color  || tint;
           tr.marker.size   = tr.marker.size   ?? 6;
           tr.marker.symbol = tr.marker.symbol || MARKERS[lineIdx % MARKERS.length];
         }
@@ -65,20 +80,20 @@
     });
   }
 
-  // ----- layout & config
   function layoutFor(el){
     const t = tokens(el);
     const w = Math.max(240, Math.floor(el.getBoundingClientRect().width));
     const h = parseInt(el.getAttribute('data-height') || '340', 10);
+    // NOTE: bigger default left margin + automargin on y to avoid clipping
     return {
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor:  'rgba(0,0,0,0)',
       width: w, height: h,
-      margin: { l:46, r:20, t:20, b:42 },
+      margin: { l: 140, r: 20, t: 20, b: 42 },   // was l:46
       font: { family: t.font, color: t.axis, size: 12 },
       hoverlabel: { font: { family: t.font, size: 12 } },
       xaxis: { showgrid:true, gridcolor:t.grid, linecolor:t.axis, zeroline:false, ticks:'outside', tickfont:{ size:11 } },
-      yaxis: { showgrid:true, gridcolor:t.grid, linecolor:t.axis, zeroline:false, ticks:'outside', tickfont:{ size:11 } }
+      yaxis: { showgrid:true, gridcolor:t.grid, linecolor:t.axis, zeroline:false, ticks:'outside', tickfont:{ size:11 }, automargin:true }
     };
   }
 
@@ -92,7 +107,6 @@
     };
   }
 
-  // ----- data
   async function getData(el){
     const src = (el.dataset.src || 'demo:line').trim();
     if (src.startsWith('demo:')) {
@@ -110,52 +124,54 @@
     }
   }
 
-  // ----- initial render
+  // ---------- initial render
   async function render(el){
     const { tint } = tokens(el);
     const data = await getData(el);
+    differentiateTraces(data, tint);
 
-    differentiateTraces(data, tint); // <- tiny, readable differences per series (same theme color)
-
-    await Plotly.newPlot(el, data, layoutFor(el), configFor(el));
+    const base = layoutFor(el);
+    const over = layoutOverrides(el);           // <- read per-chart layout
+    const layout = merge(base, over);           // <- merge with base
+    await Plotly.newPlot(el, data, layout, configFor(el));
   }
 
-  // ----- live restyle on theme or resize
+  // ---------- live restyle on theme or resize
   function refresh(el){
     if (!el || !el._fullLayout) return;
     const t = tokens(el);
+    const base = layoutFor(el);
+    const over = layoutOverrides(el);
+    const L = merge(base, over);
 
     Plotly.relayout(el, {
       'font.family': t.font, 'font.color': t.axis,
       'xaxis.linecolor': t.axis, 'xaxis.gridcolor': t.grid, 'xaxis.tickfont.color': t.axis,
       'yaxis.linecolor': t.axis, 'yaxis.gridcolor': t.grid, 'yaxis.tickfont.color': t.axis,
-      ...(() => { const L = layoutFor(el); return { width: L.width, height: L.height }; })()
+      width: L.width, height: L.height,
+      margin: L.margin,
+      'yaxis.automargin': true
     });
 
-    // Repaint colors (dash/patterns persist from initial render)
     const N = (el.data || []).length;
     if (N) Plotly.restyle(el, { 'line.color': t.tint, 'marker.color': t.tint }, [...Array(N).keys()]);
   }
 
   const refreshAll = () => document.querySelectorAll('.plotly').forEach(refresh);
 
-  // ----- timing: wait for CSS to apply before sampling
   let r1=0, r2=0;
   const schedule = () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2);
     r1 = requestAnimationFrame(() => { r2 = requestAnimationFrame(refreshAll); });
   };
 
-  // ----- boot
   const boot = () => document.querySelectorAll('.plotly').forEach(render);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
-  // ----- theme watchers (html + body) + optional manual event
   new MutationObserver(m => { if (m.some(x => x.attributeName === 'data-theme')) schedule(); })
     .observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
   new MutationObserver(m => { if (m.some(x => x.attributeName === 'data-theme')) schedule(); })
     .observe(document.body, { attributes:true, attributeFilter:['data-theme'] });
   window.addEventListener('themechange', schedule);
 
-  // ----- resize (debounced)
   let tmr; window.addEventListener('resize', () => { clearTimeout(tmr); tmr = setTimeout(schedule, 120); });
 })();

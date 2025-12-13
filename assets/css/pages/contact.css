@@ -61,13 +61,12 @@ header {
 
 /* Title */
 .contact-panel h1{
-  font-size: clamp(1.35rem, 1.1rem + 0.6vw, 1.6rem);
+  font-size: clamp(1.3rem, 1.2rem + 0.6vw, 1.6rem);
   line-height: 1.2;
-  font-size: 1.3rem;
-  font-weight: 600;
-  letter-spacing: .02em;
-  margin: 0 0 .8rem 0;
-  -webkit-text-stroke: 0.2px currentColor;
+  font-weight: 400;
+  letter-spacing: .01em;
+  margin: 0 0 0.9rem 0;
+  -webkit-text-stroke: 0.1px currentColor;
 }
 
 /* Subhead */
@@ -75,7 +74,7 @@ header {
   font-size: .75rem;
   line-height: 1.35;
   opacity: .8;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.5rem;
 }
 
 /* Links */

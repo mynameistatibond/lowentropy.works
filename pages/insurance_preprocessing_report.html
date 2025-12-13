@@ -322,74 +322,74 @@ window.addEventListener('load', () => {
 
 
 
-
+     <!-- Scripts --FEATURE DICTIONARY ---// -->
 
     <script>
-(function(){
-  // --- Adjust this path if you keep the original file name with spaces ---
-  // Recommended (renamed file):
-  const CSV_PATH = '../assets/data/feature_dictionary.csv';
-  // If you keep the original: const CSV_PATH = '../assets/data/Feature%20Dictionary%20-%20ChatGPT.csv';
+        (function(){
+          // --- Adjust this path if you keep the original file name with spaces ---
+          // Recommended (renamed file):
+          const CSV_PATH = '../assets/data/feature_dictionary.csv';
+          // If you keep the original: const CSV_PATH = '../assets/data/Feature%20Dictionary%20-%20ChatGPT.csv';
 
-  // Minimal table styling (uses your CSS vars if present)
-  const style = document.createElement('style');
-  style.textContent = `
-    .table-scroll{overflow:auto;border:1px solid var(--plot-grid,#e5e7eb);border-radius:12px}
-    .feature-dict{width:100%;border-collapse:collapse;font-size:0.95rem}
-    .feature-dict th,.feature-dict td{padding:.6rem .8rem;border-bottom:1px solid var(--plot-grid,#e5e7eb);text-align:left;vertical-align:top}
-    .feature-dict thead th{position:sticky;top:0;background:var(--plot-surface,var(--clr-bg,#fff));z-index:1}
-    .feature-dict tbody tr:nth-child(odd){background:color-mix(in srgb, var(--plot-surface,#0000) 85%, transparent)}
-  `;
-  document.head.appendChild(style);
+          // Minimal table styling (uses your CSS vars if present)
+          const style = document.createElement('style');
+          style.textContent = `
+            .table-scroll{overflow:auto;border:1px solid var(--plot-grid,#e5e7eb);border-radius:12px}
+            .feature-dict{width:100%;border-collapse:collapse;font-size:0.95rem}
+            .feature-dict th,.feature-dict td{padding:.6rem .8rem;border-bottom:1px solid var(--plot-grid,#e5e7eb);text-align:left;vertical-align:top}
+            .feature-dict thead th{position:sticky;top:0;background:var(--plot-surface,var(--clr-bg,#fff));z-index:1}
+            .feature-dict tbody tr:nth-child(odd){background:color-mix(in srgb, var(--plot-surface,#0000) 85%, transparent)}
+          `;
+          document.head.appendChild(style);
 
-  // Render helper
-  function renderTable(rows) {
-    const table = document.getElementById('feature-dict');
-    if (!table || !rows || !rows.length) return;
+          // Render helper
+          function renderTable(rows) {
+            const table = document.getElementById('feature-dict');
+            if (!table || !rows || !rows.length) return;
 
-    // Sort by first column (usually "feature" or similar)
-    const cols = Object.keys(rows[0]);
-    rows.sort((a,b) => (a[cols[0]]||'').localeCompare(b[cols[0]]||''));
+            // Sort by first column (usually "feature" or similar)
+            const cols = Object.keys(rows[0]);
+            rows.sort((a,b) => (a[cols[0]]||'').localeCompare(b[cols[0]]||''));
 
-    // Build thead
-    const thead = table.createTHead();
-    const trh = thead.insertRow();
-    cols.forEach(c=>{
-      const th = document.createElement('th');
-      th.textContent = c;
-      trh.appendChild(th);
-    });
+            // Build thead
+            const thead = table.createTHead();
+            const trh = thead.insertRow();
+            cols.forEach(c=>{
+              const th = document.createElement('th');
+              th.textContent = c;
+              trh.appendChild(th);
+            });
 
-    // Build tbody
-    const tbody = table.createTBody();
-    rows.forEach(r=>{
-      const tr = tbody.insertRow();
-      cols.forEach(c=>{
-        const td = tr.insertCell();
-        const val = (r[c] ?? '').toString().trim();
+            // Build tbody
+            const tbody = table.createTBody();
+            rows.forEach(r=>{
+              const tr = tbody.insertRow();
+              cols.forEach(c=>{
+                const td = tr.insertCell();
+                const val = (r[c] ?? '').toString().trim();
 
-        // Tiny enhancement: highlight the feature name column
-        if (c.toLowerCase().includes('feature') || c.toLowerCase()==='name') {
-          const strong = document.createElement('strong');
-          strong.textContent = val;
-          td.appendChild(strong);
-        } else {
-          td.textContent = val;
-        }
-      });
-    });
-  }
+                // Tiny enhancement: highlight the feature name column
+                if (c.toLowerCase().includes('feature') || c.toLowerCase()==='name') {
+                  const strong = document.createElement('strong');
+                  strong.textContent = val;
+                  td.appendChild(strong);
+                } else {
+                  td.textContent = val;
+                }
+              });
+            });
+          }
 
-  // Load CSV via d3
-  if (typeof d3 === 'undefined') {
-    console.warn('d3 not found. Include d3 before this script.');
-    return;
-  }
-  d3.csv(CSV_PATH).then(renderTable).catch(err=>{
-    console.error('Feature dictionary load failed:', err);
-  });
-})();
-</script>
+          // Load CSV via d3
+          if (typeof d3 === 'undefined') {
+            console.warn('d3 not found. Include d3 before this script.');
+            return;
+          }
+          d3.csv(CSV_PATH).then(renderTable).catch(err=>{
+            console.error('Feature dictionary load failed:', err);
+          });
+        })();
+    </script>
 
 
 

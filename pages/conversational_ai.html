@@ -59,7 +59,46 @@
           </figure>
 
           <p><strong>This was our reality at Native</strong> - a real-time messaging platform where translation quality directly impacted business outcomes.</p>
-          <p><strong>The Core Challenge</strong>: We weren’t just building translation features; we were building <em>real‑time communication infrastructure</em> that had to feel instant, accurate, and seamless across multiple third‑party engines.</p>
+          
+          <p>
+            We weren’t “adding a translation feature.” We were building <em>real-time communication infrastructure</em> that had to
+            feel instant and correct, across multiple third-party engines, under enterprise constraints (PII, auditing, uptime).
+            The uncomfortable question: if users feel latency, <em>where is it actually coming from</em>?
+            </p>
+
+            <!-- Fig. 1: latency answers the infrastructure question -->
+            <p class="callout">
+            <strong>Fig. 1 — Why chat feels slow:</strong> the bottleneck is almost never routing—it’s translation.
+            That’s where orchestration and batching move the needle.
+            </p>
+
+            
+                <figure data-illustrative="true">
+                    <div class="plotly" id="chart-flow-latency"
+                        data-height="300"
+                        data-src='[{
+                            "type":"bar",
+                            "orientation":"h",
+                            "y":["Ingest","Detect/Context","Route","Translate","Deliver"],
+                            "x":[15,22,6,95,18],
+                            "hovertemplate":"%{y}: %{x} ms (illustrative)<extra></extra>"
+                        }]'
+                        data-layout='{
+                            "xaxis":{"title":"Milliseconds"},
+                            "yaxis":{"title":""},
+                            "margin":{"t":20,"r":10,"l":120,"b":40}
+                        }'>
+                    </div>
+                    <figcaption>
+                        <strong class="badge-illu">Illustrative</strong>
+                        “Translate” dominates; context detection is second; routing is cheap.
+                        This redirected effort from micro-tweaks in routing to <em>engine choice + batching strategy</em>.
+                    </figcaption>
+                </figure>
+
+
+
+
 
           <p><strong>Our Initial Approach (That Failed)</strong>:</p>
           <ul>
@@ -77,24 +116,7 @@
           </p>
 
 
-                <figure>
-                <div class="plotly" id="chart-flow-latency"
-                    data-height="300"
-                    data-src='[{
-                        "type":"bar",
-                        "orientation":"h",
-                        "y":["Ingest","Detect/Context","Route","Translate","Deliver"],
-                        "x":[15,22,6,95,18],
-                        "hovertemplate":"%{y}: %{x} ms<extra></extra>"
-                    }]'
-                    data-layout='{
-                        "xaxis":{"title":"Milliseconds"},
-                        "yaxis":{"title":""},
-                        "margin":{"t":20,"r":10,"l":120,"b":40}
-                    }'>
-                </div>
-                <figcaption>Latency by pipeline stage (illustrative). Shows where time actually goes in the real-time flow.</figcaption>
-                </figure>
+
 
 
           <p><strong>The Translation Picker Goldmine</strong>:</p>
@@ -209,16 +231,6 @@ Dynamic Engine Selection:
 
 
 
-          <figure>
-            <div class="plotly" id="chart-overrides"
-                data-height="280"
-                data-src='[{"type":"bar","x":["Before","After"],"y":[100,60],"text":["Baseline","-40%"],"textposition":"auto"}]'
-                data-layout='{"yaxis":{"title":"Index (100 = baseline overrides)"},"margin":{"t":20,"r":10,"l":48,"b":40}}'>
-            </div>
-            <figcaption>Manual translation overrides dropped ~40% after orchestration.</figcaption>
-          </figure>
-
-
 
 
              <figure>
@@ -265,10 +277,7 @@ Dynamic Engine Selection:
             <li>And much more…</li>
           </ul>
 
-          <figure class="viz-placeholder" aria-label="Platform evolution placeholder">
-            <svg viewBox="0 0 800 200" preserveAspectRatio="none" role="img" aria-label="visual placeholder"><rect x="0" y="0" width="800" height="200" fill="none" stroke="currentColor" stroke-dasharray="6 6"/></svg>
-            <figcaption>Visual Placeholder: “Platform evolution” diagram showing translation intelligence expanding to other AI features</figcaption>
-          </figure>
+
 
           <p><strong>The Lesson for AI Product Leaders</strong>: Sometimes the most innovative solution isn’t building better AI — it’s building smarter systems that make existing AI work better together.</p>
 

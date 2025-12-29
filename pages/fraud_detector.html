@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto Claim Fraud Detection — Lab View</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/loading.css">
+    <link rel="stylesheet" href="../assets/css/components/header.css">
+    <link rel="stylesheet" href="../assets/css/components/footer.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/favicons/regular_128.png" />
+
+    <style>
+        /* Force main to take up remaining height */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main.full-app {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 !important;
+            /* Override global main padding */
+            margin: 0 !important;
+            width: 100%;
+        }
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Override global footer spacing for tight app layout */
+        footer {
+            margin-top: -2.5rem !important;
+            padding-top: 2.5rem !important;
+            padding-bottom: 2rem !important;
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(to bottom, transparent, var(--clr-bg) 80%);
+            pointer-events: none;
+            /* Allow clicks to pass through the gradient area */
+        }
+
+        footer>* {
+            pointer-events: auto;
+            /* Re-enable clicks for content */
+        }
+
+        .divider {
+            margin: 0.5rem auto !important;
+        }
+    </style>
+</head>
+
+<body class="loading">
+    <!-- Loader -->
+    <div id="loader"></div>
+
+    <!-- Header include -->
+    <div data-include="header"></div>
+
+    <!-- Main Content -->
+    <main class="full-app">
+        <iframe src="https://mynameistatibond-fraud-detector.hf.space?embed=true" loading="lazy" allow="clipboard-write"
+            title="Auto Claim Fraud Detector">
+        </iframe>
+    </main>
+
+    <!-- Footer include -->
+    <div data-include="footer"></div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/loading.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/include-components.js"></script>
+</body>
+
+</html>

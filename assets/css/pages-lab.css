@@ -1,0 +1,1107 @@
+/* =========================================
+   Lab Page Layout: Monitor Pile
+   ========================================= */
+
+body.lab-page-body {
+  background-color: var(--clr-bg);
+  color: var(--clr-text);
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Intro Section */
+.lab-intro {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding-left: 1rem;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lab-header h1 {
+  font-family: var(--font-serif);
+  /* Shippori Mincho */
+  font-weight: 400;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.lab-header p {
+  font-family: var(--font-serif);
+  /* Shippori Mincho */
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+/* =========================================
+   Monitor Wall Container: Canvas for Absolute Pile
+   ========================================= */
+
+.monitor-wall {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  height: 800px;
+  /* Fixed height canvas for the pile */
+  margin: 0 auto;
+  padding: 0;
+  /* Strict Reset */
+  background: transparent;
+  /* Strict Reset */
+  overflow: visible;
+  /* Allow slight overlaps */
+  --floor: 0px;
+  /* Floor Baseline */
+
+  /* VIEWPORT FIT: Aggressive Scale */
+  transform: scale(0.65);
+  /* Shrink more */
+  transform-origin: top center;
+  margin-top: -8rem;
+  /* Pull up closer to title */
+  margin-bottom: -350px;
+  /* Forcefully pull footer up (800 * 0.35 gap + cushion) */
+}
+
+/* =========================================
+   Base Position Logic
+   ========================================= */
+
+/* Only position the direct children of the wall (Casing OR Link Wrapper) */
+.monitor-wall>.monitor-casing,
+.monitor-wall>.monitor-link {
+  position: absolute;
+  left: var(--x, 0px);
+  bottom: calc(var(--floor) + var(--y, 0px));
+  transform: rotate(var(--r, 0deg));
+  z-index: var(--z, 10);
+  transform-origin: bottom center;
+  /* Pivot from floor */
+  margin: 0;
+  /* Reset margins */
+  /* NO SHADOW HERE - Handled by casing to avoid square link shadows */
+}
+
+/* Ensure casings inside links do NOT float away */
+.monitor-link .monitor-casing {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  z-index: inherit;
+  margin: 0;
+  /* Box shadow is kept on casing */
+}
+
+/* Adjust link wrapper to follow casing logic if it wraps one */
+a.monitor-link {
+  display: block;
+  /* Ensure it doesn't have its own background/shadow */
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Hover Physics: Lift and Pop */
+.monitor-casing:hover,
+.monitor-link:hover .monitor-casing {
+  z-index: calc(var(--z, 10) + 50) !important;
+  /* Ensure it clears all piles */
+  transform: rotate(var(--r, 0deg)) scale(1.05);
+  /* Maintain rotation but scale */
+}
+
+/* =========================================
+   Physical Monitor Casing
+   ========================================= */
+
+.monitor-casing {
+  position: relative;
+  background: #2b2b2b;
+  /* Generic dark plastic */
+  border-radius: 12px;
+  padding: 1.5rem;
+  /* Bezel thickness */
+  /* Deep shadow moved here */
+  box-shadow:
+    0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    /* Top edge highlight (reflection) */
+    inset 0 -2px 5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, z-index 0s;
+  /* Instant z-index switch */
+  flex-shrink: 0;
+  border: none;
+
+  /* Stronger Realism: Top-down light reflection gradient + Matte Noise + Top-Left Highlight */
+  background-image:
+    radial-gradient(circle at 5% 5%, rgba(255, 255, 255, 0.35) 0%, transparent 40%),
+    /* Generic Soft Corner */
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 2px, transparent 20%, rgba(0, 0, 0, 0.4) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+}
+
+/* Scratches Overlay */
+.monitor-casing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background-image:
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.1) 10px, transparent 11px),
+    repeating-linear-gradient(-25deg, transparent, transparent 20px, rgba(0, 0, 0, 0.2) 20px, transparent 21px);
+  mask-image: radial-gradient(circle at center, transparent 30%, black 100%);
+  /* Only scratches on edges/corners */
+  -webkit-mask-image: radial-gradient(circle at center, transparent 30%, black 100%);
+  z-index: 1;
+}
+
+/* =========================================
+   New Details: Vents & Switches
+   ========================================= */
+.vent-slots {
+  width: 40px;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, #111, #111 2px, #333 2px, #333 4px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  margin: 0 4px;
+}
+
+.switch-toggle {
+  width: 24px;
+  height: 12px;
+  background: #111;
+  border: 1px solid #333;
+  position: relative;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.switch-toggle::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 1px;
+  bottom: 1px;
+  width: 8px;
+  background: #666;
+  border-radius: 1px;
+  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.label-text {
+  font-family: monospace;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  margin-left: 4px;
+  letter-spacing: 0.05em;
+}
+
+/* =========================================
+   Sizes & Shapes
+   ========================================= */
+
+/* Large Main Monitor */
+.monitor-casing.size-lg {
+  max-width: 420px;
+  width: 400px;
+  aspect-ratio: 4/3;
+  height: auto;
+  padding: 1.5rem;
+  /* Uniform bezel */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Ensure screen takes all available space minus chin */
+.monitor-casing.size-lg .screen {
+  flex: 1;
+  width: 100%;
+  margin-bottom: 1rem;
+  /* Space between screen and chin controls */
+}
+
+/* Ensure chin has fixed height/presence */
+.monitor-casing.size-lg .monitor-chin {
+  height: 40px;
+  /* Fixed height for controls */
+  width: 100%;
+  flex-shrink: 0;
+  padding: 0;
+  /* Reset */
+}
+
+
+/* Wide Monitor */
+.monitor-casing.size-wide {
+  max-width: 380px;
+  width: 300px;
+  /* Reduced to 300px */
+  aspect-ratio: 3/2;
+  height: auto;
+  padding-bottom: 2.5rem;
+  display: flex;
+  /* Enforce Flex to hold screen size */
+  flex-direction: column;
+}
+
+/* Standard */
+.monitor-casing.size-md {
+  max-width: 260px;
+  width: 240px;
+  aspect-ratio: 4/3;
+  height: auto;
+  /* Standard Matte Dark Grey + Highlight */
+  background-image:
+    radial-gradient(circle at 3% 8%, rgba(255, 255, 255, 0.4) 0%, transparent 45%),
+    linear-gradient(to bottom, #444 0%, #333 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Intermediate Size (User Request) */
+.monitor-casing.size-md-lg {
+  max-width: 340px;
+  width: 320px;
+  /* Bridge gap between 240px (MD) and 400px (LG) */
+  aspect-ratio: 4/3;
+  height: auto;
+  /* Match Standard styling */
+  background-image:
+    radial-gradient(circle at 3% 8%, rgba(255, 255, 255, 0.4) 0%, transparent 45%),
+    linear-gradient(to bottom, #444 0%, #333 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem;
+}
+
+/* Small */
+.monitor-casing.size-sm {
+  max-width: 180px;
+  width: 160px;
+  aspect-ratio: 4/3;
+  height: auto;
+  /* Small Matte Black + Highlight */
+  background-image:
+    radial-gradient(circle at 2% 2%, rgba(255, 255, 255, 0.5) 0%, transparent 40%),
+    linear-gradient(to bottom, #1a1a1a 0%, #111 100%);
+  border-radius: 8px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Small Medium (Monitor 6) */
+.monitor-casing.size-sm-md {
+  max-width: 190px;
+  width: 170px;
+  /* +10px total (5px per side) */
+  aspect-ratio: 4/3;
+  height: auto;
+  /* Match Small styling */
+  background-image:
+    radial-gradient(circle at 2% 2%, rgba(255, 255, 255, 0.5) 0%, transparent 40%),
+    linear-gradient(to bottom, #1a1a1a 0%, #111 100%);
+  border-radius: 8px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Small Plus (Monitor 9) */
+.monitor-casing.size-sm-lg {
+  max-width: 200px;
+  width: 188px;
+  /* +28px total (180 + 8) */
+  aspect-ratio: 4/3;
+  height: auto;
+  /* Match Small styling */
+  background-image:
+    radial-gradient(circle at 2% 2%, rgba(255, 255, 255, 0.5) 0%, transparent 40%),
+    linear-gradient(to bottom, #1a1a1a 0%, #111 100%);
+  border-radius: 8px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Rack */
+.monitor-casing.size-rack {
+  max-width: 200px;
+  width: 200px;
+  aspect-ratio: 3/2;
+  height: auto;
+  /* Rack Mount Metal + Highlight */
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.3) 0%, transparent 35%),
+    linear-gradient(to bottom, #151515 0%, #050505 100%);
+  border: 4px solid #444;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Large Main Monitor */
+.monitor-casing.size-lg {
+  padding: 1.5rem;
+}
+
+/* Ensure screen takes all available space minus chin */
+.monitor-casing.size-lg .screen {
+  flex: 1;
+  width: 100%;
+  margin-bottom: 1rem;
+  /* Space between screen and chin controls */
+}
+
+/* Ensure chin has fixed height/presence */
+.monitor-casing.size-lg .monitor-chin {
+  height: 40px;
+  /* Fixed height for controls */
+  width: 100%;
+  flex-shrink: 0;
+  padding: 0;
+  /* Reset */
+}
+
+
+
+/* =========================================
+   Monitor Details (Retro Controls)
+   ========================================= */
+
+/* =========================================
+   Controls (Knobs, LEDs, Sliders) - HIGH CONTRAST
+   ========================================= */
+
+.monitor-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.monitor-chin {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  /* Sharp top-edge highlight */
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.control-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  flex-flow: row nowrap;
+  /* Force single line */
+}
+
+/* KNOBS & BUTTONS - 3D PLASTIC LOOK */
+.knob {
+  width: 12px;
+  height: 12px;
+  background: #1a1a1a;
+  border-radius: 50%;
+  border: 1px solid #000;
+  /* Top-down light reflection */
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.8),
+    /* Strong Drop shadow */
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  /* Strong Top edge highlight */
+}
+
+/* LEDs */
+.power-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #333;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  border: 1px solid #111;
+}
+
+.power-led.on {
+  background-color: #4af64a;
+  box-shadow: 0 0 5px #4af64a, inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.power-led.off {
+  background-color: #1a0505;
+}
+
+/* BEAMING RED LIGHT */
+.power-led.red-beam {
+  background-color: #ff0000;
+  border-color: #800000;
+  box-shadow:
+    0 0 10px #ff0000,
+    0 0 20px #ff0000,
+    0 0 30px #ff0000,
+    inset 0 0 4px rgba(255, 200, 200, 0.8);
+  animation: red-beam-pulse 0.2s infinite alternate;
+}
+
+@keyframes red-beam-pulse {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow:
+      0 0 15px #ff0000,
+      0 0 30px #ff0000,
+      0 0 50px #ff0000;
+  }
+}
+
+.knob.small {
+  width: 8px;
+  height: 8px;
+}
+
+.button-rect {
+  width: 16px;
+  height: 8px;
+  background: #222;
+  border: 1px solid #000;
+  border-radius: 1px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  /* Strong Sharp top highlight */
+}
+
+.switch-toggle {
+  /* Reinforce shadows */
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.vent-slots {
+  /* Deep recessed look */
+  background: repeating-linear-gradient(90deg, #000, #000 2px, #222 2px, #222 4px);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================
+   Monitor Aging: "FRAUD DETECTOR" Main Unit
+   ========================================= */
+.monitor-casing.size-lg.state-active {
+  /* AGING 1: Uneven Yellowing (Sepia/Brown tint concentrated in corners) */
+  background-color: #2e2c26;
+  /* Slightly brownish/yellowed base */
+  /* AGING 1: Uneven Yellowing (Sepia/Brown tint concentrated in corners) */
+  background-color: #2e2c26;
+  /* Slightly brownish/yellowed base */
+  background-image:
+    radial-gradient(circle at 8% 4%, rgba(255, 255, 255, 0.4) 0%, transparent 45%),
+    /* Top-Left Highlight */
+    /* Harsher Frontal Glare (Window reflection) */
+    linear-gradient(110deg, rgba(255, 255, 255, 0.2) 0%, transparent 40%),
+    /* Dust/Grime in corners (Radial vignette) */
+    radial-gradient(circle at center, transparent 30%, rgba(20, 15, 10, 0.6) 100%),
+    /* Base Noise Texture */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.12'/%3E%3C/svg%3E");
+
+  /* Dust accumulation in seams */
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.9),
+    /* Internal Grime */
+    0 30px 60px rgba(var(--clr-shadow-rgb), 0.9);
+}
+
+/* Micro-scratches specific to this unit */
+.monitor-casing.size-lg.state-active::before {
+  opacity: 0.25;
+  /* More visible scratches */
+  /* Irregular density (using multiple gradients) */
+  background-image:
+    repeating-linear-gradient(75deg, transparent, transparent 5px, rgba(255, 255, 255, 0.08) 5px, transparent 6px),
+    repeating-linear-gradient(-15deg, transparent, transparent 15px, rgba(0, 0, 0, 0.3) 15px, transparent 16px);
+  mask-image: radial-gradient(circle at 80% 80%, black, transparent 70%);
+  /* Focused bottom-right */
+}
+
+/* SCREEN BURN-IN GHOSTING */
+.monitor-casing.size-lg.state-active .screen-content::before {
+  content: "FRAUD\A DETECTOR\A AUTO-TRIAGE\A SYSTEM\A ● LIVE";
+  white-space: pre-wrap;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: #0f4;
+  /* Phosphate green */
+  opacity: 0.08;
+  /* Very faint */
+  filter: blur(2px);
+  transform: translate(1px, 1px);
+  /* Slight shift */
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* BARREL DISTORTION SIMULATION */
+.monitor-casing.size-lg.state-active .screen {
+  border-radius: 6px;
+  /* Slightly rounder */
+  box-shadow:
+    inset 0 0 25px rgba(0, 0, 0, 1),
+    /* Deep edges */
+    inset 0 0 5px rgba(255, 255, 255, 0.05);
+}
+
+/* Screen Base */
+.screen {
+  position: relative;
+  background-color: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  display: block;
+}
+
+/* Glass Overlay - Forces visual effects ON TOP of any content (images, text, noise) */
+.screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  /* Ensure it sits above content */
+  pointer-events: none;
+  /* Let clicks pass through */
+  border-radius: 4px;
+
+  /* Deep inset shadow to mimic CRT curvature/bezel depth */
+  /* Deep inset shadow to mimic CRT curvature/bezel depth */
+  /* Thin, sharp edge shadow as requested */
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9);
+
+  /* Glass Effects Stack: 
+     1. Reflection (Center Light/Bulge) - "LIGHT color reflection in the center"
+     2. Vignette (Dark Edges) - "Really small/thin"
+  */
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at center, transparent 75%, rgba(0, 0, 0, 0.9) 100%);
+}
+
+/* =========================================
+   Monitor Style Variants
+   ========================================= */
+
+/* VARIANT 1: Rubbery/Tacky Plastic (EXP_02) */
+.monitor-casing.style-rubbery {
+  background-color: #222;
+  /* Soft, light-absorbing matte */
+  box-shadow:
+    0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* Very weak highlight */
+
+  /* Tacky Noise Texture + Upper-Left Corner Highlight */
+  background-image:
+    radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+/* Localized Wear (Power/Bezel) */
+.monitor-casing.style-rubbery::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 20%);
+  /* Smoothed textture near controls */
+  mix-blend-mode: overlay;
+}
+
+/* Screen: Blue Tint + Edge Noise */
+.monitor-casing.style-rubbery .screen {
+  box-shadow: inset 0 0 20px rgba(0, 50, 100, 0.4);
+  /* Blue glow */
+}
+
+.monitor-casing.style-rubbery .screen-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0, transparent 98%, rgba(255, 255, 255, 0.1) 99%, rgba(0, 0, 0, 0.2) 100%);
+  opacity: 0.3;
+  animation: crawl 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes crawl {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 20px 0;
+  }
+}
+
+
+/* VARIANT 3: Portable Field Monitor (Rugged) */
+.monitor-casing.style-portable {
+  background-color: #3a3a3a;
+  border-radius: 4px;
+  /* Utility/Industrial look */
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  /* Bumper texture + Top-Left Highlight */
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.6) 0%, transparent 40%),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.2) 2px, rgba(0, 0, 0, 0.2) 4px);
+}
+
+/* Carry Handle (Simulated via pseudo) */
+.monitor-casing.style-portable .monitor-handle {
+  position: absolute;
+  top: -25px;
+  left: 20%;
+  right: 20%;
+  height: 20px;
+  background: #222;
+  border-radius: 4px 4px 0 0;
+  border: 1px solid #111;
+  border-bottom: none;
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.1);
+}
+
+.monitor-casing.style-portable .monitor-handle::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  bottom: 0;
+  background: #151515;
+  /* Hollow out */
+  border-radius: 2px 2px 0 0;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Amber Screen */
+.monitor-casing.style-portable .screen {
+  box-shadow: inset 0 0 15px rgba(255, 170, 0, 0.3);
+  /* Amber glow */
+}
+
+.monitor-casing.style-portable .screen-content {
+  color: #fa0;
+  text-shadow: 0 0 4px #fa0;
+}
+
+.monitor-casing.style-glossy {
+  background-color: #1a1a1a;
+  /* High gloss reflection - Blown highlights */
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.5) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 10%, transparent 40%),
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 20%);
+  /* Fingerprints */
+
+  /* Hard Shadows (Overlit) */
+  box-shadow:
+    10px 20px 30px rgba(0, 0, 0, 1),
+    /* Hard drop shadow */
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  /* Blown edge highlight */
+}
+
+/* Smudges/Fingerprints */
+.monitor-casing.style-glossy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.6;
+  background: radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0, transparent 15%);
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+/* Screen: Uneven Luminance + Cool Temp */
+.monitor-casing.style-glossy .screen {
+  background: linear-gradient(to bottom, #050a10 0%, #000 50%, #050a10 100%);
+  /* Banding */
+  box-shadow: inset 0 0 10px rgba(100, 200, 255, 0.2);
+  /* Cool temp */
+}
+
+
+/* =========================================
+   States (Content Styling)
+   ========================================= */
+
+/* ACTIVE */
+.state-active .screen {
+  /* Green tinted glass gradient */
+  background: radial-gradient(circle at center, #0a1a0a 0%, #000 90%);
+}
+
+.state-active .screen-content {
+  color: #4af64a;
+  text-shadow: 0 0 5px rgba(74, 246, 74, 0.6);
+}
+
+.state-active .project-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 1px solid #4af64a;
+  padding: 0.2rem 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* GLITCH */
+/* GLITCH */
+.state-glitch .screen-content {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.5rem;
+  /* Even Bigger */
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  animation: text-glitch 0.2s infinite;
+  padding-left: 1rem;
+  /* Move right */
+}
+
+/* PINK NOISE (Monitor 9) */
+.monitor-casing.state-pink-noise .screen {
+  background-color: #1a0510;
+  /* Deep purple/black base */
+  background-image:
+    /* Moving Scanlines */
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 0, 255, 0.1) 2px, rgba(255, 0, 255, 0.1) 4px),
+    /* Color Noise */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 200px 200px;
+  filter: contrast(120%) brightness(110%) hue-rotate(-50deg);
+  /* Shift noise to pink/purple */
+  animation: pink-static 0.15s steps(4) infinite;
+}
+
+@keyframes pink-static {
+  0% {
+    background-position: 0 0, 0 0;
+    filter: contrast(120%) brightness(110%) hue-rotate(-50deg);
+  }
+
+  50% {
+    background-position: 0 4px, -100px -100px;
+    filter: contrast(150%) brightness(130%) hue-rotate(-30deg);
+  }
+
+  100% {
+    background-position: 0 -4px, 100px 100px;
+    filter: contrast(120%) brightness(110%) hue-rotate(-50deg);
+  }
+
+  100% {
+    background-position: 0 -4px, 100px 100px;
+    filter: contrast(120%) brightness(110%) hue-rotate(-50deg);
+  }
+}
+
+/* RETRO NOISE (Monitor 4) */
+.monitor-casing.state-retro-noise .screen {
+  background-color: #2b1d10;
+  /* Sepia dark */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+  filter: sepia(0.5) contrast(140%) brightness(120%);
+  animation: static-noise 0.2s steps(4) infinite;
+  display: block;
+  /* Ensure pseudo-element attaches */
+}
+
+/* Upward Moving Stripes */
+.monitor-casing.state-retro-noise .screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(0deg,
+      transparent 0%,
+      transparent 10%,
+      rgba(255, 220, 180, 0.1) 10.5%,
+      rgba(255, 230, 200, 0.3) 11%,
+      transparent 11.5%,
+      transparent 30%);
+  background-size: 100% 200%;
+  animation: scan-rise 2.5s linear infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+@keyframes scan-rise {
+  0% {
+    background-position: 0 100%;
+  }
+
+  100% {
+    background-position: 0 0%;
+  }
+}
+
+@keyframes text-glitch {
+  0% {
+    transform: translate(0);
+  }
+
+  20% {
+    transform: translate(-2px, 1px);
+  }
+
+  50% {
+    transform: translate(1px, -1px);
+  }
+
+  80% {
+    transform: translate(-1px, 1px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* OFF & RESERVED */
+.state-off .screen,
+.state-reserved .screen {
+  /* Bulging Glass Effect: Dark Grey Center -> Black Edge */
+  background: radial-gradient(circle at center, #2a2a2a 0%, #000 85%);
+}
+
+/* IDLE (White Noise Animation) */
+.state-idle .screen {
+  background-color: #000;
+  /* Simpler, high-contrast noise pattern */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  filter: contrast(150%) brightness(150%);
+  /* Force visibility */
+  opacity: 1;
+  animation: static-noise 0.2s steps(4) infinite;
+}
+
+/* Knobs */
+.knob {
+  width: 12px;
+  height: 12px;
+  background: #111;
+  border-radius: 50%;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.knob::after {
+  content: "";
+  /* Indicator line */
+  position: absolute;
+  top: 1px;
+  left: 5px;
+  width: 2px;
+  height: 5px;
+  background: #555;
+}
+
+/* Buttons */
+.button-rect {
+  width: 16px;
+  height: 10px;
+  background: #2a2a2a;
+  border: 1px solid #000;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.brand-badge {
+  font-family: sans-serif;
+  font-weight: 900;
+  color: #555;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+  font-style: italic;
+}
+
+.switch {
+  width: 8px;
+  height: 16px;
+  background: #000;
+  border: 1px solid #333;
+}
+
+.slider-group {
+  display: flex;
+  gap: 4px;
+}
+
+.slider {
+  width: 4px;
+  height: 16px;
+  background: #111;
+  border: 1px solid #000;
+}
+
+/* =========================================
+   States (Content Styling)
+   ========================================= */
+
+/* ACTIVE */
+.state-active .screen {
+  box-shadow: inset 0 0 30px rgba(0, 40, 0, 0.5);
+  background: #020502;
+}
+
+/* Slow Beep for Live Dot */
+.blink-dot {
+  display: inline-block;
+  animation: slow-beep 1.5s infinite ease-in-out;
+}
+
+@keyframes slow-beep {
+
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(74, 246, 74, 0.9);
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    text-shadow: none;
+    transform: scale(0.9);
+  }
+}
+
+.state-active .screen-content {
+  color: #4af64a;
+  text-shadow: 0 0 5px rgba(74, 246, 74, 0.6);
+  padding-left: 1.5rem;
+  /* Move text away from edge */
+}
+
+.state-active .project-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 1px solid #4af64a;
+  padding: 0.2rem 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* GLITCH */
+.state-glitch .screen-content {
+  color: #aaa;
+  font-size: 0.7rem;
+}
+
+.state-glitch:hover .screen-content {
+  animation: text-glitch 0.2s infinite;
+  color: #fff;
+}
+
+@keyframes text-glitch {
+  0% {
+    transform: translate(0);
+  }
+
+  20% {
+    transform: translate(-2px, 1px);
+  }
+
+  50% {
+    transform: translate(1px, -1px);
+  }
+
+  80% {
+    transform: translate(-1px, 1px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* OFF */
+/* OFF & RESERVED */
+.state-off .screen,
+.state-reserved .screen {
+  /* Bulging Glass Effect: Dark Grey Center -> Black Edge */
+  background: radial-gradient(circle at center, #2a2a2a 0%, #000 85%);
+  /* Deep inset shadow to mimic CRT curvature/bezel depth */
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), inset 0 0 5px rgba(255, 255, 255, 0.05);
+}
+
+/* IDLE (White Noise Animation) */
+/* IDLE (White Noise Animation) */
+.state-idle .screen {
+  background-color: #000;
+  /* Simpler, high-contrast noise pattern */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  filter: contrast(150%) brightness(150%);
+  /* Force visibility */
+  opacity: 1;
+  animation: static-noise 0.2s steps(4) infinite;
+}
+
+@keyframes static-noise {
+  0% {
+    background-position: 0 0;
+  }
+
+  25% {
+    background-position: -64px 32px;
+  }
+
+  50% {
+    background-position: 32px -64px;
+  }
+
+  75% {
+    background-position: -32px -32px;
+  }
+
+  100% {
+    background-position: 64px 64px;
+  }
+}
+
+/* RESERVED */
+.state-reserved .screen-content {
+  opacity: 0.3;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+}
+
+/* Link Wrapper */
+a.monitor-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}

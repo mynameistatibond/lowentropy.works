@@ -1,0 +1,167 @@
+/* =========================================
+   NEW MATERIAL VARIANTS (Diversified)
+   ========================================= */
+
+/* 1. Beige (Retro 90s PC) */
+.monitor-casing.style-beige {
+    background-color: #4a4840;
+    /* Dark Dirty Beige */
+    color: #333;
+    /* Dark text for contrast */
+    box-shadow:
+        0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    background-image:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* 2. Gunmetal (Blue-Grey Metallic) */
+.monitor-casing.style-gunmetal {
+    background-color: #1a222a;
+    /* Dark Gunmetal */
+    box-shadow:
+        0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+        inset 0 1px 0 rgba(100, 200, 255, 0.2);
+
+    background-image:
+        radial-gradient(circle at 10% 0%, rgba(200, 230, 255, 0.5) 0%, transparent 45%),
+        /* Cool highlight */
+        linear-gradient(120deg, rgba(255, 255, 255, 0.1) 0%, transparent 30%);
+}
+
+/* 3. Rack Silver (Brushed Aluminum) */
+.monitor-casing.style-rack-silver {
+    background-color: #333;
+    /* Dark Aluminum */
+    border: 4px solid #222;
+
+    background-image:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.9) 0%, transparent 40%),
+        repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0, 0, 0, 0.1) 1px, rgba(0, 0, 0, 0.1) 2px);
+    /* Brushed texture */
+}
+
+/* 4. Bakelite (Vintage Dark Brown Plastic) */
+.monitor-casing.style-bakelite {
+    background-color: #1a100a;
+    /* Dark Bakelite */
+    border-radius: 16px;
+    /* Smooth */
+    box-shadow:
+        0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+        inset 0 1px 5px rgba(255, 100, 50, 0.2);
+
+    background-image:
+        radial-gradient(circle at 15% 15%, rgba(255, 200, 150, 0.4) 0%, transparent 30%),
+        /* Oily warm highlight */
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 30%);
+}
+
+/* 5. Military (Matte OD Green) */
+.monitor-casing.style-military {
+    background-color: #1f2210;
+    /* Dark Military Green */
+    border: 2px solid #333;
+    border-radius: 4px;
+    /* Boxy */
+
+    background-image:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
+        /* Dull highlight */
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.2'/%3E%3C/svg%3E");
+}
+
+/* 6. Titanium (High-Tech Dark Grey) */
+.monitor-casing.style-titanium {
+    background-color: #222;
+    /* Dark Titanium */
+    border-top: 1px solid #777;
+
+    background-image:
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.3) 0%, transparent 60%),
+        /* Top center highlight */
+        linear-gradient(to bottom, #555 0%, #333 100%);
+}
+
+/* 7. Rusted (Industrial Worn) */
+.monitor-casing.style-rusted {
+    background-color: #2a1a15;
+    /* Dark Rust */
+    border-color: #3e2723;
+    box-shadow: 0 30px 60px rgba(var(--clr-shadow-rgb), 0.9);
+
+    background-image:
+        radial-gradient(circle at 0% 100%, rgba(255, 100, 50, 0.1) 0%, transparent 50%),
+        /* Bottom highlight */
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.3'/%3E%3C/svg%3E");
+}
+
+/* =========================================
+   SPECIAL: RETRO WOOD TV (3D)
+   ========================================= */
+
+/* 1. Base Casing (Front Face) */
+/* 1. Base Casing (Front Face) */
+.monitor-casing.style-retro-tv {
+    /* Wood Grain Texture */
+    background-color: #5d4037;
+    background-image:
+        repeating-linear-gradient(90deg,
+            rgba(62, 39, 35, 0.9) 0px,
+            rgba(93, 64, 55, 0.9) 2px,
+            rgba(62, 39, 35, 0.9) 4px,
+            rgba(45, 30, 25, 0.9) 8px);
+
+    /* Silver Bezel (Inner) */
+    box-shadow:
+        0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+        /* Added External Shadow */
+        inset 0 0 0 12px #909090,
+        /* Thick Silver Bezel */
+        inset 0 0 20px 15px rgba(0, 0, 0, 0.5);
+    /* Inner Depth Shadow */
+
+    border: 2px solid #3e2723;
+    border-radius: 4px;
+
+    /* FLAT Front Face - No Rotation */
+    transform-style: preserve-3d;
+    /* Essential for the side panel to render continuously in 3D space */
+}
+
+/* 2. Side Panel (True 3D "Hinge" - Correct Perspective) */
+/* 2. Side Panel (Coordinate Fix - Translate Method) */
+
+
+/* 3. Removed Connectors (Trapezoid fills the logic) */
+.monitor-casing.style-retro-tv::after {
+    display: none;
+}
+
+/* ENABLE 3D SPACE ON PARENT */
+.monitor-casing.style-retro-tv {
+    transform-style: preserve-3d !important;
+}
+
+/* 3. Screen Adjustment */
+.monitor-casing.style-retro-tv .screen {
+    border-radius: 20px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 1);
+    border: 4px solid #1a1a1a;
+    margin: 4px;
+}
+
+/* 4. Controls Adjustment */
+.monitor-casing.style-retro-tv .monitor-controls {
+    background: #505050;
+    padding: 2px 4px;
+    border-radius: 2px;
+    border: 1px solid #333;
+}
+
+.monitor-casing.style-retro-tv .monitor-controls .knob {
+    background: #111;
+    border: 1px solid #000;
+}

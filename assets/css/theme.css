@@ -6,7 +6,7 @@
   --clr-bg: #ffffff;
   --clr-text: #000000;
   --clr-divider: #1a1a1a;
-  --clr-cobalt:#0800ff;
+  --clr-cobalt: #0800ff;
 
   /* Accent Colors (dots) */
   --clr-midblue: #82acff;
@@ -20,6 +20,8 @@ body[data-theme="light"] {
   --clr-bg: #ffffff;
   --clr-text: #000000;
   --clr-divider: #1a1a1a;
+  --clr-shadow-rgb: 0, 0, 0;
+  /* Black shadows */
   --plot-font: 'Shippori Mincho B1', serif;
   --plot-axis: #000000;
   --plot-grid: #000000c3;
@@ -31,14 +33,10 @@ body[data-theme="dark"] {
   --clr-bg: #0800ff;
   --clr-text: #ffffff;
   --clr-divider: #ffffff66;
+  --clr-shadow-rgb: 255, 255, 255;
+  /* White shadows */
   --plot-font: 'Shippori Mincho B1', serif;
   --plot-axis: #ffffff;
   --plot-grid: #ffffffc3;
   --plot-trace: #ffffffaf;
 }
-
-
-
-
-
-

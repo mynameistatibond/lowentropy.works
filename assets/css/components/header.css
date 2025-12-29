@@ -14,7 +14,7 @@ header {
   letter-spacing: 0.15em;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 9999;
   transition: background-color 2s ease, color 2s ease, border-color 2s ease;
 }
 
@@ -30,8 +30,13 @@ header .left {
   gap: 0.3rem;
 }
 
-header .center { text-align: center; }
-header .right { text-align: right; }
+header .center {
+  text-align: center;
+}
+
+header .right {
+  text-align: right;
+}
 
 
 /* =========================================
@@ -46,7 +51,9 @@ header a {
   font-feature-settings: "liga" off;
 }
 
-header a:hover { opacity: 0.6; }
+header a:hover {
+  opacity: 0.6;
+}
 
 /* =========================================
    Components: Brand Name + Theme Toggle
@@ -120,14 +127,20 @@ header a:hover { opacity: 0.6; }
 
 
 @keyframes glowPulse {
-  0% { text-shadow: 0 0 0px currentColor; }
+  0% {
+    text-shadow: 0 0 0px currentColor;
+  }
+
   50% {
     text-shadow:
       0 0 4px currentColor,
       0 0 10px currentColor,
       0 0 25px currentColor;
   }
-  100% { text-shadow: 0 0 0px currentColor; }
+
+  100% {
+    text-shadow: 0 0 0px currentColor;
+  }
 }
 
 .theme-toggle button.glow {

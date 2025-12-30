@@ -1,0 +1,119 @@
+/* Annotation Hover Styles */
+
+/* SVG Overlay Container */
+.annotation-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Let clicks pass through */
+    z-index: 100;
+    overflow: visible;
+}
+
+/* The Line Itself */
+.annotation-path {
+    fill: none;
+    stroke: var(--clr-text);
+    /* Theme aware */
+    stroke-width: 1px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    /* White highlight for contrast on dark monitor parts */
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8));
+
+    /* Animation Setup */
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    transition: stroke-dashoffset 1000ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    opacity: 1;
+}
+
+/* Active State for Line (Draws out) */
+.annotation-path.active {
+    stroke-dashoffset: 0 !important;
+}
+
+/* Hotspot for Hover Trigger */
+.fraud-screen-hotspot {
+    position: absolute;
+    top: 15%;
+    /* Match screen area approx */
+    left: 10%;
+    width: 80%;
+    height: 60%;
+    z-index: 150;
+    /* Above screen content */
+    cursor: crosshair;
+}
+
+/* =========================================
+   TEXT BLOCK STYLES
+   ========================================= */
+
+.annotation-text-block {
+    position: absolute;
+    /* Position is now handled by JS for perfect sync with line */
+    width: 280px;
+    pointer-events: none;
+    z-index: 101;
+
+    font-family: 'Shippori Mincho', serif;
+    text-align: left;
+
+    /* Animation Sequence Defaults */
+    opacity: 1;
+}
+
+/* Header */
+.anno-header {
+    font-size: 16px;
+    color: var(--clr-text);
+    /* Theme aware */
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+/* Status */
+.anno-status {
+    font-size: 12px;
+    color: var(--clr-text);
+    /* Theme aware */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+/* Body */
+.anno-body {
+    font-size: 14px;
+    color: var(--clr-text);
+    /* Theme aware */
+    line-height: 1.35;
+}
+
+.anno-body div {
+    margin-bottom: 0;
+}
+
+/* Animation Classes (Handled by JS) */
+.type-char {
+    opacity: 0;
+    transition: opacity 0.05s ease;
+}
+
+.type-char.visible {
+    opacity: 1;
+}
+
+/* Container fade out helper */
+.annotation-text-block.hidden {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}

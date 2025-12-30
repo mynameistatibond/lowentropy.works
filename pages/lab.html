@@ -16,14 +16,17 @@
     <link rel="stylesheet" href="../assets/css/loading.css">
     <link rel="stylesheet" href="../assets/css/components/header.css">
     <link rel="stylesheet" href="../assets/css/components/footer.css">
-    <link rel="stylesheet" href="../assets/css/pages-lab.css?v=90">
-    <link rel="stylesheet" href="../assets/css/pages-lab-materials.css?v=35">
+    <link rel="stylesheet" href="../assets/css/pages-lab.css?v=100">
+    <link rel="stylesheet" href="../assets/css/pages-lab-materials.css?v=40">
+    <!-- Annotation Hover System -->
+    <link rel="stylesheet" href="../assets/css/annotation-hover.css?v=1">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
         rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
 
     <!-- Favicon -->
@@ -45,7 +48,8 @@
         <!-- Lab Intro -->
         <section class="lab-intro">
             <h1>Low-Entropy Lab</h1>
-            <p>Artifact Storage // Experimental</p>
+            <p class="lab-subtitle">【DEPLOYED ML SYSTEMS】 『LIVE』 〈INSPECTABLE〉</p>
+            <p class="lab-instruction">Each monitor is an entry point.</p>
         </section>
 
         <!-- Monitor Wall: Compact Heap Pile (Restored) -->
@@ -55,7 +59,8 @@
 
             <!-- 1. Wide Idle (Left Base) -->
             <!-- Tucked closer to main -->
-            <div class="monitor-casing size-wide state-idle style-beige" style="--x: 285px; --y: 0px; --z: 15;">
+            <div class="monitor-casing size-wide state-idle style-beige style-heavy-contact"
+                style="--x: 285px; --y: 0px; --z: 15; --sx: 1.02; --sy: 0.97;">
                 <div class="screen">
                     <div class="screen-content"></div>
                 </div>
@@ -66,11 +71,38 @@
                         <div class="slider"></div>
                     </div>
                 </div>
+                <!-- Floppy Drive (Standard 3.5" PC Style) -->
+                <div class="floppy-drive">
+                    <div class="drive-slot"></div>
+                    <div class="drive-button"></div>
+                    <div class="drive-led"></div>
+                </div>
             </div>
 
             <!-- 2. Main Active (Center Base - Dominant) -->
-            <a href="/pages/fraud_detector.html" class="monitor-link" style="--x: 580px; --y: 0px; --z: 20;">
-                <div class="monitor-casing size-lg state-active">
+            <a href="/pages/fraud_detector.html" class="monitor-link"
+                style="--x: 580px; --y: -5px; --z: 20; --sx: 1.015; --sy: 0.98;">
+                <div class="monitor-casing size-lg state-active style-heavy-contact" id="monitor-2">
+
+                    <!-- ANNOTATION HOVER SYSTEM (Overlay) -->
+                    <div class="fraud-screen-hotspot"></div>
+                    <svg class="annotation-overlay" viewBox="0 0 400 300" style="overflow: visible;">
+                        <!-- Path: Start -> Out -> End (shorter, approx 75% screen width) -->
+                        <path class="annotation-path" d="" fill="none" stroke-width="1" />
+                    </svg>
+
+                    <!-- Declassified Text Annotation -->
+                    <div class="annotation-text-block hidden">
+                        <div class="anno-header">FRAUD DETECTION SYSTEM</div>
+                        <div class="anno-status">STATUS: OPERATIONAL</div>
+                        <div class="anno-body">
+                            <div>End-to-end fraud detection system.</div>
+                            <div>Multiple models trained and calibrated</div>
+                            <div>for risk-aware decisioning.</div>
+                            <div>Agentic AI layer for triage and prioritization.</div>
+                        </div>
+                    </div>
+
                     <div class="screen">
                         <div class="screen-content">
                             <div class="project-title">FRAUD<br>DETECTOR</div>
@@ -78,6 +110,7 @@
                             <div class="status-indicator"><span class="blink-dot">●</span> LIVE</div>
                         </div>
                     </div>
+
                     <div class="monitor-chin">
                         <div class="brand-badge">SONY</div>
                         <div class="control-row">
@@ -94,12 +127,18 @@
 
             <!-- 3. Med Glitch (Right Base) -->
             <!-- Tucked closer to main -->
-            <div class="monitor-casing size-md state-glitch style-rubbery" style="--x: 960px; --y: 0px; --z: 15;">
+            <div class="monitor-casing size-md state-glitch style-rubbery style-heavy-contact"
+                style="--x: 960px; --y: 0px; --z: 15; --sx: 1.02; --sy: 0.96;">
                 <div class="screen">
                     <div class="screen-content">EXP_02</div>
                 </div>
-                <div class="monitor-controls right-side">
-                    <div class="switch-toggle" style="transform:rotate(90deg);"></div> <!-- Converted to Switch -->
+                <!-- Brand Name (Bottom Right) -->
+                <div class="brand-name">POLYMER</div>
+                <!-- Controls (Bottom Left: Switch + 2 Knobs) -->
+                <div class="monitor-controls">
+                    <div class="switch-toggle" style="transform:rotate(90deg);"></div>
+                    <div class="knob"></div>
+                    <div class="knob small sunken"></div>
                 </div>
             </div>
 
@@ -131,7 +170,7 @@
 
             <!-- 6. Small Off (Bridging Main/Med) -->
             <!-- Shifted RIGHT to clear main screen -->
-            <div class="monitor-casing size-sm-md state-off style-bakelite"
+            <div class="monitor-casing size-sm-md state-off style-bakelite v-hold-drift"
                 style="--x: 951px; --y: 326px; --z: 22; --r: -14deg;">
                 <div class="screen"></div>
                 <div class="monitor-controls">
@@ -183,11 +222,12 @@
 
             <!-- 10. Rack (Far Right - Leaning In) -->
             <!-- No longer vertical monolith, now leaning against pile -->
-            <div class="monitor-casing size-rack state-off style-rusted"
+            <div class="monitor-casing size-rack state-off style-rusted phosphor-burn"
                 style="--x: 1210px; --y: 60px; --z: 5; --r: -85deg;">
                 <div class="screen"></div>
             </div>
 
+            </div><!-- End .monitor-pile-inner -->
         </section>
 
     </main>
@@ -199,7 +239,35 @@
     <script src="../assets/js/loading.js"></script>
     <script src="../assets/js/theme.js"></script>
     <script src="../assets/js/include-components.js"></script>
+    <script src="../assets/js/annotation-hover.js?v=1"></script>
 
+    <!-- Responsive Scaling Script -->
+    <script>
+        function resizeWall() {
+            const wall = document.querySelector('.monitor-wall');
+            if (!wall) return;
+
+            const baseWidth = 1250; // Adjusted to match new CSS width for centering
+            const baseHeight = 600; // Natural height
+
+            // Available width: 66% of viewport (Reduced by 5% per user request)
+            const targetWidth = window.innerWidth * 0.66;
+
+            // Calculate scale
+            const scale = targetWidth / baseWidth;
+
+            // Apply scale
+            wall.style.transform = `scale(${scale})`;
+
+            // Adjust height so footer flows correctly (Scale * BaseHeight)
+            wall.style.height = `${baseHeight * scale}px`;
+        }
+
+        window.addEventListener('resize', resizeWall);
+        window.addEventListener('DOMContentLoaded', resizeWall);
+        // Initial call
+        resizeWall();
+    </script>
 </body>
 
 </html>

@@ -9,6 +9,16 @@ body.lab-page-body {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+/* Override Footer Margin for this page */
+body.lab-page-body footer {
+  margin-top: 0;
+}
+
+/* Remove Divider Top Margin to pull line up */
+body.lab-page-body footer .divider {
+  margin-top: 0;
+}
+
 /* Intro Section */
 .lab-intro {
   margin-top: 2rem;
@@ -20,22 +30,29 @@ body.lab-page-body {
   margin-right: auto;
 }
 
-.lab-header h1 {
+.lab-intro h1 {
   font-family: var(--font-serif);
   /* Shippori Mincho */
   font-weight: 400;
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  font-size: clamp(1rem, 2vw, 2rem);
+  margin-bottom: 1.2rem;
   letter-spacing: -0.02em;
 }
 
-.lab-header p {
-  font-family: var(--font-serif);
-  /* Shippori Mincho */
-  font-size: 0.9rem;
-  letter-spacing: 0.1em;
-  opacity: 0.6;
+.lab-intro p {
+  font-family: "Inter Tight", sans-serif;
+  font-size: 0.77rem;
+  letter-spacing: 0.12em;
+  opacity: 1;
+  /* Reset opacity as bold text handles hierarchy */
   text-transform: uppercase;
+  margin: 0;
+  /* Tight spacing between lines */
+}
+
+.lab-intro .lab-instruction {
+  margin-top: 0.3rem;
+  opacity: 0.8;
 }
 
 /* =========================================
@@ -44,11 +61,20 @@ body.lab-page-body {
 
 .monitor-wall {
   position: relative;
-  width: 100%;
-  max-width: 1400px;
-  height: 800px;
-  /* Fixed height canvas for the pile */
-  margin: 0 auto;
+  width: 1250px;
+  /* Reduced from 1450px to match actual content width for entering */
+  /* Explicit natural width of pile */
+  max-width: none;
+  /* Remove constraint */
+  height: 400px;
+  /* Reduced from 600px to pull footer up */
+  margin-top: 9rem;
+  /* Push down significantly (approx 144px) to clear header */
+  margin-left: calc(50% - 625px - 5vw);
+  /* Shift Left by 5% of viewport for balance */
+  margin-right: calc(50% - 625px);
+  transform-origin: top center;
+  /* Scale from center */
   padding: 0;
   /* Strict Reset */
   background: transparent;
@@ -57,15 +83,8 @@ body.lab-page-body {
   /* Allow slight overlaps */
   --floor: 0px;
   /* Floor Baseline */
-
-  /* VIEWPORT FIT: Aggressive Scale */
-  transform: scale(0.65);
-  /* Shrink more */
-  transform-origin: top center;
-  margin-top: -8rem;
-  /* Pull up closer to title */
-  margin-bottom: -350px;
-  /* Forcefully pull footer up (800 * 0.35 gap + cushion) */
+  /* Anchor to left */
+  /* Spacing handled by fixed top margin */
 }
 
 /* =========================================
@@ -114,6 +133,12 @@ a.monitor-link {
   transform: rotate(var(--r, 0deg)) scale(1.05);
   /* Maintain rotation but scale */
 }
+
+/* Fix: Ensure the Link Wrapper itself pops up, otherwise the child is trapped in low Z-index */
+.monitor-link:hover {
+  z-index: calc(var(--z, 10) + 50) !important;
+}
+
 
 /* =========================================
    Physical Monitor Casing
@@ -389,14 +414,24 @@ a.monitor-link {
   margin-top: 0.5rem;
 }
 
+/* Textured/Curved Chin Surface */
 .monitor-chin {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: 0.5rem;
+  padding-bottom: 0.2rem;
+  /* Add subtle gradient to show curvature */
+  background: linear-gradient(to bottom, #252525 0%, #303030 20%, #202020 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  /* Sharp top-edge highlight */
-  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.5);
+  /* Highlight edge */
+
+  /* Deep inset shadow at top to suggest it curves IN towards the screen */
+  box-shadow:
+    inset 0 10px 10px -5px rgba(0, 0, 0, 0.8),
+    /* Top "curve in" shadow */
+    inset 0 1px 0 rgba(0, 0, 0, 1);
+  /* Deep groove line */
 }
 
 .control-row {
@@ -611,19 +646,58 @@ a.monitor-link {
    Monitor Style Variants
    ========================================= */
 
-/* VARIANT 1: Rubbery/Tacky Plastic (EXP_02) */
+/* 3. Rubbery (Matte Black Rubberized Coating) */
 .monitor-casing.style-rubbery {
-  background-color: #222;
-  /* Soft, light-absorbing matte */
+  background-color: #202020;
+  /* Deep Matte Black */
+  border-radius: 8px;
+  /* Soft corners */
   box-shadow:
     0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  /* Very weak highlight */
+
+  /* PADDING for Chin adjustments */
+  padding-bottom: 40px;
+  /* Make room for bottom controls/brand */
 
   /* Tacky Noise Texture + Upper-Left Corner Highlight */
   background-image:
     radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+/* Controls (Bottom Left) */
+.monitor-casing.style-rubbery .monitor-controls {
+  position: absolute;
+  bottom: 8px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+/* Brand Name (Bottom Right) */
+.monitor-casing.style-rubbery .brand-name {
+  position: absolute;
+  bottom: 12px;
+  right: 15px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.5rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Sunken Knob Override */
+.monitor-casing.style-rubbery .knob.sunken {
+  transform: scale(0.8);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9);
+  border-color: #111;
+  opacity: 0.7;
 }
 
 /* Localized Wear (Power/Bezel) */
@@ -635,6 +709,25 @@ a.monitor-link {
   background: radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 20%);
   /* Smoothed textture near controls */
   mix-blend-mode: overlay;
+}
+}
+
+/* Sunken Knob */
+.monitor-casing.style-rubbery .knob.sunken {
+  transform: scale(0.9) translate(1px, 1px);
+  /* Physically smaller and shifted */
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+  /* Recessed shadow */
+  opacity: 0.8;
+  border-color: #111;
+}
+
+/* Localized Wear (Power/Bezel) -> moved to pseudo above for cleaner CSS */
+.monitor-casing.style-rubbery::after {
+  content: "";
+  position: absolute;
+  /* Not used here, effects are in background-image */
+  display: none;
 }
 
 /* Screen: Blue Tint + Edge Noise */
@@ -944,6 +1037,8 @@ a.monitor-link {
   color: #555;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
   font-style: italic;
+  padding-left: 15px;
+  /* Slight shift to right */
 }
 
 .switch {
@@ -1104,4 +1199,52 @@ a.monitor-link {
   text-decoration: none;
   color: inherit;
   display: block;
+}
+
+/* V-HOLD DRIFT ANIMATION (Personality Defect) */
+@keyframes v-hold-roll {
+  0% {
+    background-position-y: 0%;
+  }
+
+  100% {
+    background-position-y: 100%;
+  }
+}
+
+.v-hold-drift .screen {
+  /* Inherit existing noise pattern but animate position vertically */
+  animation: static-noise 0.2s steps(4) infinite, v-hold-roll 4s linear infinite;
+  /* Combine fast static with slow roll */
+}
+
+/* PHOSPHOR PERSISTENCE (Ghost Burn-in) */
+.phosphor-burn .screen::after {
+  content: "SYSTEM ALERT  SYSTEM ALERT  SYSTEM ALERT";
+  /* Ghost text */
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 80%;
+  height: 60%;
+  color: rgba(50, 255, 50, 0.08);
+  /* Very faint radioactive green */
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow: hidden;
+  z-index: 5;
+  pointer-events: none;
+
+  /* Burned Grid Lines + Vignette */
+  background-image:
+    repeating-linear-gradient(0deg,
+      rgba(50, 255, 50, 0.05) 0px,
+      rgba(50, 255, 50, 0.05) 1px,
+      transparent 1px,
+      transparent 20px),
+    radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.4) 100%);
 }

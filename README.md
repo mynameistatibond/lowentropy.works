@@ -1,5 +1,9 @@
 # lowentropy.works
 
+## Latest Updates (Visual Refinement)
+- **Lab Page**: Adjusted scale (66%), fixed responsive centering, and resolved header overlap issues.
+- **Fraud Detector**: Implemented custom dark-mode footer.
+
 ## Recent Updates (Monitor Wall Refinement)
 
 ### Visual Polish & Themes

@@ -68,6 +68,30 @@
         .divider {
             margin: 0.5rem auto !important;
         }
+
+        /* Dark Mode Footer Override for this page only */
+        footer {
+            color: #ffffff !important;
+            background: #0000ff !important;
+            /* Explicit Blue to match App */
+        }
+
+        footer .divider {
+            border-top-color: rgba(255, 255, 255, 0.4) !important;
+            margin-top: 0 !important;
+        }
+
+        /* High Specificity for Links */
+        footer a,
+        footer .entropy-fish-link {
+            color: #ffffff !important;
+            opacity: 0.8;
+        }
+
+        footer a:hover,
+        footer .entropy-fish-link:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 

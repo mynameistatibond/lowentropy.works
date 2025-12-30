@@ -3,18 +3,93 @@
    ========================================= */
 
 /* 1. Beige (Retro 90s PC) */
+/* 1. Beige (Retro 90s PC - HEAVILY DISTRESSED) */
 .monitor-casing.style-beige {
     background-color: #4a4840;
-    /* Dark Dirty Beige */
+    /* Dark Dirty Beige Base */
     color: #333;
-    /* Dark text for contrast */
+
     box-shadow:
         0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
 
     background-image:
-        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 40%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+        /* 1. UV Yellowing (Top Edges & Corners) - Stronger yellow/brown overlay */
+        radial-gradient(ellipse at 10% 0%, rgba(180, 160, 50, 0.4) 0%, transparent 30%),
+        radial-gradient(ellipse at 90% 0%, rgba(180, 160, 50, 0.4) 0%, transparent 30%),
+        linear-gradient(to bottom, rgba(160, 140, 60, 0.2) 0%, transparent 5%),
+
+        /* 2. Dust packed in vents (Simulated Slits on Left Side) */
+        linear-gradient(90deg,
+            transparent 0px,
+            transparent 10px,
+            rgba(0, 0, 0, 0.4) 11px,
+            rgba(0, 0, 0, 0.4) 14px,
+            transparent 15px),
+        /* Mask for vents - only show on left side */
+        linear-gradient(to right, rgba(0, 0, 0, 0.1) 0%, transparent 30px),
+
+        /* 3. Rubbed Smooth Texture (Center) vs Matte Edges */
+        radial-gradient(circle at 60% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+
+        /* 4. Base Noise */
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+
+    background-size:
+        100% 100%, 100% 100%, 100% 100%,
+        /* UV */
+        30px 100%, 100% 100%,
+        /* Vents pattern + mask (tiled horizontally start) */
+        100% 100%,
+        /* Rubbed */
+        100% 100%;
+    /* Noise */
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat-y, no-repeat, no-repeat, repeat;
+    background-position: 0 0, 0 0, 0 0, 15px 50px, 0 0, 0 0, 0 0;
+}
+
+/* MICRO-CRACK (Hairline from lower screw) */
+.monitor-casing.style-beige::after {
+    content: '';
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 20px;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.6);
+    transform: rotate(-25deg);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* GREASE HALOS (Around Buttons) */
+.monitor-casing.style-beige .monitor-controls {
+    background-image:
+        /* Shiny grease spots around imaginary buttons */
+        radial-gradient(circle at 10px 10px, rgba(255, 255, 255, 0.15) 0%, transparent 12px),
+        /* Power */
+        radial-gradient(circle at 40px 12px, rgba(255, 255, 255, 0.1) 0%, transparent 10px);
+    /* Reset */
+}
+
+/* SCREEN SMEAR (Keyboard reflection) */
+.monitor-casing.style-beige .screen::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 40%;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+    mask-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 90 Q 50 70 90 90' stroke='black' stroke-width='20' fill='none'/%3E%3C/svg%3E");
+    -webkit-mask-image: linear-gradient(to top, black, transparent);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 5;
+    /* Faint keyboard grid reflection hints */
+    background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 5px, transparent 5px, transparent 15px);
 }
 
 /* 2. Gunmetal (Blue-Grey Metallic) */
@@ -85,6 +160,15 @@
         linear-gradient(to bottom, #555 0%, #333 100%);
 }
 
+.monitor-casing.style-titanium .screen {
+    box-shadow:
+        inset 0 0 0 2px rgba(0, 0, 0, 0.8),
+        /* Sharp dark inner rim */
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    /* Subtle outer lip highlight */
+    border: 1px solid #111;
+}
+
 /* 7. Rusted (Industrial Worn) */
 .monitor-casing.style-rusted {
     background-color: #2a1a15;
@@ -153,6 +237,80 @@
     margin: 4px;
 }
 
+/* --- DIVERSE SCREEN SHADOWS FOR OTHER VARIANTS --- */
+
+/* 1. Beige (Dark Deep Recess - "Ugly" Fix) */
+.monitor-casing.style-beige .screen {
+    box-shadow:
+        inset 0 0 0 1px #000,
+        /* Sharp inner black line */
+        inset 0 0 20px #000;
+    /* Deep dark void shadow */
+    border: 1px solid #222;
+    /* Darker bezel border */
+}
+
+/* 2. Monitor #3 Rubbery (Soft Deep Inset) */
+.monitor-casing.style-rubbery .screen {
+    box-shadow:
+        inset 0 0 15px rgba(0, 0, 0, 1),
+        /* Very deep shadow */
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    /* Highlight on rubber edge */
+}
+
+/* 4. Bakelite (Round Soft Edges) */
+.monitor-casing.style-bakelite .screen {
+    box-shadow:
+        inset 0 0 12px rgba(0, 0, 0, 0.9),
+        /* Smooth rounded depth */
+        0 1px 0 rgba(255, 255, 255, 0.1);
+    /* Bottom lip highlight */
+    border-radius: 4px;
+    /* Slight screen roundness */
+}
+
+/* 7. Rusted (Sharp Gritty Cutout) */
+.monitor-casing.style-rusted .screen {
+    box-shadow:
+        inset 2px 2px 0 rgba(0, 0, 0, 0.8),
+        /* Sharp hard shadow top-left */
+        inset -1px -1px 0 rgba(255, 255, 255, 0.05);
+    /* Edge wear contrast */
+    border: 1px solid #1a0f0a;
+}
+}
+
+/* 2. Monitor #3 Rubbery (Soft Deep Inset) */
+.monitor-casing.style-rubbery .screen {
+    box-shadow:
+        inset 0 0 15px rgba(0, 0, 0, 1),
+        /* Very deep shadow */
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    /* Highlight on rubber edge */
+}
+
+/* 4. Bakelite (Round Soft Edges) */
+.monitor-casing.style-bakelite .screen {
+    box-shadow:
+        inset 0 0 12px rgba(0, 0, 0, 0.9),
+        /* Smooth rounded depth */
+        0 1px 0 rgba(255, 255, 255, 0.1);
+    /* Bottom lip highlight */
+    border-radius: 4px;
+    /* Slight screen roundness */
+}
+
+/* 7. Rusted (Sharp Gritty Cutout) */
+.monitor-casing.style-rusted .screen {
+    box-shadow:
+        inset 2px 2px 0 rgba(0, 0, 0, 0.8),
+        /* Sharp hard shadow top-left */
+        inset -1px -1px 0 rgba(255, 255, 255, 0.05);
+    /* Edge wear contrast */
+    border: 1px solid #1a0f0a;
+}
+
 /* 4. Controls Adjustment */
 .monitor-casing.style-retro-tv .monitor-controls {
     background: #505050;
@@ -164,4 +322,53 @@
 .monitor-casing.style-retro-tv .monitor-controls .knob {
     background: #111;
     border: 1px solid #000;
+}
+
+/* FLOPPY DRIVE (PC Style - Beige Monitor) */
+.monitor-casing.style-beige .floppy-drive {
+    position: absolute;
+    bottom: 25px;
+    right: 35px;
+    /* Offset from crack */
+    width: 90px;
+    height: 12px;
+    background: #3e3c36;
+    /* Darker recess */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(0, 0, 0, 0.5);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+}
+
+.monitor-casing.style-beige .drive-slot {
+    flex-grow: 1;
+    height: 4px;
+    background: #000;
+    margin-right: 6px;
+    border-bottom: 1px solid #555;
+    /* Metallic lip */
+}
+
+.monitor-casing.style-beige .drive-button {
+    width: 14px;
+    height: 8px;
+    background: #6a665a;
+    /* Slightly lighter beige plastic */
+    box-shadow:
+        inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+        1px 1px 1px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.monitor-casing.style-beige .drive-led {
+    width: 4px;
+    height: 2px;
+    background: #3a4a3a;
+    /* Unlit green LED */
+    margin-left: 4px;
+    box-shadow: inset 0 0 1px #000;
 }

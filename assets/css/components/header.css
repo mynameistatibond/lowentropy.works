@@ -6,10 +6,10 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1.2rem 2rem;
-  border-bottom: 0.5px solid var(--clr-divider);
+  padding: 1rem 2rem 0.6rem 2rem;
+  border-bottom: 1.2px solid var(--clr-divider);
   text-transform: uppercase;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   background: var(--clr-bg);
   letter-spacing: 0.15em;
   position: sticky;
@@ -60,7 +60,7 @@ header a:hover {
 ========================================= */
 
 .brand {
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   letter-spacing: 0.15em;
 }
 

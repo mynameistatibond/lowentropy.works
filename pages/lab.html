@@ -61,6 +61,7 @@
             <!-- Tucked closer to main -->
             <div class="monitor-casing size-wide state-idle style-beige style-heavy-contact"
                 style="--x: 285px; --y: 0px; --z: 15; --sx: 1.02; --sy: 0.97;">
+                <div class="ambient-glow"></div>
                 <div class="screen">
                     <div class="screen-content"></div>
                 </div>
@@ -83,12 +84,31 @@
             <a href="/pages/fraud_detector.html" class="monitor-link"
                 style="--x: 580px; --y: -5px; --z: 20; --sx: 1.015; --sy: 0.98;">
                 <div class="monitor-casing size-lg state-active style-heavy-contact" id="monitor-2">
+                    <div class="ambient-glow"></div>
 
                     <!-- ANNOTATION HOVER SYSTEM (Overlay) -->
                     <div class="fraud-screen-hotspot"></div>
                     <svg class="annotation-overlay" viewBox="0 0 400 300" style="overflow: visible;">
-                        <!-- Path: Start -> Out -> End (shorter, approx 75% screen width) -->
-                        <path class="annotation-path" d="" fill="none" stroke-width="1" />
+                        <defs>
+                            <!-- Gradient for Soft Stop -->
+                            <linearGradient id="line-fade" gradientUnits="userSpaceOnUse" x1="560" y1="0" x2="640"
+                                y2="0">
+                                <stop offset="0" stop-color="white" />
+                                <stop offset="1" stop-color="black" />
+                            </linearGradient>
+
+                            <!-- Mask that handles the "Draw" animation -->
+                            <mask id="draw-mask">
+                                <!-- This path draws out physically but is only visible as a mask -->
+                                <!-- Stroke is the gradient so it fades the end of the reveal -->
+                                <path class="anno-curve anno-mask-path" d="" fill="none" stroke="url(#line-fade)"
+                                    stroke-width="6" stroke-linecap="round" />
+                            </mask>
+                        </defs>
+
+                        <!-- Visible Line: Static Dotted, Revealed by Mask -->
+                        <path class="anno-curve dotted-display-line" d="" fill="none" stroke-width="2.5"
+                            stroke-dasharray="0 5" stroke-linecap="round" mask="url(#draw-mask)" />
                     </svg>
 
                     <!-- Declassified Text Annotation -->
@@ -105,7 +125,7 @@
 
                     <div class="screen">
                         <div class="screen-content">
-                            <div class="project-title">FRAUD<br>DETECTOR</div>
+                            <div class="project-title">FRAUD DETECTOR</div>
                             <div class="project-desc">AUTO-TRIAGE<br>SYSTEM</div>
                             <div class="status-indicator"><span class="blink-dot">●</span> LIVE</div>
                         </div>
@@ -129,6 +149,7 @@
             <!-- Tucked closer to main -->
             <div class="monitor-casing size-md state-glitch style-rubbery style-heavy-contact"
                 style="--x: 960px; --y: 0px; --z: 15; --sx: 1.02; --sy: 0.96;">
+                <div class="ambient-glow"></div>
                 <div class="screen">
                     <div class="screen-content">EXP_02</div>
                 </div>
@@ -149,6 +170,7 @@
             <!-- Rotated to show depth -->
             <div class="monitor-casing size-md state-retro-noise style-retro-tv"
                 style="--x: 30px; --y: 8px; --z: 10; --r: -4deg;">
+                <div class="ambient-glow"></div>
                 <div class="screen"></div>
                 <div class="monitor-controls right-side">
                     <div class="knob"></div>
@@ -187,8 +209,9 @@
 
             <!-- 7. Small Idle (Peak Left - on Rack) -->
             <!-- Dropped down to sit on #5 -->
-            <div class="monitor-casing size-sm state-idle style-military"
+            <div class="monitor-casing size-sm state-glitch-noise style-military"
                 style="--x: 385px; --y: 350px; --z: 30; --r: -4deg;">
+                <div class="ambient-glow"></div>
                 <div class="screen"></div>
                 <div class="monitor-controls">
                     <div class="knob small"></div>
@@ -217,6 +240,7 @@
             <!-- Sitting on the Med Glitch -->
             <div class="monitor-casing size-sm-lg state-pink-noise style-glossy"
                 style="--x: 1020px; --y: 187px; --z: 18; --r: -4deg;">
+                <div class="ambient-glow"></div>
                 <div class="screen"></div>
             </div>
 
@@ -250,8 +274,8 @@
             const baseWidth = 1250; // Adjusted to match new CSS width for centering
             const baseHeight = 600; // Natural height
 
-            // Available width: 66% of viewport (Reduced by 5% per user request)
-            const targetWidth = window.innerWidth * 0.66;
+            // Available width: 61% of viewport (Reduced by ~7% per user request)
+            const targetWidth = window.innerWidth * 0.61;
 
             // Calculate scale
             const scale = targetWidth / baseWidth;

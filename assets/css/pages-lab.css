@@ -123,6 +123,8 @@ a.monitor-link {
   /* Ensure it doesn't have its own background/shadow */
   background: transparent;
   box-shadow: none;
+  cursor: pointer;
+  /* Enforce pointer cursor */
 }
 
 /* Hover Physics: Lift and Pop */
@@ -153,7 +155,11 @@ a.monitor-link {
   /* Bezel thickness */
   /* Deep shadow moved here */
   box-shadow:
-    0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+    0 2px 5px rgba(0, 0, 0, 1),
+    /* Ultra Tight Crease */
+    0 10px 40px 10px rgba(0, 0, 0, 0.95),
+    /* Widened Contact Gap-Filler */
+    0 30px 60px rgba(0, 0, 0, 0.9),
     inset 0 1px 1px rgba(255, 255, 255, 0.15),
     /* Top edge highlight (reflection) */
     inset 0 -2px 5px rgba(0, 0, 0, 0.5);
@@ -557,9 +563,13 @@ a.monitor-link {
 
   /* Dust accumulation in seams */
   box-shadow:
+    0 2px 5px rgba(0, 0, 0, 1),
+    /* Ultra Tight Crease */
+    0 10px 40px 10px rgba(0, 0, 0, 0.95),
+    /* Widened Contact Gap-Filler */
     inset 0 0 15px rgba(0, 0, 0, 0.9),
     /* Internal Grime */
-    0 30px 60px rgba(var(--clr-shadow-rgb), 0.9);
+    0 30px 60px rgba(0, 0, 0, 0.95);
 }
 
 /* Micro-scratches specific to this unit */
@@ -576,7 +586,7 @@ a.monitor-link {
 
 /* SCREEN BURN-IN GHOSTING */
 .monitor-casing.size-lg.state-active .screen-content::before {
-  content: "FRAUD\A DETECTOR\A AUTO-TRIAGE\A SYSTEM\A ● LIVE";
+  content: "FRAUD DETECTOR\A AUTO-TRIAGE\A SYSTEM\A ● LIVE";
   white-space: pre-wrap;
   position: absolute;
   top: 0;
@@ -653,7 +663,7 @@ a.monitor-link {
   border-radius: 8px;
   /* Soft corners */
   box-shadow:
-    0 30px 60px rgba(var(--clr-shadow-rgb), 0.9),
+    0 30px 60px rgba(0, 0, 0, 0.9),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
   /* PADDING for Chin adjustments */
@@ -669,7 +679,7 @@ a.monitor-link {
 /* Controls (Bottom Left) */
 .monitor-casing.style-rubbery .monitor-controls {
   position: absolute;
-  bottom: 8px;
+  bottom: 15px;
   left: 15px;
   display: flex;
   align-items: center;
@@ -709,7 +719,6 @@ a.monitor-link {
   background: radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 20%);
   /* Smoothed textture near controls */
   mix-blend-mode: overlay;
-}
 }
 
 /* Sunken Knob */
@@ -797,7 +806,51 @@ a.monitor-link {
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* Amber Screen */
+/* 4. Heavy Contact (Worn Industrial Metal) */
+.monitor-casing.style-heavy-contact {
+  background-color: #1a1a1a;
+  /* Dark metallic base */
+  border-radius: 6px;
+  /* Slightly rounded metal */
+
+  /* Deep, heavy shadows + Internal Grime */
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.95),
+    /* Deep drop shadow */
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    /* Top edge lighting */
+    inset 0 0 60px rgba(0, 0, 0, 0.9);
+  /* Heavily darkened center/edges */
+
+  /* Metallic Texture + Noise */
+  background-image:
+    /* Vertical Brushed Metal Effect */
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255, 255, 255, 0.03) 1px, rgba(255, 255, 255, 0.03) 2px),
+    /* Radial Sheen (Metallic reflection) */
+    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+    /* High-frequency Noise (Grain) */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.2'/%3E%3C/svg%3E");
+}
+
+/* Extra Grime/Shadow Overlay */
+.monitor-casing.style-heavy-contact::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 50%, rgba(0, 0, 0, 0.8) 100%);
+  border-radius: 6px;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+/* Disable global scratches for heavy contact style to avoid visual artifacts */
+.monitor-casing.style-heavy-contact::before {
+  display: none !important;
+  content: none !important;
+  background-image: none !important;
+}
+
 .monitor-casing.style-portable .screen {
   box-shadow: inset 0 0 15px rgba(255, 170, 0, 0.3);
   /* Amber glow */
@@ -858,9 +911,13 @@ a.monitor-link {
 .state-active .screen-content {
   color: #4af64a;
   text-shadow: 0 0 5px rgba(74, 246, 74, 0.6);
+  padding-top: 1.5rem;
+  /* Lowered text block */
 }
 
 .state-active .project-title {
+  display: inline-block;
+  /* Tight frame */
   font-size: 1.1rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -929,6 +986,17 @@ a.monitor-link {
   animation: static-noise 0.2s steps(4) infinite;
   display: block;
   /* Ensure pseudo-element attaches */
+  position: relative;
+}
+
+/* Static Center Highlight */
+.monitor-casing.state-retro-noise .screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 240, 200, 0.4) 0%, transparent 70%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* Upward Moving Stripes */
@@ -1000,6 +1068,33 @@ a.monitor-link {
   opacity: 1;
   animation: static-noise 0.2s steps(4) infinite;
 }
+
+/* Glitchy Noise (Monitor 7 - Green Casing) */
+/* Glitchy Noise (Monitor 7 - Green Casing) */
+.state-glitch-noise .screen {
+  background-color: #000;
+
+  /* Heavy Vignette + Noise */
+  background-image:
+    radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.95) 90%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, 120px 120px;
+
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+
+  filter: contrast(170%) brightness(130%);
+  opacity: 1;
+  /* Just noise, NO JUMP */
+  animation: static-noise 0.15s steps(3) infinite;
+  overflow: hidden;
+  /* Ensure scanline doesn't bleed */
+  position: relative;
+  /* For pseudo pos */
+}
+
+
 
 /* Knobs */
 .knob {
@@ -1097,9 +1192,13 @@ a.monitor-link {
   text-shadow: 0 0 5px rgba(74, 246, 74, 0.6);
   padding-left: 1.5rem;
   /* Move text away from edge */
+  padding-top: 1.5rem;
+  /* Lowered text block */
 }
 
 .state-active .project-title {
+  display: inline-block;
+  /* Tight frame */
   font-size: 1.1rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -1247,4 +1346,93 @@ a.monitor-link {
       transparent 1px,
       transparent 20px),
     radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+/* =========================================
+   AMBIENT BACKGROUND GLOWS (Floor Reflections)
+   ========================================= */
+
+.ambient-glow {
+  position: absolute;
+  /* Base position - Overridden by specific states */
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  z-index: -1;
+  width: 150%;
+  height: 120px;
+  /* Fixed height oval */
+  border-radius: 50%;
+
+  filter: blur(50px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* 1. Retro TV (Whitish - Soft Spread) */
+.state-retro-noise .ambient-glow {
+  /* Standardized Whitish */
+  background: radial-gradient(ellipse at 50% 0%, rgba(230, 245, 255, 0.8) 0%, transparent 70%);
+  mix-blend-mode: screen;
+
+  width: 160%;
+  height: 250px;
+  bottom: -300px;
+  /* Raised slightly */
+  filter: blur(45px);
+  opacity: 0.7;
+}
+
+/* 2. Main Fraud (Greenish Cyan) */
+.state-active .ambient-glow {
+  background: radial-gradient(circle, rgba(100, 255, 150, 0.95) 0%, transparent 60%);
+  mix-blend-mode: screen;
+  bottom: -140px;
+  /* Large monitor, further shadow throw */
+  width: 180%;
+  filter: blur(60px);
+  opacity: 0.45;
+  /* Much Subtler */
+}
+
+/* 3. Military Glitch (Cyan White) */
+.state-glitch-noise .ambient-glow {
+  background: radial-gradient(circle, rgba(200, 255, 255, 0.9) 0%, transparent 60%);
+  mix-blend-mode: screen;
+  bottom: -120px;
+  opacity: 0.8;
+}
+
+/* 4. Pink Noise (Magenta) */
+.state-pink-noise .ambient-glow {
+  background: radial-gradient(circle, rgba(255, 100, 255, 0.95) 0%, transparent 60%);
+  mix-blend-mode: screen;
+  bottom: -120px;
+  opacity: 0.45;
+  /* Much Subtler */
+}
+
+/* 5. Wide Idle (Whitish - Soft Spread) */
+.state-idle .ambient-glow {
+  /* Standardized Whitish */
+  background: radial-gradient(ellipse at 50% 0%, rgba(230, 245, 255, 0.8) 0%, transparent 70%);
+  mix-blend-mode: screen;
+
+  width: 160%;
+  height: 220px;
+  bottom: -290px;
+  /* Raised slightly */
+  filter: blur(45px);
+  opacity: 0.7;
+}
+
+/* 6. Polymer Glitch (Subtle Cool White) */
+.state-glitch .ambient-glow {
+  background: radial-gradient(circle, rgba(220, 240, 255, 0.8) 0%, transparent 60%);
+  mix-blend-mode: screen;
+  bottom: -280px;
+  /* VERY LOW to clear other screens */
+  opacity: 0.3;
+  /* Subtle */
 }

@@ -2,28 +2,29 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Elements
         const hotspot = document.querySelector('.fraud-screen-hotspot');
-        const path = document.querySelector('.annotation-path');
+        const paths = document.querySelectorAll('.anno-curve'); // All curves that need "d" update
+        const animPath = document.querySelector('.anno-mask-path'); // The one that animates (in mask)
         const textBlock = document.querySelector('.annotation-text-block');
 
-        if (!hotspot || !path || !textBlock) {
+        if (!hotspot || paths.length === 0 || !textBlock) {
             console.warn('Annotation Hover: Elements not found.');
             return;
         }
 
         // Configuration: Single Source of Truth for Layout
         const config = {
-            start: { x: 180, y: 68 },
+            start: { x: 290, y: 68 },
             elbow: { x: 350, y: 68 },
             end: { x: 640, y: -255 },
             textGap: 34,        // Horizontal gap between line tip and text
-            textYOffset: -105   // Vertical offset (Text Top relative to Line End Y)
+            textYOffset: -35   // Vertical offset (Text Top relative to Line End Y)
         };
 
         // Apply Layout Dynamically
         function updateLayout() {
-            // 1. Draw Line
+            // 1. Draw Line (Update all geometric instances)
             const d = `M ${config.start.x} ${config.start.y} L ${config.elbow.x} ${config.elbow.y} L ${config.end.x} ${config.end.y}`;
-            path.setAttribute('d', d);
+            paths.forEach(p => p.setAttribute('d', d));
 
             // 2. Position Text
             const textLeft = config.end.x + config.textGap;
@@ -59,12 +60,20 @@
         });
 
         // Calculate path length for perfect drawing
-        const length = path.getTotalLength();
-        path.style.strokeDasharray = length + 200; // Extra buffer
-        path.style.strokeDashoffset = length + 200;
+        if (animPath) {
+            const length = animPath.getTotalLength();
 
-        // Force layout
-        path.getBoundingClientRect();
+            // Disable transition to force immediate hide
+            animPath.style.transition = 'none';
+            animPath.style.strokeDasharray = length + 200; // Extra buffer
+            animPath.style.strokeDashoffset = length + 200;
+
+            // Force layout
+            animPath.getBoundingClientRect();
+
+            // Restore transition
+            animPath.style.transition = '';
+        }
 
         let typeTimeouts = [];
         let isHovering = false;
@@ -74,11 +83,11 @@
             if (!isHovering) return;
 
             // 1. Line Draw (CSS Transition)
-            path.classList.add('active');
+            if (animPath) animPath.classList.add('active');
             textBlock.classList.remove('hidden'); // Ensure container is visible
 
-            // 2. Typing Start Delay (Reduced to 800ms for smoother overlap)
-            const lineDuration = 800;
+            // 2. Typing Start Delay (Reduced for faster overlap)
+            const lineDuration = 600;
 
             // Clear any existing timeouts first
             clearTypeTimeouts();
@@ -89,17 +98,17 @@
             // Iterate through each block (Header, Status, Body Lines)
             charSpansMap.forEach((spans, blockIndex) => {
                 // Add a small pause between blocks?
-                if (blockIndex > 0) globalDelay += 100; // 100ms pause between lines
+                if (blockIndex > 0) globalDelay += 50; // 50ms pause between lines
 
                 spans.forEach((span, charIndex) => {
                     const timeout = setTimeout(() => {
                         if (isHovering) span.classList.add('visible');
-                    }, globalDelay + (charIndex * 25)); // 25ms per char
+                    }, globalDelay + (charIndex * 15)); // 15ms per char
                     typeTimeouts.push(timeout);
                 });
 
                 // Increment globalDelay by the time it took to type this block
-                globalDelay += (spans.length * 25);
+                globalDelay += (spans.length * 15);
             });
         }
 
@@ -116,7 +125,7 @@
             });
 
             // 3. Line Retracts
-            path.classList.remove('active');
+            if (animPath) animPath.classList.remove('active');
         }
 
         function clearTypeTimeouts() {

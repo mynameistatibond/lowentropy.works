@@ -14,26 +14,21 @@
 }
 
 /* The Line Itself */
-.annotation-path {
-    fill: none;
+/* The Visible Dotted Line */
+.dotted-display-line {
     stroke: var(--clr-text);
     /* Theme aware */
-    stroke-width: 1px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-
-    /* White highlight for contrast on dark monitor parts */
     filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8));
+}
 
-    /* Animation Setup */
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
+/* The Invisible Mask Path (Handles Animation) */
+.anno-mask-path {
+    /* stroke-dasharray/offset injected by JS */
     transition: stroke-dashoffset 1000ms cubic-bezier(0.4, 0.0, 0.2, 1);
-    opacity: 1;
 }
 
 /* Active State for Line (Draws out) */
-.annotation-path.active {
+.anno-mask-path.active {
     stroke-dashoffset: 0 !important;
 }
 
@@ -47,7 +42,8 @@
     height: 60%;
     z-index: 150;
     /* Above screen content */
-    cursor: crosshair;
+    cursor: pointer;
+    /* User requested pointer instead of crosshair */
 }
 
 /* =========================================
@@ -70,7 +66,7 @@
 
 /* Header */
 .anno-header {
-    font-size: 16px;
+    font-size: 18px;
     color: var(--clr-text);
     /* Theme aware */
     letter-spacing: 0.05em;
@@ -81,7 +77,7 @@
 
 /* Status */
 .anno-status {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--clr-text);
     /* Theme aware */
     text-transform: uppercase;
@@ -92,7 +88,7 @@
 
 /* Body */
 .anno-body {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--clr-text);
     /* Theme aware */
     line-height: 1.35;

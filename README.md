@@ -1,7 +1,8 @@
 # lowentropy.works
 
 ## Latest Updates (Visual Refinement)
-- **Lab Page**: Adjusted scale (66%), fixed responsive centering, and resolved header overlap issues.
+- **Lab Page**: Enhanced realism with deep contact shadows, refined header, and faster annotations.
+- **Home Page**: Adjusted floating dots animation.
 - **Fraud Detector**: Implemented custom dark-mode footer.
 
 ## Recent Updates (Monitor Wall Refinement)

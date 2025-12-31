@@ -6,7 +6,7 @@ body.lab-page-body {
   background-color: var(--clr-bg);
   color: var(--clr-text);
   overflow-x: hidden;
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition: background-color 2s ease, color 2s ease;
 }
 
 /* Override Footer Margin for this page */

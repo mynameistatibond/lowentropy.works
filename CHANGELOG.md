@@ -2,30 +2,33 @@
 
 All notable changes to the **Low Entropy Works** project will be documented in this file.
 
-## [Unreleased] - 2025-12-30
+## [v1.2.0] - 2025-12-30
 
 ### Added
 - **Global**: Created this `CHANGELOG.md` to track project history.
+- **Content**: Added "Insurance Fraud Detection — End-to-End ML Decision App (Live)" to `pages/case_studies.html`.
+- **Assets**: Added theme-aware Alice images to Home page.
 
 ### Changed
+- **Page: Home (`/index.html`)**:
+    - **Theme Transitions**: Implemented seamless 2-second cross-fade for Alice images and synced all button color transitions (`.pill-button`) to match the global theme fade.
+    - **Visual Alignment**:
+        - Shifted Alice image (`translateX(-12px)`) for optical center.
+        - Tuned floating dots position (`73.5%`) and z-index (`100`) to align with the action button and float above images.
+    - **Navigation**:
+        - Reordered "Now Exploring" list (Newest/2025-12 first).
+        - Renamed top item to "⟡ Claim Fraud Detection (ML): End-to-End ML Decision App (Live)".
+    - **Action**: Updated "down the rabbit hole →" button style and text.
+
 - **Page: Low-Entropy Lab (`/pages/lab.html`)**:
-    - **Header**: Updated subheader text to "【DEPLOYED ML SYSTEMS】 『LIVE』 〈INSPECTABLE〉" with simplified instruction line.
-    - **Layout**:
-        - Scaled down monitor wall composition to **66% viewport width**.
-        - Implemented **responsive centering** with a calculated left offset (`5vw`) to maintain visual balance across desktop and mobile.
-        - Fixed header overlap issue by enforcing a fixed `9rem` top margin.
-    - **Visuals**: Implemented deep contact shadows (ambient occlusion) for monitor pile realism.
-    - **Typography**: Restored technical/uppercase styling for "EACH MONITOR IS AN ENTRY POINT".
+    - **Header**: Updated subheader text and instruction line.
+    - **Layout**: Scaled monitor wall to 66% width with responsive centering (`5vw` offset).
+    - **Visuals**: Added deep ambient occlusion shadows and "LIVE" status pulse.
+    - **Transitions**: Synced background color transition to `2s`.
 
 - **Page: Fraud Detector (`/pages/fraud_detector.html`)**:
-    - **Footer**: Enforced a custom "Dark Mode" footer (Solid Blue background, White text) to match the page aesthetic, distinct from the global footer.
-
-- **Page: Home (`/index.html`)**:
-    - **Animation**: Raised floating dots ending position to 75% (5% higher).
+    - **Footer**: Enforced custom "Dark Mode" footer.
 
 - **Global Styles**:
-    - **Header**:
-        - Reduced vertical padding (Asymmetric: `1rem` top, `0.6rem` bottom).
-        - Reduced link font size to `0.75rem` (Brand remains `0.95rem`).
-    - **Footer**: Optimized global footer spacing.
-    - **Annotations**: Accelerated text typing animation speed.
+    - **Transitions**: Standardized all theme transitions (Buttons, Backgrounds, Noise Opacity) to `2s ease`.
+    - **Header**: Refined padding and link sizes.

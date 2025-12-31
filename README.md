@@ -1,9 +1,9 @@
 # lowentropy.works
 
-## Latest Updates (Visual Refinement)
-- **Lab Page**: Enhanced realism with deep contact shadows, refined header, and faster annotations.
-- **Home Page**: Adjusted floating dots animation.
-- **Fraud Detector**: Implemented custom dark-mode footer.
+## Latest Updates (v1.2.0)
+- **Home**: Theme-aware "Alice" cross-fade animations, synced button transitions, and reordered "Now Exploring" feed.
+- **Lab**: Synced background transitions and refined monitor wall shadows.
+- **Global**: Enforced 2s smooth theme transitions across all interactive elements.
 
 ## Recent Updates (Monitor Wall Refinement)
 

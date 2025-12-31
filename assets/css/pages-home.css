@@ -263,6 +263,56 @@
 
 .dot {
   position: fixed;
-  z-index: 0;
-  /* was 1 → push further back */
+  z-index: 100;
+}
+
+/* =========================================
+   Home: Alice Image Theme Switcher
+   (Grid stack for smooth cross-fade)
+========================================= */
+.alice-container {
+  margin-top: 1rem;
+  max-width: 280px;
+  transform: translateX(-12px);
+  display: grid;
+  grid-template-areas: "stack";
+}
+
+/* Reduce gap between image and button */
+.home .rabbit-hole-link-wrap {
+  margin-top: 0.2rem;
+}
+
+/* Button transition sync */
+.home .pill-button {
+  transition: background-color 2s ease, color 2s ease, border-color 2s ease, opacity 0.2s ease;
+}
+
+.alice-container img {
+  grid-area: stack;
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+/* Default (Light Mode) */
+.alice-container .alice-light {
+  opacity: 1;
+  z-index: 1;
+}
+
+.alice-container .alice-dark {
+  opacity: 0;
+  z-index: 2;
+}
+
+/* Dark Mode Override */
+body[data-theme="dark"] .alice-container .alice-light {
+  opacity: 0;
+}
+
+body[data-theme="dark"] .alice-container .alice-dark {
+  opacity: 1;
 }

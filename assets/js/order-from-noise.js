@@ -14,7 +14,7 @@
     const s = getComputedStyle(host);
     // Try both tokens; fall back to computed text color
     const v =
-      (s.getPropertyValue('--clr-txt')  || '').trim() ||
+      (s.getPropertyValue('--clr-txt') || '').trim() ||
       (s.getPropertyValue('--clr-text') || '').trim() ||
       s.color || '#000';
     THEME_COLOR = v;
@@ -27,22 +27,22 @@
   mo.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
 
   // Config
-  const N       = Number(host.dataset.n      || 240);
-  const GRID    = Number(host.dataset.grid   || 28);
-  const SNAP_R  = Number(host.dataset.snap   || 100);
-  const RELAX   = Number(host.dataset.relax  || 0.3);
-  const R_BASE  = Number(host.dataset.r      || 5);
-  const OPACITY = Number(host.dataset.alpha  || 0.3);
-  const DAMP    = Number(host.dataset.damp   || 0.95);
-  const MARGIN  = Number(host.dataset.margin || 10);
-  const HOME    = Number(host.dataset.home   || 0.008);
+  const N = Number(host.dataset.n || 240);
+  const GRID = Number(host.dataset.grid || 28);
+  const SNAP_R = Number(host.dataset.snap || 100);
+  const RELAX = Number(host.dataset.relax || 0.3);
+  const R_BASE = Number(host.dataset.r || 5);
+  const OPACITY = Number(host.dataset.alpha || 0.3);
+  const DAMP = Number(host.dataset.damp || 0.95);
+  const MARGIN = Number(host.dataset.margin || 10);
+  const HOME = Number(host.dataset.home || 0.008);
 
   let W = 0, H = 0, pts = [], mouse = null;
 
   function size() {
     const r = host.getBoundingClientRect();
-    W = Math.max(320, Math.floor(r.width));
-    H = Math.max(80,  Math.floor(r.height));
+    W = Math.max(50, Math.floor(r.width));
+    H = Math.max(50, Math.floor(r.height));
     c.width = W * dpr; c.height = H * dpr;
     c.style.width = W + 'px'; c.style.height = H + 'px';
 
@@ -57,11 +57,10 @@
   size();
   new ResizeObserver(size).observe(host);
 
-  host.addEventListener('mousemove', (e) => {
+  document.addEventListener('mousemove', (e) => {
     const rect = host.getBoundingClientRect();
     mouse = { x: e.clientX - rect.left, y: e.clientY - rect.top };
   });
-  host.addEventListener('mouseleave', () => (mouse = null));
 
   function step() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

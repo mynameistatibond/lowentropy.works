@@ -3,10 +3,10 @@
 
 // dots.js — JS owns all positions now
 const dots = [
-  { el: document.querySelector('.dot.midblue'), start: { top: 20, left: 20 }, end: { top: 75, left: 40 } },
-  { el: document.querySelector('.dot.coral'), start: { top: 40, left: 37 }, end: { top: 75, left: 80 } },
-  { el: document.querySelector('.dot.lightblue'), start: { top: 45, left: 75 }, end: { top: 75, left: 60 } },
-  { el: document.querySelector('.dot.brightblue'), start: { top: 74, left: 10 }, end: { top: 75, left: 20 } }
+  { el: document.querySelector('.dot.midblue'), start: { top: 20, left: 20 }, end: { top: 73.5, left: 40 } },
+  { el: document.querySelector('.dot.coral'), start: { top: 40, left: 37 }, end: { top: 73.5, left: 80 } },
+  { el: document.querySelector('.dot.lightblue'), start: { top: 45, left: 75 }, end: { top: 73.5, left: 60 } },
+  { el: document.querySelector('.dot.brightblue'), start: { top: 74, left: 10 }, end: { top: 73.5, left: 20 } }
 ];
 
 const clamp01 = x => Math.max(0, Math.min(1, x));

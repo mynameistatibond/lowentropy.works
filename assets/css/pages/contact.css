@@ -1,7 +1,8 @@
-
-
-
-html, body { height: auto; overflow: auto; }
+html,
+body {
+  height: auto;
+  overflow: auto;
+}
 
 header {
   position: static !important;
@@ -14,10 +15,15 @@ header {
 ========================================= */
 
 /* fallback header height, works even if you don't set the var elsewhere */
-:root { --header-h: 60px; }  /* adjust after you eyeball it */
+:root {
+  --header-h: 60px;
+}
 
-.quadrant-grid{
-  position: relative;              /* not absolute */
+/* adjust after you eyeball it */
+
+.quadrant-grid {
+  position: relative;
+  /* not absolute */
   width: 100vw;
   min-height: calc(100vh - (var(--header-h)*2));
   height: auto;
@@ -25,9 +31,10 @@ header {
 
   display: grid;
   grid-template-columns: 60vw 40vw;
-  grid-template-rows: minmax(40vh, 1fr) auto;  /* top flexible, bottom grows to content */
-  margin: 0; 
-  padding: 0; 
+  grid-template-rows: minmax(40vh, 1fr) auto;
+  /* top flexible, bottom grows to content */
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -54,13 +61,13 @@ header {
 
 /* ── Contact block typography ───────────────────────────── */
 
-.q4{
+.q4 {
   margin-top: 2.2rem;
   margin-left: 1.4rem;
 }
 
 /* Title */
-.contact-panel h1{
+.contact-panel h1 {
   font-size: clamp(1.3rem, 1.2rem + 0.6vw, 1.6rem);
   line-height: 1.2;
   font-weight: 400;
@@ -70,7 +77,7 @@ header {
 }
 
 /* Subhead */
-.contact-sub{
+.contact-sub {
   font-size: .75rem;
   line-height: 1.35;
   opacity: .8;
@@ -78,18 +85,34 @@ header {
 }
 
 /* Links */
-.contact-panel ul{ padding-left: 0; margin: 0 0 .6rem 0; }
-.contact-list{ list-style: none; padding: 0; margin: 0 0 .6rem 0; }
-.contact-list li{ margin: .25rem 0; line-height: 1.25; }
-.contact-list a{
+.contact-panel ul {
+  padding-left: 0;
+  margin: 0 0 .6rem 0;
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 .6rem 0;
+}
+
+.contact-list li {
+  margin: .25rem 0;
+  line-height: 1.25;
+}
+
+.contact-list a {
   font-size: .9rem;
   text-decoration: none;
   color: var(--clr-text);
 }
-.contact-list a:hover{ opacity: .6; }
+
+.contact-list a:hover {
+  opacity: .6;
+}
 
 /* Newsletter CTA */
-.libutton{
+.libutton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -102,23 +125,26 @@ header {
   background: var(--clr-bg);
   color: var(--clr-text);
   text-decoration: none;
-  transition: opacity .25s ease, text-shadow .3s ease;
+  transition: opacity .25s ease, text-shadow .3s ease, background-color 2s ease, color 2s ease, border-color 2s ease;
 }
-.libutton:hover{
+
+.libutton:hover {
   opacity: .7;
   text-shadow: 0 0 10px currentColor;
 }
-[data-theme="dark"] .libutton:hover{
+
+[data-theme="dark"] .libutton:hover {
   text-shadow: 0 0 6px currentColor, 0 0 14px currentColor, 0 0 28px currentColor;
 }
 
 /* Meta */
-.location{
+.location {
   font-size: .78rem;
   opacity: .62;
   margin: .6rem 0 .4rem 0;
 }
-.note{
+
+.note {
   font-size: .75rem;
   line-height: 1.35;
   opacity: .72;
@@ -150,7 +176,7 @@ footer {
    Components: Voronoi Breathe Background
 ========================================= */
 
-.voronoi-breathe{
+.voronoi-breathe {
   position: relative;
   width: 100%;
   height: 100%;
@@ -158,43 +184,45 @@ footer {
 
   /* theme vars */
   --v-width: 0.9px;
-  --v-stroke:  #5d5d5d;
+  --v-stroke: #5d5d5d;
 }
 
 /* SVG fills container and clips edges so strokes don't touch frame */
-.voronoi-breathe svg{
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
+.voronoi-breathe svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   display: block;
   clip-path: inset(calc(var(--v-width, 2px) + 1px));
-  border: none; outline: none;
+  border: none;
+  outline: none;
 }
 
 /* Cells: IMPORTANT — give them the gradient fill here */
-.voronoi-breathe path{
-  fill: url(#cellShade) !important;   /* <-- ensures gradient is used */
+.voronoi-breathe path {
+  fill: url(#cellShade) !important;
+  /* <-- ensures gradient is used */
   stroke: var(--v-stroke);
   stroke-width: var(--v-width);
   vector-effect: non-scaling-stroke;
-  color: var(--v-shade);               /* currentColor for gradient stops */
+  color: var(--v-shade);
+  /* currentColor for gradient stops */
   opacity: .4;
 }
 
 /* Dark theme */
-[data-theme="dark"] .voronoi-breathe{
+[data-theme="dark"] .voronoi-breathe {
   --v-stroke: rgb(216, 216, 216);
 }
 
 /* Layout hygiene */
-.q1, .voronoi-breathe{ border: none; outline: none; }
-.quadrant-grid{ gap: 0; }
+.q1,
+.voronoi-breathe {
+  border: none;
+  outline: none;
+}
 
-
-
-
-
-
-
-
-
-
+.quadrant-grid {
+  gap: 0;
+}

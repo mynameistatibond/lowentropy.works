@@ -267,75 +267,12 @@
 }
 
 /* =========================================
-   Home: Alice Image Theme Switcher
-   (Grid stack for smooth cross-fade)
+   Home: Alice Image Position
+   (Generic transition handled by .theme-image-pair)
 ========================================= */
 .alice-container {
   margin-top: 1rem;
   max-width: 280px;
   transform: translateX(-12px);
-  display: grid;
-  grid-template-areas: "stack";
-}
-
-/* Reduce gap between image and button */
-.home .rabbit-hole-link-wrap {
-  margin-top: 0.2rem;
-}
-
-/* Button transition sync */
-.home .pill-button {
-  transition: background-color 2s ease, color 2s ease, border-color 2s ease, opacity 0.2s ease;
-}
-
-.alice-container img {
-  grid-area: stack;
-  width: 100%;
-  height: auto;
-  display: block;
-  opacity: 0;
-  transition-property: opacity;
-  transition-timing-function: ease;
-  transition-duration: 0.8s;
-}
-
-/* Default (Light Mode) / Fallback */
-.alice-container .alice-light {
-  z-index: 1;
-  opacity: 1;
-}
-
-.alice-container .alice-dark {
-  z-index: 2;
-  opacity: 0;
-}
-
-/* =========================================
-   Phase-Shifted Ops: Prevent Ghosting
-   ========================================= */
-
-/* State: DARK (switched TO dark) */
-body[data-theme="dark"] .alice-container .alice-light {
-  opacity: 0;
-  transition-delay: 0.2s;
-  /* Outgoing: vanish fast */
-}
-
-body[data-theme="dark"] .alice-container .alice-dark {
-  opacity: 1;
-  transition-delay: 1s;
-  /* Incoming: wait for bg to settle */
-}
-
-/* State: LIGHT (switched TO light) */
-body[data-theme="light"] .alice-container .alice-dark {
-  opacity: 0;
-  transition-delay: 0s;
-  /* Outgoing: vanish fast */
-}
-
-body[data-theme="light"] .alice-container .alice-light {
-  opacity: 1;
-  transition-delay: 1s;
-  /* Incoming: wait for bg to settle */
+  /* The rest is handled by .theme-image-pair */
 }

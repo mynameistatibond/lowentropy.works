@@ -1,6 +1,6 @@
 /* =========================================
    Components: Hero Text - Building order in intelligent systems and subtext
-========================================= */
+   ========================================= */
 
 .hero h1 {
   font-weight: 400;
@@ -16,7 +16,7 @@
 
 /* =========================================
    Components: Content / Left Column
-========================================= */
+   ========================================= */
 
 .content .symbol-header {
   font-size: 1.2rem;
@@ -58,7 +58,7 @@
 
 /* =========================================
    Components: Artifacts (right / center column)
-========================================= */
+   ========================================= */
 
 .artifact-feed {
   font-size: 0.8rem;
@@ -125,7 +125,7 @@
 
 /* =========================================
    Recommended Signals Table
-========================================= */
+   ========================================= */
 
 .section-note {
   font-size: 0.68rem;
@@ -201,7 +201,7 @@
 
 /* =========================================
    Components: Floating Symbols (spawned)
-========================================= */
+   ========================================= */
 
 .symbol {
   position: absolute;
@@ -222,7 +222,7 @@
 
 /* =========================================
    Components: CTA Link - Rabbit Hole
-========================================= */
+   ========================================= */
 
 .rabbit-hole-link-wrap {
   display: flex;
@@ -275,7 +275,7 @@
 
 /* =========================================
    Components: Pill Button (Newsletter/CV)
-========================================= */
+   ========================================= */
 
 .pill-button {
   display: inline-flex;
@@ -305,4 +305,67 @@
 
 [data-theme="dark"] .pill-button:hover {
   text-shadow: 0 0 6px currentColor, 0 0 14px currentColor, 0 0 28px currentColor;
+}
+
+
+/* =========================================
+   Components: Theme Image Pair (Phase-Shifted Cross-Fade)
+   ========================================= */
+.theme-image-pair {
+  display: grid;
+  grid-template-areas: "stack";
+  width: 100%;
+  /* Default width behavior */
+}
+
+.theme-image-pair img {
+  grid-area: stack;
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+  transition-duration: 0.8s;
+}
+
+/* Default (Light Mode) / Fallback */
+.theme-image-pair .theme-img-light {
+  z-index: 1;
+  opacity: 1;
+}
+
+.theme-image-pair .theme-img-dark {
+  z-index: 2;
+  opacity: 0;
+}
+
+/* =========================================
+   Phase-Shifted Ops: Prevent Ghosting
+   ========================================= */
+
+/* State: DARK (switched TO dark) */
+body[data-theme="dark"] .theme-image-pair .theme-img-light {
+  opacity: 0;
+  transition-delay: 0.2s;
+  /* Outgoing: vanish fast */
+}
+
+body[data-theme="dark"] .theme-image-pair .theme-img-dark {
+  opacity: 1;
+  transition-delay: 1s;
+  /* Incoming: wait for bg to settle */
+}
+
+/* State: LIGHT (switched TO light) */
+body[data-theme="light"] .theme-image-pair .theme-img-dark {
+  opacity: 0;
+  transition-delay: 0s;
+  /* Outgoing: vanish fast */
+}
+
+body[data-theme="light"] .theme-image-pair .theme-img-light {
+  opacity: 1;
+  transition-delay: 1s;
+  /* Incoming: wait for bg to settle */
 }

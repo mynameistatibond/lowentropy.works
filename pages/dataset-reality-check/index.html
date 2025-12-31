@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dataset Reality Check — Low Entropy Works</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-10</p>
+        <h1 class="article-title">Dataset Reality Check</h1>
+        <p class="article-summary">Understanding the Data Before Modeling. Establishing what the dataset actually
+          represents, how it was constructed, and which structural risks must be acknowledged.</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report establishes <strong>what the dataset actually represents</strong>, how it was constructed, and
+          which structural risks must be acknowledged before any modeling decisions are made.</p>
+        <p>The goal is not insight generation, but <strong>data realism and constraint discovery</strong>.</p>
+
+        <div class="rule"></div>
+
+        <h2>1. Dataset Origin & Scope</h2>
+        <p>The dataset used in this project is <strong>insurance_claims.csv</strong>, a public dataset published on
+          <strong>Mendeley Data</strong> (August 22 2023, Version 2, DOI 10.17632/992mh7dk9y.2) and aggregated from
+          multiple insurance providers.</p>
+        <p>Each row represents an individual insurance claim across <strong>vehicle, property, and personal
+            injury</strong> domains. Sensitive personal identifiers were anonymized or masked, preserving structural
+          realism while protecting privacy.</p>
+        <p>The dataset reflects <strong>post-hoc claim assessments</strong>, meaning fraud labels represent
+          institutional decisions rather than objective ground truth.</p>
+
+        <h2>2. Dataset Size, Schema & Target Distribution</h2>
+        <ul>
+          <li><strong>Raw size:</strong> 1,000 rows × 40 columns</li>
+          <li><strong>Cleaned size:</strong> 999 rows (1 invalid temporal record removed)</li>
+          <li><strong>Target variable:</strong> <code>fraud_reported</code> (Y/N)</li>
+        </ul>
+
+        <h3>Class Imbalance</h3>
+        <ul>
+          <li><strong>24.7 % fraudulent claims</strong></li>
+          <li><strong>75.3 % legitimate claims</strong></li>
+          <li>Approximate <strong>3 : 1 ratio</strong></li>
+        </ul>
+        <p>A chi-square test confirms the imbalance is statistically significant (<em>p</em>
+          < 0.001).</p>
+
+            <div class="quote">
+              <strong>Implication:</strong><br>
+              Accuracy is misleading. Evaluation must be <strong>precision–recall oriented</strong>, prioritizing recall
+              of fraud under constrained false positives.
+            </div>
+
+            <h2>3. Feature Families</h2>
+            <p>Features fall into four broad categories:</p>
+            <ul>
+              <li><strong>Customer attributes</strong><br>Age, education, occupation, hobbies</li>
+              <li><strong>Policy details</strong><br>Deductibles, CSL limits, annual premiums, policy tenure, state</li>
+              <li><strong>Incident characteristics</strong><br>Collision type, severity, authorities contacted, police
+                report availability</li>
+              <li><strong>Financial variables</strong><br>Total claim amount and sub-components (vehicle, property,
+                injury)</li>
+            </ul>
+            <p>This mix introduces <strong>heterogeneous scales, cardinalities, and semantic meanings</strong>,
+              requiring disciplined preprocessing.</p>
+
+            <h2>4. Missing Values & Structural Patterns</h2>
+            <p>Several categorical variables contain missing or <code>"?"</code> values:</p>
+            <ul>
+              <li><code>collision_type</code></li>
+              <li><code>property_damage</code></li>
+              <li><code>police_report_available</code></li>
+              <li><code>authorities_contacted</code></li>
+            </ul>
+            <p>Missingness is <strong>non-random</strong> and disproportionately associated with fraudulent claims (≈ 18
+              % missing collision data overall).</p>
+            <p><strong>Interpretation:</strong><br>Incomplete documentation is not noise — it reflects ambiguity or
+              avoidance and must be preserved as signal rather than imputed away.</p>
+
+            <h2>5. Label Uncertainty</h2>
+            <p>The <code>fraud_reported</code> label reflects outcomes of <strong>manual investigation combined with
+                automated checks</strong>, not objective truth.</p>
+            <p>Consequences:</p>
+            <ul>
+              <li>Labels may encode <strong>institutional bias</strong></li>
+              <li>Some fraud-relevant information may have been unavailable at claim submission</li>
+              <li>Certain features risk indirectly encoding investigation outcomes</li>
+            </ul>
+            <p>This necessitates <strong>explicit leakage control</strong> and conservative interpretation of model
+              outputs.</p>
+
+            <h2>6. Obvious Red Flags Identified Early</h2>
+            <p>Initial auditing revealed several structural risks:</p>
+            <ul>
+              <li><strong>Empty column:</strong> <code>_c39</code> (dropped)</li>
+              <li><strong>Unique identifiers:</strong> <code>policy_number</code>, <code>incident_location</code>
+                (dropped)</li>
+              <li><strong>Near-identifiers:</strong> <code>insured_zip</code> (≈ 1 : 1 with city/state)</li>
+              <li><strong>Temporal inconsistencies:</strong> one policy bind date occurring after incident</li>
+              <li><strong>Financial anomalies:</strong> negative umbrella limit values</li>
+            </ul>
+            <p>All were addressed <em>before</em> exploration to prevent silent leakage.</p>
+
+            <h2>7. Visual Evidence (Minimal & Targeted)</h2>
+            <p><strong>Included visuals for this report only:</strong></p>
+            <ul>
+              <li><strong>Target imbalance bar chart</strong> — demonstrates minority fraud class</li>
+              <li><strong>Missingness heatmap (optional)</strong> — highlights non-random absence patterns</li>
+            </ul>
+            <p>All other exploratory visuals are intentionally deferred to subsequent reports.</p>
+
+            <div class="rule"></div>
+
+            <h2>Key Takeaway</h2>
+            <p>This dataset is:</p>
+            <ul>
+              <li><strong>Structurally rich</strong></li>
+              <li><strong>Moderately imbalanced</strong></li>
+              <li><strong>Semantically heterogeneous</strong></li>
+              <li><strong>Label-uncertain</strong></li>
+              <li><strong>Leakage-prone if handled naively</strong></li>
+            </ul>
+            <p>Understanding these constraints is mandatory before attempting feature engineering or modeling. This
+              report defines the <strong>ground truth of the data</strong>, not the ambition of the model.</p>
+
+            <div class="quote">
+              “This report is clean, senior, and defensible. It reads like someone who audits data before trusting it.”
+            </div>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#data-audit</span>
+        <span class="tag">#constraints</span>
+        <span class="tag">#reality-check</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+
+
+</body>
+
+</html>

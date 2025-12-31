@@ -294,25 +294,48 @@
   height: auto;
   display: block;
   opacity: 0;
-  transition: opacity 2s ease;
+  transition-property: opacity;
+  transition-timing-function: ease;
+  transition-duration: 0.8s;
 }
 
-/* Default (Light Mode) */
+/* Default (Light Mode) / Fallback */
 .alice-container .alice-light {
-  opacity: 1;
   z-index: 1;
+  opacity: 1;
 }
 
 .alice-container .alice-dark {
-  opacity: 0;
   z-index: 2;
+  opacity: 0;
 }
 
-/* Dark Mode Override */
+/* =========================================
+   Phase-Shifted Ops: Prevent Ghosting
+   ========================================= */
+
+/* State: DARK (switched TO dark) */
 body[data-theme="dark"] .alice-container .alice-light {
   opacity: 0;
+  transition-delay: 0.2s;
+  /* Outgoing: vanish fast */
 }
 
 body[data-theme="dark"] .alice-container .alice-dark {
   opacity: 1;
+  transition-delay: 1s;
+  /* Incoming: wait for bg to settle */
+}
+
+/* State: LIGHT (switched TO light) */
+body[data-theme="light"] .alice-container .alice-dark {
+  opacity: 0;
+  transition-delay: 0s;
+  /* Outgoing: vanish fast */
+}
+
+body[data-theme="light"] .alice-container .alice-light {
+  opacity: 1;
+  transition-delay: 1s;
+  /* Incoming: wait for bg to settle */
 }

@@ -2,7 +2,25 @@
 
 All notable changes to the **Low Entropy Works** project will be documented in this file.
 
-## [v1.2.0] - 2025-12-30
+## [v1.3.0] - 2025-12-31
+
+### Refactored
+- **Clean URLs**: Restructured the entire site to use folder-based URLs (e.g., `/pages/about/` instead of `about.html`).
+    - Moved all user-facing pages into dedicated directories with `index.html`.
+    - Removed `.html` extensions from all internal links.
+    - Updated asset paths to `../../assets/` to accommodate deeper nesting.
+- **Templates**: Moved template files to `/templates/` directory for better organization.
+
+### Changed
+- **Home (`/index.html`)**:
+    - **Alice Image Transition**: Implemented "Phase-Shifted Opacity" to eliminate ghosting outlines during theme switches.
+        - **Logic**: Incoming image waits (`1s` delay) for the background (`2s` fade) to settle before appearing. Outgoing image vanishing immediately.
+        - **Timing**: Base fade `0.8s`, Incoming Delay `1s`.
+- **Bug Fixes**: Corrected broken relative paths in `lab`, `case-studies`, and `conversational-ai` pages that were caused by the directory move.
+
+### Added
+- **Page (`/pages/fraud-detection-framing/`)**: Created shell for "Claim Fraud Detection (ML): Framing Report" based on the article template.
+- **Documentation**: Added design system notes to `README.md` regarding the role of `article-template`.
 
 ### Added
 - **Global**: Created this `CHANGELOG.md` to track project history.

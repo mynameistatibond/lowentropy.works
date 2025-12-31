@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claim Fraud Detection (ML): Framing Report — Low Entropy Works</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-10</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Framing Report</h1>
+        <p class="article-summary">Defining the problem space, success metrics, and architectural decisions for an
+          end-to-end fraud detection system.</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>1. Context: Why Claim Fraud Detection Exists at All</h2>
+        <p>Insurance fraud is not a rare anomaly — it is a structural cost of the insurance business.</p>
+        <p>Claims processes are designed to be fast, customer-friendly, and scalable. Fraud exploits exactly those
+          properties. The result is a persistent tension between:</p>
+
+        <ul>
+          <li>speed vs. scrutiny</li>
+          <li>customer trust vs. loss prevention</li>
+          <li>human judgment vs. operational scale</li>
+        </ul>
+
+        <p>Fraud does not appear as a single, well-defined pattern. It ranges from deliberate fabrication to
+          exaggeration,
+          opportunistic timing, and inconsistencies that may also arise from stress, error, or misunderstanding.</p>
+        <p>From a product and operations perspective, the challenge is not to eliminate fraud, but to manage uncertainty
+          efficiently.</p>
+
+        <div class="rule"></div>
+
+        <h2>2. Business Problem Statement</h2>
+        <p>The core business problem addressed in this project is:</p>
+        <div class="quote">How can insurance companies prioritize potentially fraudulent claims early, so that limited
+          investigation resources are focused where they matter most, without unfairly impacting legitimate customers?
+        </div>
+
+        <p>This reframing is intentional.</p>
+        <ul>
+          <li>The goal is not automatic rejection of claims.</li>
+          <li>The goal is <strong>decision support</strong>.</li>
+        </ul>
+        <p>A useful system must help humans decide where to look, not decide what is true.</p>
+
+        <h2>3. Operational Reality & Constraints</h2>
+        <p>In real insurance operations:</p>
+        <ul>
+          <li>Fraudulent claims represent a small minority of total claims</li>
+          <li>Manual investigation is expensive, slow, and capacity-limited</li>
+          <li>Many signals emerge only after initial claim submission</li>
+          <li>Investigators must justify decisions to customers, regulators, and courts</li>
+        </ul>
+
+        <h3>This imposes hard constraints:</h3>
+        <ul>
+          <li>Every false positive has a real cost (customer friction, legal risk)</li>
+          <li>Every false negative has a real cost (financial loss, precedent)</li>
+          <li>Investigators cannot review everything — triage is unavoidable</li>
+        </ul>
+        <p>Therefore, the problem is best understood as a <strong>ranking and prioritization task</strong> under
+          capacity
+          constraints, not a pure binary classification problem.</p>
+
+        <h2>4. System Objective (Product View)</h2>
+        <p>The system developed in this project aims to:</p>
+        <ul>
+          <li>Assign a risk score to incoming insurance claims</li>
+          <li>Enable early prioritization for human review</li>
+          <li>Support threshold-based workflows aligned with investigation capacity</li>
+          <li>Provide signals that are interpretable and auditable</li>
+        </ul>
+        <p>This aligns with how fraud detection systems are actually deployed in production environments.</p>
+
+        <h2>5. Dataset Context</h2>
+        <p>This project is based on the publicly available dataset:</p>
+        <p class="lede">
+          <strong>insurance_claims.csv</strong><br>
+          Published: 22 August 2023<br>
+          Version: 2<br>
+          DOI: 10.17632/992mh7dk9y.2<br>
+          Contributor: Abdelrahim Aqqad
+        </p>
+
+        <p>Each row represents a single insurance claim. Columns describe customer history, policy attributes, incident
+          details, and administrative signals.</p>
+        <p>The target variable <code>fraud_reported</code> indicates whether a claim was ultimately classified as
+          fraudulent following a combination of manual review and automated checks.</p>
+
+        <h3>Key contextual characteristics:</h3>
+        <ul>
+          <li>Data aggregated from multiple insurance providers</li>
+          <li>Covers vehicle, property, and personal injury claims</li>
+          <li>Sensitive identifiers are anonymized</li>
+          <li>Labels reflect post-hoc decisions, not objective ground truth</li>
+        </ul>
+        <p>This framing has direct implications for modeling and evaluation.</p>
+
+        <h2>6. Important Assumptions & Limitations</h2>
+        <p>This dataset supports supervised learning, but only under explicit assumptions:</p>
+
+        <ul>
+          <li><strong>Label uncertainty:</strong> Fraud labels reflect institutional decisions, not absolute truth.</li>
+          <li><strong>Temporal ambiguity:</strong> Some features may encode information unavailable at claim submission
+            time.</li>
+          <li><strong>Human bias:</strong> Historical fraud decisions may reflect procedural or demographic biases.</li>
+          <li><strong>Class imbalance:</strong> Fraud cases are rare by nature, shaping both modeling strategy and
+            metrics.</li>
+        </ul>
+        <p>These issues are acknowledged at the framing stage to prevent methodological errors later.</p>
+
+        <h2>7. Formal Problem Definition</h2>
+        <p>For the purposes of this project, the task is defined as:</p>
+        <div class="quote">Estimate the probability that a newly submitted insurance claim will be reported as
+          fraudulent, based solely on information plausibly available at or near submission time, in order to support
+          human investigation prioritization.</div>
+
+        <p>This definition intentionally excludes:</p>
+        <ul>
+          <li>Automated claim rejection</li>
+          <li>Post-investigation features</li>
+          <li>Assumptions of perfect labels</li>
+        </ul>
+
+        <h2>8. Success Criteria (Non-Technical)</h2>
+        <p>A successful system should:</p>
+        <ul>
+          <li>Rank higher-risk claims above lower-risk ones</li>
+          <li>Allow threshold tuning based on investigation capacity</li>
+          <li>Reduce average investigation effort per detected fraud</li>
+          <li>Remain explainable to investigators and auditors</li>
+        </ul>
+        <p>Raw accuracy alone is insufficient and potentially misleading in this context.</p>
+
+        <h2>9. Ethical & Governance Considerations</h2>
+        <p>Even at the framing stage, several risks are explicit:</p>
+        <ul>
+          <li>Disparate impact through proxy variables</li>
+          <li>Over-reliance on probabilistic outputs</li>
+          <li>Misuse as an automated decision authority</li>
+        </ul>
+        <p>This project treats these as design constraints, not afterthoughts. Bias, leakage, and explainability will be
+          addressed in dedicated stages.</p>
+
+        <div class="rule"></div>
+
+        <h2>10. Project Roadmap</h2>
+        <p>This report establishes the conceptual and operational foundation. Subsequent reports will cover:</p>
+        <ul>
+          <li>Exploratory Data Analysis (EDA)</li>
+          <li>Feature Engineering & Representation</li>
+          <li>Data Leakage Prevention</li>
+          <li>Bias & Fairness Analysis</li>
+          <li>Model Selection & Evaluation</li>
+          <li>Calibration & Threshold Strategy</li>
+          <li>Human-in-the-Loop Integration</li>
+        </ul>
+        <p>Each stage builds directly on the framing decisions documented here.</p>
+
+        <div class="quote">
+          “Fraud detection is not about catching liars.<br>
+          It is about allocating attention under uncertainty.”
+        </div>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#fraud-detection</span>
+        <span class="tag">#ML-strategy</span>
+        <span class="tag">#problem-framing</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+
+
+</body>
+
+</html>

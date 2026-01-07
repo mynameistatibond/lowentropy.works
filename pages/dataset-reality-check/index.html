@@ -101,6 +101,79 @@
         <p>A chi-square test confirms the imbalance is statistically significant (<em>p</em>
           < 0.001).</p>
 
+            <!-- Visualization -->
+            <div id="fraud-distribution-chart" style="width:100%; max-width:600px; height:400px; margin: 2rem auto;">
+            </div>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                const chartId = 'fraud-distribution-chart';
+                const root = document.documentElement;
+
+                // Data matches notebook analysis
+                var data = [
+                  {
+                    x: ['Non-Fraud (N)', 'Fraud (Y)'],
+                    y: [752, 247],
+                    type: 'bar',
+                    marker: {
+                      color: ['#2E86AB', '#F26419']
+                    },
+                    text: ['75.3%', '24.7%'],
+                    textposition: 'auto',
+                    hoverinfo: 'y+text'
+                  }
+                ];
+
+                // Initial Layout
+                var layout = {
+                  title: {
+                    text: 'Fraud vs Non-Fraud Distribution',
+                    font: { family: 'Shippori Mincho B1', size: 20 }
+                  },
+                  yaxis: { title: 'Count' },
+                  xaxis: { title: '' },
+                  showlegend: false,
+                  margin: { t: 50, b: 40, l: 50, r: 20 },
+                  paper_bgcolor: 'rgba(0,0,0,0)',
+                  plot_bgcolor: 'rgba(0,0,0,0)',
+                  font: { family: 'Helvetica, Arial, sans-serif' } // Default, updated by theme
+                };
+
+                var config = { responsive: true, displayModeBar: false };
+
+                Plotly.newPlot(chartId, data, layout, config).then(function () {
+                  updateChartTheme(); // Apply correct theme immediately
+                });
+
+                // Theme Sync Logic
+                function getThemeVar(name, fallback) {
+                  return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
+                }
+
+                function updateChartTheme() {
+                  const axisColor = getThemeVar('--plot-axis', '#666');
+                  const gridColor = getThemeVar('--plot-grid', '#ccc');
+                  const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
+
+                  Plotly.relayout(chartId, {
+                    'font.color': axisColor,
+                    'font.family': fontFamily,
+                    'xaxis.linecolor': axisColor,
+                    'xaxis.gridcolor': gridColor,
+                    'xaxis.tickfont.color': axisColor,
+                    'yaxis.linecolor': axisColor,
+                    'yaxis.gridcolor': gridColor,
+                    'yaxis.tickfont.color': axisColor,
+                    'title.font.color': axisColor
+                  });
+                }
+
+                // Watch for theme changes
+                new MutationObserver(updateChartTheme)
+                  .observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+              });
+            </script>
+
             <div class="quote">
               <strong>Implication:</strong><br>
               Accuracy is misleading. Evaluation must be <strong>precision–recall oriented</strong>, prioritizing recall

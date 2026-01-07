@@ -2,6 +2,20 @@
 
 All notable changes to the **Low Entropy Works** project will be documented in this file.
 
+## [v1.4.0] and [v1.3.1] - 2025-12-31
+
+### Added
+- **Report**: Fully implemented **Dataset Reality Check** report (`/pages/dataset-reality-check/`).
+    - **Visualization**: Added interactive **Class Imbalance** Plotly bar chart (N=752, Y=247).
+        - **Theme-Aware**: Chart colors and grids strictly adhere to Light/Dark theme variables.
+    - **Content**: Added "Origin", "Imbalance", and "Leakage" sections.
+- **Components**: Created generic `.theme-image-pair` CSS component for seamless, phase-shifted image transitions across the site.
+
+### Changed
+- **Home**: Refactored Alice images to use the new `.theme-image-pair` component.
+- **Fraud Detection Framing**: Added theme-aware "Fraud Detector" header images using the new component.
+- **Embedded App**: Fixed `z-index` / `pointer-events` bug in `pages/fraud-detector/` where the footer observer was blocking clicks on the specific app buttons.
+
 ## [v1.3.0] - 2025-12-31
 
 ### Refactored

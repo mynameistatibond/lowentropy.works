@@ -114,26 +114,7 @@
     <script src="../../assets/js/include-components.js"></script>
     <script>
         document.addEventListener('componentsLoaded', () => {
-            const footer = document.querySelector('footer');
-            const iframe = document.querySelector('iframe');
-
-            if (!footer || !iframe) return;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    // If footer is visible, disable iframe interaction so scrolling works on body
-                    if (entry.isIntersecting) {
-                        iframe.style.pointerEvents = 'none';
-                    } else {
-                        // Footer hidden, re-enable interaction
-                        iframe.style.pointerEvents = 'auto';
-                    }
-                });
-            }, {
-                threshold: 0
-            }); // Trigger as soon as any part of footer is visible
-
-            observer.observe(footer);
+            // Logic removed to allow interaction with the iframe at all times.
         });
     </script>
 </body>

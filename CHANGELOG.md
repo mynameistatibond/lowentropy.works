@@ -2,6 +2,14 @@
 
 All notable changes to the **Low Entropy Works** project will be documented in this file.
 
+## [v1.5.0] - 2026-01-28
+
+### Added
+- **Integration**: Added Intercom Messenger for visitor communication.
+    - **Script**: Created `assets/js/intercom.js` for initialization.
+    - **Injected**: Added script to all pages and templates.
+    - **Docs**: Added `docs/INTERCOM.md`.
+
 ## [v1.4.0] and [v1.3.1] - 2025-12-31
 
 ### Added

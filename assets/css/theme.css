@@ -13,6 +13,18 @@
   --clr-coral: #ffa998;
   --clr-lightblue: #b0bef4;
   --clr-brightblue: #5076ff;
+
+  /* Plotly Standard Palette */
+  --clr-plot-vermilion: #FF4800;
+  /* Red: Primary Alert */
+  --clr-plot-cashmere: #E8DFD7;
+  /* Cashmere: Neutral/Context (Warmer) */
+  --clr-plot-indigo: #B49DF8;
+  /* Indigo: Contrast */
+  --clr-plot-amber: #FF7124;
+  /* Amber: Secondary Alert */
+  --clr-plot-yellow: #F6C74D;
+  /* Yellowish: Highlight */
 }
 
 /* Light Theme */

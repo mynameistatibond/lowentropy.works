@@ -29,3 +29,6 @@
 
 ### Layout
 - Refined positioning and dimensions for monitors #6, #8, and #9 to create a tighter, more cohesive "pile" aesthetic.
+
+## Integrations
+- **Intercom Messenger**: Added support for visitor chat. Setup located in `docs/INTERCOM.md`.

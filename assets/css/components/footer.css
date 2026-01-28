@@ -31,6 +31,20 @@ footer p {
   transition: color 2s ease;
 }
 
+/* Privacy Link - Matches Contact Page Style */
+#privacy-settings,
+#privacy-settings:visited {
+  color: inherit;
+  /* Inherit color from parent (p) which transitions smoothly */
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+#privacy-settings:hover {
+  opacity: 0.6;
+}
+
 /* =========================================
    Components: Floating Link
 ========================================= */

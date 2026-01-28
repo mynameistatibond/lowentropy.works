@@ -1,3 +1,18 @@
+/**
+ * Intercom Messenger Initialization
+ * =================================
+ * This script initializes the Intercom Messenger widget for user support and engagement.
+ *
+ * Configuration:
+ * - App ID: 'ob9tvmfi'
+ * - Integration Type: Anonymous / Cookie-based (no user login data passed by default)
+ *
+ * Usage:
+ * - This file is included in `index.html` and all pages via a <script> tag.
+ * - Ideally placed before the closing </body> tag or in the <head> (async).
+ * - Loaded via: <script src="/assets/js/intercom.js"></script>
+ */
+
 window.intercomSettings = {
     app_id: "ob9tvmfi"
 };

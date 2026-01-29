@@ -53,7 +53,7 @@
         grid-template-columns: 2.5fr 1.5fr 0.5fr;
         /* Maximized text space from 1.8fr */
         gap: 1rem;
-        align-items: center;
+        align-items: end;
         /* Reset padding right, we use grid columns for clearance now */
         padding-right: 1rem;
     }

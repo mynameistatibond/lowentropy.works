@@ -50,8 +50,8 @@
 @media (min-width: 830px) {
     .consent-wrapper {
         display: grid;
-        grid-template-columns: 1.8fr 2.2fr 0.5fr;
-        /* Increased text space from 1.3fr */
+        grid-template-columns: 2.5fr 1.5fr 0.5fr;
+        /* Maximized text space from 1.8fr */
         gap: 1rem;
         align-items: center;
         /* Reset padding right, we use grid columns for clearance now */

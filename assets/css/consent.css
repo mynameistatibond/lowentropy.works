@@ -8,12 +8,12 @@
 }
 
 /* Banner (Fixed Bottom) */
+/* Banner (Fixed Bottom) */
 #le-consent-banner {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 1.5rem;
 
     /* Inherit generic theme variables from body */
     background-color: var(--clr-bg, #ffffff);
@@ -21,11 +21,9 @@
     border-top: 1px solid var(--clr-divider, #e0e0e0);
 
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-    font-family: var(--font-body, system-ui, sans-serif);
+    font-family: inherit;
     z-index: var(--consent-z-index);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+
     transition: transform 0.3s ease-in-out;
     transform: translateY(100%);
     /* Hidden by default */
@@ -35,24 +33,32 @@
     transform: translateY(0);
 }
 
+/* Wrapper to match site max-width and padding */
+.consent-wrapper {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 1.5rem 1.2rem;
+    /* Vertical | Horizontal (matches site main padding) */
+    padding-right: calc(1.2rem + 60px);
+    /* Clearance for Intercom on Desktop */
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 @media (min-width: 768px) {
-    #le-consent-banner {
+    .consent-wrapper {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-
-        /* Large padding to "center" the content visually */
-        padding: 1.5rem 15%;
-
-        /* Create clearance for Intercom (bottom-right) */
-        padding-right: calc(15% + 100px);
     }
 
-    #le-consent-banner .consent-content {
+    .consent-content {
         max-width: 60%;
     }
 
-    #le-consent-banner .consent-actions {
+    .consent-actions {
         display: flex;
         gap: 0.75rem;
     }

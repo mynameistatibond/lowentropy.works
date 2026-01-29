@@ -83,18 +83,20 @@
         const banner = document.createElement('div');
         banner.id = 'le-consent-banner';
         banner.innerHTML = `
-            <div class="consent-content">
-                <div class="consent-title">Privacy & Cookies</div>
-                <p class="consent-text">
-                    We process data to understand how the site is used. 
-                    "Essential" cookies are needed for the site to work. 
-                    Others help us improve the experience.
-                </p>
-            </div>
-            <div class="consent-actions">
-                <button id="btn-consent-manage" class="btn-consent">Customize</button>
-                <button id="btn-consent-essential" class="btn-consent">Reject Non-Essential</button>
-                <button id="btn-consent-accept" class="btn-consent primary">Accept All</button>
+            <div class="consent-wrapper">
+                <div class="consent-content">
+                    <div class="consent-title">Privacy & Cookies</div>
+                    <p class="consent-text">
+                        We process data to understand how the site is used. 
+                        "Essential" cookies are needed for the site to work. 
+                        Others help us improve the experience.
+                    </p>
+                </div>
+                <div class="consent-actions">
+                    <button id="btn-consent-manage" class="btn-consent">Customize</button>
+                    <button id="btn-consent-essential" class="btn-consent">Reject Non-Essential</button>
+                    <button id="btn-consent-accept" class="btn-consent primary">Accept All</button>
+                </div>
             </div>
         `;
         document.body.appendChild(banner);

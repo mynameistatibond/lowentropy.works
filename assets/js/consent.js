@@ -87,9 +87,8 @@
                 <div class="consent-content">
                     <div class="consent-title">Privacy & Cookies</div>
                     <p class="consent-text">
-                        We process data to understand how the site is used. 
-                        "Essential" cookies are needed for the site to work. 
-                        Others help us improve the experience.
+                        We process data to understand how the site is used.<br>
+                        "Essential" cookies are needed for the site to work. Others help us improve the experience.
                     </p>
                 </div>
                 <div class="consent-actions">

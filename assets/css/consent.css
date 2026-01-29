@@ -47,20 +47,31 @@
     gap: 1rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 830px) {
     .consent-wrapper {
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: 1.8fr 2.2fr 0.5fr;
+        /* Increased text space from 1.3fr */
+        gap: 1rem;
         align-items: center;
-        justify-content: space-between;
+        /* Reset padding right, we use grid columns for clearance now */
+        padding-right: 1rem;
     }
 
     .consent-content {
-        max-width: 60%;
+        grid-column: 1 / 2;
+        /* Ensure text doesn't overflow or look too narrow */
+        min-width: 300px;
     }
 
     .consent-actions {
+        grid-column: 2 / 3;
+        justify-self: end;
+
         display: flex;
         gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 }
 

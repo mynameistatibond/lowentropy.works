@@ -37,255 +37,278 @@
   <main class="article">
     <article class="article-shell">
       <div class="article-hero">
-        <p class="article-eyebrow">Data Science · 2025-11-03</p>
-        <h1 class="article-title">Insurance Claims Fraud Detection — Data Preprocessing Report</h1>
+        <p class="article-eyebrow">Technical Report · 2025-10</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Data Integrity &amp; Preprocessing Architecture</h1>
         <p class="article-summary">
-          This report documents the comprehensive preprocessing pipeline applied to the insurance claims dataset
-          (1,000 records, 40 original features). The pipeline converts raw inputs into a clean, model‑ready dataset
-          while preserving and enhancing fraud signals through targeted feature engineering and rigorous data quality
-          controls.
+          Transforming raw insurance claims into modeling-ready datasets with structural safeguards.
         </p>
       </div>
 
       <div class="rule"> . . . </div>
 
       <section class="article-body">
-        <h2>Executive Summary</h2>
-        <p class="lede">
-          The dataset was cleaned, standardized, and enriched with domain‑aligned features (temporal structure,
-          claim composition, vehicle age, and time‑of‑day cycles). We removed identifiers and artifacts, encoded
-          missingness,
-          and validated the integrity of critical targets and features. The result is a compact, information‑dense table
-          designed
-          for downstream fraud modeling.
-        </p>
+        <h2>Purpose</h2>
+        <p>This report documents how the raw claims dataset was transformed into a clean, leakage-controlled,
+          modeling-ready foundation.</p>
 
-        <!-- Executive Summary: class balance -->
+        <p>The previous report established <em>what</em> the dataset represents. This report explains <em>how</em> it
+          was engineered into a reliable analytical system.</p>
+
+        <p>The focus is:</p>
+        <ul>
+          <li><strong>Structural correction</strong></li>
+          <li><strong>Leakage elimination</strong></li>
+          <li><strong>Missingness handling</strong></li>
+          <li><strong>Temporal normalization</strong></li>
+          <li><strong>Dual feature-engineering strategy</strong> (Trees vs Linear models)</li>
+        </ul>
+        <p>No modeling yet. Just disciplined preparation.</p>
+
+        <div class="rule"></div>
+
+        <h2>1. From Raw Records to Clean Base Dataset</h2>
+
+        <p>The initial dataset contained:</p>
+        <ul>
+          <li><strong>1,000 rows</strong></li>
+          <li><strong>40 columns</strong></li>
+          <li><strong>Mixed types:</strong> numeric, categorical, temporal, identifiers</li>
+        </ul>
+
+        <p>During preprocessing:</p>
+        <ul>
+          <li>1 invalid temporal record was removed</li>
+          <li>Leakage-prone identifiers were dropped</li>
+          <li>Missing values were harmonized</li>
+          <li>Date fields were standardized</li>
+          <li>Derived variables were created</li>
+        </ul>
+
+        <p><strong>Final base dataset:</strong> 999 structurally valid records.</p>
+        <p>This stage ensured the dataset could support reliable modeling without hidden shortcuts.</p>
+
+        <h2>2. Leakage Control: Removing Hidden Answer Keys</h2>
+        <p>Some columns contained information that would allow a model to “cheat.”</p>
+
+        <p>Removed:</p>
+        <ul>
+          <li><code>policy_number</code> (unique identifier)</li>
+          <li><code>incident_location</code> (unique street-level detail)</li>
+          <li><code>_c39</code> (empty column)</li>
+          <li><code>insured_zip</code> (near-identifier, almost 1:1 with city/state)</li>
+          <li><code>auto_year</code> (replaced with vehicle_age)</li>
+        </ul>
+
+        <p><strong>Why this matters:</strong></p>
+        <p>If a feature uniquely identifies a record, the model can memorize fraud labels instead of learning patterns.
+          That produces artificially high accuracy but fails in production.</p>
+        <p>In short: we removed lookup keys disguised as data.</p>
+
         <figure>
-          <div id="plot-class-balance" class="plotly" data-src="demo:bar"></div>
-          <figcaption>Target balance after preprocessing (class imbalance matters for fraud).</figcaption>
+          <div id="plot-leakage-risk" class="plotly"></div>
+          <figcaption>Columns with near-unique values introduce memorization risk and were removed.</figcaption>
         </figure>
 
+        <h2>3. Missingness as Signal (Not Noise)</h2>
+        <p>The dataset used both <code>"?"</code> and <code>NaN</code>.</p>
 
-        <h2>1. Data Loading &amp; Initial Assessment</h2>
-
-        <h3>1.1 Dataset Characteristics</h3>
+        <p>These were harmonized into a unified "Missing" category for:</p>
         <ul>
-          <li><strong>Original Size:</strong> 1,000 rows × 40 columns</li>
-          <li><strong>Memory Usage:</strong> ~1.28 MB (in‑memory friendly)</li>
-          <li><strong>Data Types:</strong> mixed numerical (≈17) and categorical (≈21)</li>
-          <li><strong>Target Variable:</strong> <code>fraud_reported</code> (Y/N → binary indicator)</li>
+          <li><code>collision_type</code></li>
+          <li><code>property_damage</code></li>
+          <li><code>police_report_available</code></li>
+          <li><code>authorities_contacted</code></li>
         </ul>
+        <p>Instead of imputing values (e.g., filling with “No”), we created explicit missingness indicators.</p>
 
-        <h3>1.2 Initial Data Quality Issues</h3>
-        <ul>
-          <li>Empty CSV artifact column (<code>_c39</code>) with 100% missing values</li>
-          <li>Placeholder tokens (<code>"?"</code>) in categorical fields</li>
-          <li>Mixed casing/whitespace in text columns</li>
-          <li>Negative values in <code>umbrella_limit</code> (domain violation)</li>
-          <li>High‑cardinality quasi‑identifiers (e.g., near‑unique ZIPs/locations)</li>
-        </ul>
-
-        <h2>2. Data Cleaning &amp; Quality Assurance</h2>
-
-        <h3>2.1 Structural Cleanup</h3>
-        <ul>
-          <li><strong>Removed empty column:</strong> dropped <code>_c39</code> (CSV export artifact).</li>
-          <li><strong>Normalized missing values:</strong> converted <code>"?"</code> → <code>NaN</code> in
-            <code>collision_type</code>, <code>property_damage</code>, <code>police_report_available</code>.
-          </li>
-        </ul>
-
-        <h3>2.2 Text Standardization</h3>
-        <ul>
-          <li>Trimmed leading/trailing whitespace across all text columns.</li>
-          <li>Normalized case for categorical values (consistent tokens).</li>
-          <li>Audited other missing representations (NA/NULL/None).</li>
-        </ul>
-
-        <h3>2.3 Domain Logic Enforcement</h3>
-        <ul>
-          <li><strong>Umbrella coverage:</strong> fixed negatives via absolute value on <code>umbrella_limit</code>.
-          </li>
-          <li><strong>Target encoding:</strong> mapped <code>fraud_reported</code> Y/N → <code>{1,0}</code> with compact
-            integer type.</li>
-        </ul>
-
-        <h2>3. Feature Engineering</h2>
-
-        <h3>3.1 Temporal Features</h3>
-        <ul>
-          <li><strong>Date parsing:</strong> converted <code>policy_bind_date</code> and <code>incident_date</code> to
-            datetime.</li>
-          <li><strong>Policy duration:</strong> <code>days_since_bind</code> (incident date − bind date).</li>
-          <li><strong>Calendar signals:</strong> <code>incident_month</code>, <code>incident_dow</code> (0=Mon),
-            <code>incident_weekend</code> (binary).
-          </li>
-          <li><strong>Removed constant:</strong> dropped <code>incident_year</code> (all 2015).</li>
-        </ul>
-
-
-        <pre><code># Core transforms (excerpt)
-              df['umbrella_limit'] = df['umbrella_limit'].abs()  # domain fix
-              df['target'] = df['fraud_reported'].map({'Y':1,'N':0}).astype('int8')
-
-              # Temporal
-              df['policy_bind_date'] = pd.to_datetime(df['policy_bind_date'])
-              df['incident_date'] = pd.to_datetime(df['incident_date'])
-              df['days_since_bind'] = (df['incident_date'] - df['policy_bind_date']).dt.days
-              df['incident_month'] = df['incident_date'].dt.month
-              df['incident_dow'] = df['incident_date'].dt.weekday
-              df['incident_weekend'] = (df['incident_dow'] >= 5).astype('int8')
-
-              # Claim composition
-              total = df['total_claim_amount'].replace(0, np.nan)
-              df['injury_share']   = df['injury_claim']   / total
-              df['property_share'] = df['property_claim'] / total
-
-              # Vehicle & hour cyclic
-              df['vehicle_age'] = 2015 - df['auto_year']
-              h = df['incident_hour_of_the_day']
-              df['hour_sin'] = np.sin(2*np.pi*h/24)
-              df['hour_cos'] = np.cos(2*np.pi*h/24)</code></pre>
-
-
-        <h3>3.2 Claim Amount Composition</h3>
-        <p>
-          Explored multiple representations (component totals vs. shares). Selected total + component shares to retain
-          scale
-          while capturing composition:
+        <p><strong>Why?</strong></p>
+        <p>Because early inspection showed that missing documentation disproportionately appeared in fraudulent cases.
         </p>
+        <p>In fraud detection, absence of paperwork is not random. It may reflect ambiguity, evasion, or incomplete
+          reporting.</p>
+        <p>So we encoded missingness explicitly rather than hiding it.</p>
+
+        <figure>
+          <div id="plot-missingness-fraud" class="plotly"></div>
+          <figcaption>Missing documentation correlates with elevated fraud probability.</figcaption>
+        </figure>
+
+        <h2>4. Temporal Standardization</h2>
+        <p>Two date fields:</p>
+        <ul>
+          <li><code>policy_bind_date</code></li>
+          <li><code>incident_date</code></li>
+        </ul>
+        <p>Both were converted to datetime format.</p>
+
+        <p>We then derived:</p>
+        <pre><code>days_since_bind = incident_date − policy_bind_date</code></pre>
+        <p>One record where the policy began after the incident was removed. Raw dates were dropped after
+          transformation.</p>
+
+        <p><strong>Why derive instead of keeping raw dates?</strong></p>
+        <p>Because models do not understand calendar meaning. But they understand measurable quantities like:</p>
+        <ul>
+          <li>policy age</li>
+          <li>month</li>
+          <li>weekday</li>
+          <li>weekend</li>
+          <li>holiday proximity</li>
+        </ul>
+        <p>We transformed timestamps into interpretable behavioral signals.</p>
+
+        <figure>
+          <div id="plot-policy-age" class="plotly"></div>
+          <figcaption>Short policy tenure appears more frequently among fraudulent claims.</figcaption>
+        </figure>
+
+        <h2>5. Numeric Corrections</h2>
+        <p>One anomaly was detected:</p>
+        <ul>
+          <li><code>umbrella_limit</code> contained negative values.</li>
+        </ul>
+        <p>These were corrected using absolute value transformation.</p>
+        <p>This was not modeling enhancement — just restoring logical consistency.</p>
+
+        <h2>6. Feature Engineering Strategy: One Dataset Is Not Enough</h2>
+        <p>A key architectural decision in Step 1 was building two separate modeling datasets:</p>
+        <ul>
+          <li><strong>Trees dataset</strong></li>
+          <li><strong>Linear dataset</strong></li>
+        </ul>
+        <p><strong>Why two?</strong></p>
+        <p>Because tree models and linear models interpret structure differently.</p>
+
+        <h2>7. Shared Feature Engineering</h2>
+        <p>Applied to both pipelines:</p>
+
+        <h3>7.1 Temporal Features</h3>
+        <ul>
+          <li><code>days_since_bind</code></li>
+          <li><code>incident_month</code></li>
+          <li><code>vehicle_age</code></li>
+          <li><code>hour_sin</code>, <code>hour_cos</code></li>
+        </ul>
+
+        <p><strong>Cyclical encoding explanation:</strong></p>
+        <p>Hours repeat every 24 hours. 23:00 and 00:00 are neighbors in real life but numerically far apart (23 vs 0).
+        </p>
+        <p>Sine and cosine encoding places them close in geometric space. Think of time as a circle, not a line.</p>
+
+        <figure>
+          <div id="plot-hour-cyclic" class="plotly" style="height:320px;"></div>
+          <figcaption>Cyclic encoding preserves temporal continuity.</figcaption>
+        </figure>
+
+        <h3>7.2 Claim Composition Features</h3>
+        <p>To reduce dominance of large monetary values:</p>
         <ul>
           <li><code>injury_share = injury_claim / total_claim_amount</code></li>
           <li><code>property_share = property_claim / total_claim_amount</code></li>
-          <li>Protected against division by zero (NaN handling).</li>
+        </ul>
+        <p>Instead of only learning “big claims are risky,” the model can learn patterns like:</p>
+        <ul>
+          <li>“High injury share with low property damage”</li>
+          <li>or “Unusual claim composition”</li>
         </ul>
 
-        <h3>3.3 Vehicle Information</h3>
+        <figure>
+          <div id="plot-claim-share" class="plotly"></div>
+          <figcaption>injury_share distribution</figcaption>
+        </figure>
+
+        <h2>8. Trees-Optimized Dataset</h2>
+        <p>Tree models can naturally handle:</p>
         <ul>
-          <li><strong>Vehicle age:</strong> <code>vehicle_age = 2015 − auto_year</code>.</li>
-          <li>Dropped raw <code>auto_year</code> after derivation to avoid redundancy.</li>
+          <li>Non-linear interactions</li>
+          <li>Raw categorical variables</li>
+          <li>High cardinality features</li>
         </ul>
 
-        <h3>3.4 Time‑of‑Day Cyclic Encoding</h3>
+        <p>Therefore, retained:</p>
         <ul>
-          <li><code>hour_sin = sin(2π × hour/24)</code>, <code>hour_cos = cos(2π × hour/24)</code>.</li>
-          <li>Added 4 interpreter‑friendly buckets: Night (0–5), Morning (6–11), Afternoon (12–17), Evening (18–23).
+          <li><code>auto_make</code></li>
+          <li><code>auto_model</code></li>
+          <li><code>insured_hobbies</code></li>
+        </ul>
+        <p>Minimal bucketing was applied. Trees decide splits like: “If auto_model = X and collision_type = Y → higher
+          risk.” No coefficient instability.</p>
+
+        <h2>9. Linear-Optimized Dataset</h2>
+        <p>Linear models assume straight-line relationships. But many real-world variables behave in curves.</p>
+        <p>Example: Fraud risk might increase sharply below 3 months tenure, then flatten.</p>
+        <p>A straight line cannot represent that shape well. So we used bucketing.</p>
+
+        <h3>9.1 Risk Bucketing</h3>
+        <p>Continuous variables were segmented:</p>
+        <ul>
+          <li><code>customer_tenure_bucket</code></li>
+          <li><code>claim_amount_risk_band</code></li>
+          <li><code>umbrella_limit_bin</code></li>
+          <li><code>policy_annual_premium_bin</code></li>
+          <li><code>vehicle_age_bucket</code></li>
+        </ul>
+
+        <p><strong>What bucketing does:</strong></p>
+        <p>Instead of asking the model to draw one straight line across all values, we group similar ranges together.
+        </p>
+        <p>Imagine approximating a curve using stairs instead of a single ramp. It’s still simple — but much more
+          flexible.</p>
+
+        <figure>
+          <div id="plot-bucket-example" class="plotly"></div>
+          <figcaption>Bucketing approximates non-linear fraud patterns for linear models.</figcaption>
+        </figure>
+
+        <h2>10. Final Preprocessing Outputs</h2>
+        <p>After all transformations:</p>
+
+        <h3>Base cleaned dataset:</h3>
+        <ul>
+          <li>999 valid records</li>
+          <li>Leakage removed</li>
+          <li>Temporal features derived</li>
+          <li>Missingness encoded</li>
+        </ul>
+
+        <h3>Two modeling-ready datasets:</h3>
+        <ul>
+          <li><strong>Trees dataset</strong>
+            <ul>
+              <li>Categorical richness retained</li>
+              <li>Share features included</li>
+              <li>Interaction-friendly</li>
+            </ul>
+          </li>
+          <li><strong>Linear dataset</strong>
+            <ul>
+              <li>Bucketed non-linear variables</li>
+              <li>Structured temporal semantics</li>
+              <li>Controlled cardinality</li>
+            </ul>
           </li>
         </ul>
 
+        <p>All transformations were deterministic and documented in the preprocessing pipeline.</p>
 
-        <!-- 3.4 Time-of-Day -->
-        <figure>
-          <div id="plot-hour-buckets" class="plotly" data-src="demo:bar"></div>
-          <figcaption>Incidents by 4 time-of-day buckets (Night / Morning / Afternoon / Evening).</figcaption>
-        </figure>
+        <div class="rule"></div>
 
-        <figure>
-          <div id="plot-hour-cyclic" class="plotly" data-src="demo:line" data-height="320"></div>
-          <figcaption>Cyclic encoding shows continuity of hour-of-day on the unit circle (sin/cos).</figcaption>
-        </figure>
-
-
-
-        <h2>4. High‑Cardinality &amp; Quasi‑Identifier Management</h2>
-
-        <h3>4.1 Column Removal Strategy</h3>
+        <h2>Key Takeaway</h2>
+        <p>This stage accomplished:</p>
         <ul>
-          <li>Dropped identifiers/quasi‑identifiers: <code>policy_number</code>, <code>incident_location</code>,
-            <code>insured_zip</code>.
-          </li>
-          <li>Removed raw date columns post‑feature‑extraction.</li>
+          <li>Structural data correction</li>
+          <li>Leakage prevention</li>
+          <li>Explicit encoding of behavioral absence</li>
+          <li>Temporal normalization</li>
+          <li>Multicollinearity reduction via share features</li>
+          <li>Model-family-aligned feature architecture</li>
         </ul>
 
-        <h3>4.2 Cardinality Analysis</h3>
-        <p>
-          Retained genuinely grouped categoricals with reasonable uniqueness ratios:
-          <code>auto_model</code> (~39 cats), <code>insured_hobbies</code> (~20 cats), <code>auto_make</code>,
-          <code>insured_occupation</code> (~14 cats each).
-        </p>
+        <p>No modeling was performed here. But without this stage, any modeling results would be unreliable.</p>
 
-        <h2>5. Missing Value Treatment</h2>
-
-        <h3>5.1 Strategy</h3>
-        <p>
-          Treated missingness as potentially informative (common in fraud settings). Key columns with notable absence:
-          <code>collision_type</code>, <code>authorities_contacted</code>, <code>property_damage</code>,
-          <code>police_report_available</code>.
-        </p>
-
-        <h3>5.2 Two‑Pronged Approach</h3>
-        <ul>
-          <li><strong>Missing flags:</strong> binary <code>_missing</code> indicators.</li>
-          <li><strong>Explicit category:</strong> filled <code>NaN</code> with <code>"Missing"</code> to ensure encoder
-            compatibility.</li>
-        </ul>
-
-        <h2>6. Final Dataset Composition</h2>
-
-        <h3>6.1 Model‑Ready Feature Set</h3>
-        <ul>
-          <li><strong>Total features:</strong> ~38 columns (net of drops + engineering)</li>
-          <li><strong>Numerical:</strong> ~20 (incl. engineered)</li>
-          <li><strong>Categorical:</strong> ~18 (incl. time buckets)</li>
-          <li><strong>Target:</strong> binary <code>target</code> (fraud indicator)</li>
-        </ul>
-
-
-        <!-- 6.1 Feature mix -->
-        <figure>
-          <div id="plot-feature-types" class="plotly" data-src="demo:bar"></div>
-          <figcaption>Final mix of numerical vs categorical vs engineered features.</figcaption>
-        </figure>
-
-
-        <h3>6.2 Data Integrity Checks</h3>
-        <ul>
-          <li>Validated <code>target ∈ {0,1}</code>.</li>
-          <li>Confirmed completeness for <code>total_claim_amount</code>, share features, <code>days_since_bind</code>,
-            and temporal encodings.</li>
-        </ul>
-
-        <h3>6.3 Memory Optimization</h3>
-        <ul>
-          <li>Down‑cast to compact numerics (<code>int8</code>, <code>int32</code>) where safe.</li>
-          <li>Kept object dtype only for true categoricals.</li>
-        </ul>
-
-        <h2>7. Key Preprocessing Decisions &amp; Rationale</h2>
-
-        <h3>7.1 Feature Selection Philosophy</h3>
-        <ul>
-          <li><strong>Removed:</strong> identifiers, near‑constant, and redundant columns.</li>
-          <li><strong>Retained:</strong> genuine categorical groupings with interpretable cardinality.</li>
-          <li><strong>Enhanced:</strong> temporal intelligence, claim composition, and vehicle age.</li>
-        </ul>
-
-        <h3>7.2 Missing Data Strategy</h3>
-        <ul>
-          <li>Captured absence explicitly (flags + category).</li>
-          <li>Reflected domain reality that missingness itself can be a fraud signal.</li>
-        </ul>
-
-        <h3>7.3 Engineering Priorities</h3>
-        <ul>
-          <li><strong>Interpretability:</strong> human‑readable buckets alongside mathematical transforms.</li>
-          <li><strong>Signal preservation:</strong> ratios + totals to keep scale and composition.</li>
-          <li><strong>Temporal patterns:</strong> duration and cyclic encodings.</li>
-        </ul>
-        <h2 id="feature-dictionary">Appendix: Feature Dictionary</h2>
-        <div class="table-scroll">
-          <table id="feature-dict" class="feature-dict"></table>
+        <div class="quote">
+          “Data integrity is not glamorous. But it is the difference between a demo and a deployable system.”
         </div>
-
-        <h2>8. Next Steps for Modeling</h2>
-        <ol>
-          <li><strong>Categorical encoding:</strong> One‑Hot / Target / Frequency (evaluate per model family).</li>
-          <li><strong>Scaling:</strong> standardize numerics for linear models (within pipeline only).</li>
-          <li><strong>Train‑test split:</strong> stratified by target to respect class imbalance.</li>
-          <li><strong>Metrics focus:</strong> precision‑recall curves, PR‑AUC, and F<sub>2</sub> for recall‑weighted
-            scenarios.</li>
-        </ol>
       </section>
 
       <div class="rule"></div>
@@ -311,112 +334,261 @@
   <script src="../../assets/js/posthog.js"></script>
   <script src="../../assets/js/intercom.js"></script>
 
-  <!-- Plotly + YOUR bootstrap -->
+  <!-- Plotly & PapaParse -->
   <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
-  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
-
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <script>
-    window.addEventListener('load', () => {
-      Plotly.d3.csv('../../assets/data/insurance_claims_preprocessed.csv', (err, rows) => {
-        if (err) { console.error('CSV load error:', err); return; }
+    document.addEventListener("DOMContentLoaded", () => {
+      const root = document.documentElement;
 
-        // Compute class counts from the real dataset
-        const fraud = rows.filter(r => +r.target === 1).length;
-        const notFraud = rows.length - fraud;
+      // --- Theme Sync Logic ---
+      function getThemeVar(name, fallback) {
+        return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
+      }
 
-        // Replace the demo bar chart with the actual balance
-        Plotly.react('plot-class-balance', [{
-          type: 'bar',
-          x: ['Not Fraud', 'Fraud'],
-          y: [notFraud, fraud],
-          marker: {
-            color: getComputedStyle(document.documentElement)
-              .getPropertyValue('--plot-trace') || '#30343F'
-          }
-        }], {
-          title: 'Target Balance',
-          xaxis: { title: 'Class' },
-          yaxis: { title: 'Count' },
-          font: { family: 'Shippori Mincho B1' },
-          plot_bgcolor: 'rgba(0,0,0,0)',
-          paper_bgcolor: 'rgba(0,0,0,0)'
+      function updateChartTheme(chartId) {
+        const axisColor = getThemeVar('--plot-axis', '#666');
+        const gridColor = getThemeVar('--plot-grid', '#ccc');
+        const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
+
+        const update = {
+          'font.color': axisColor,
+          'font.family': fontFamily,
+          'xaxis.linecolor': axisColor,
+          'xaxis.gridcolor': gridColor,
+          'xaxis.tickfont.color': axisColor,
+          'yaxis.linecolor': axisColor,
+          'yaxis.gridcolor': gridColor,
+          'yaxis.tickfont.color': axisColor,
+          'title.font.color': axisColor
+        };
+
+        Plotly.relayout(chartId, update).catch(e => { /* Chart might not be rendered yet */ });
+      }
+
+      // Observer for theme switching
+      const observer = new MutationObserver(() => {
+        ['plot-leakage-risk', 'plot-missingness-fraud', 'plot-policy-age', 'plot-hour-cyclic', 'plot-claim-share', 'plot-bucket-example'].forEach(id => {
+          if (document.getElementById(id).children.length > 0) updateChartTheme(id);
         });
+      });
+      observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+
+      // Load the RAW dataset for Visuals 1, 2, 3, 5? (Or use preprocessed where appropriate)
+      Papa.parse("../../assets/data/insurance_claims.csv", {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        complete: function (results) {
+          const rawData = results.data.filter(row => Object.keys(row).length > 1); // Filter empty rows
+
+          // --- 1. Leakage Risk Illustration ---
+          const totalRows = rawData.length;
+          const policyNumbers = new Set(rawData.map(r => r.policy_number));
+          const incidentLocations = new Set(rawData.map(r => r.incident_location));
+          const insuredZips = new Set(rawData.map(r => r.insured_zip));
+
+          Plotly.newPlot('plot-leakage-risk', [{
+            type: 'bar',
+            x: ['Total Rows', 'Policy Number', 'Incident Location', 'Insured Zip'],
+            y: [totalRows, policyNumbers.size, incidentLocations.size, insuredZips.size],
+            marker: { color: ['#E8DFD7', '#FF4800', '#FF4800', '#FF4800'] },
+            text: [totalRows, policyNumbers.size, incidentLocations.size, insuredZips.size],
+            textposition: 'auto',
+            hoverinfo: 'x+y'
+          }], {
+            title: { text: 'Identity Memorization Risk', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Unique Count' },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-leakage-risk'));
+
+          // --- 2. Missingness vs Fraud Rate ---
+          // Need to calculate fraud rate (% of Fraud=Y) when missing vs not missing
+          const getFraudRate = (conditionFn) => {
+            const subset = rawData.filter(conditionFn);
+            if (subset.length === 0) return 0;
+            return (subset.filter(r => r.fraud_reported === 'Y').length / subset.length) * 100;
+          };
+
+          const isMissing = val => (val === '?' || val === '' || val === undefined || val === null);
+
+          const frColliMissing = getFraudRate(r => isMissing(r.collision_type));
+          const frColliPresent = getFraudRate(r => !isMissing(r.collision_type));
+          const frPoliceMissing = getFraudRate(r => isMissing(r.police_report_available));
+          const frPolicePresent = getFraudRate(r => !isMissing(r.police_report_available));
+
+          Plotly.newPlot('plot-missingness-fraud', [
+            {
+              x: ['Collision Type', 'Police Report'],
+              y: [frColliPresent, frPolicePresent],
+              name: 'Present',
+              type: 'bar',
+              marker: { color: '#E8DFD7' }
+            },
+            {
+              x: ['Collision Type', 'Police Report'],
+              y: [frColliMissing, frPoliceMissing],
+              name: 'Missing',
+              type: 'bar',
+              marker: { color: '#FF4800' }
+            }
+          ], {
+            title: { text: 'Fraud Rate by Document Presence', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Fraud Rate (%)' },
+            barmode: 'group',
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            legend: { orientation: 'h', y: -0.2 }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-missingness-fraud'));
+
+          // --- 3. Policy Age Distribution ---
+          const calcDays = (start, end) => {
+            if (!start || !end) return null;
+            return Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24));
+          };
+
+          const daysFraud = rawData.filter(r => r.fraud_reported === 'Y').map(r => calcDays(r.policy_bind_date, r.incident_date)).filter(d => d !== null);
+          const daysNotFraud = rawData.filter(r => r.fraud_reported === 'N').map(r => calcDays(r.policy_bind_date, r.incident_date)).filter(d => d !== null);
+
+          Plotly.newPlot('plot-policy-age', [
+            {
+              x: daysNotFraud,
+              type: 'histogram',
+              name: 'Not Fraud',
+              marker: { color: '#E8DFD7' },
+              opacity: 0.75
+            },
+            {
+              x: daysFraud,
+              type: 'histogram',
+              name: 'Fraud',
+              marker: { color: '#FF4800' },
+              opacity: 0.75
+            }
+          ], {
+            title: { text: 'Policy Age (Days) at Incident', font: { family: 'Shippori Mincho B1', size: 16 } },
+            barmode: 'overlay',
+            xaxis: { title: 'Days Since Bind' },
+            yaxis: { title: 'Count' },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            legend: { orientation: 'h', y: -0.2 }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-policy-age'));
+
+          // --- 5. Claim Share vs Fraud ---
+          const fraudShares = rawData.filter(r => r.fraud_reported === 'Y' && r.total_claim_amount > 0).map(r => r.injury_claim / r.total_claim_amount);
+          const notFraudShares = rawData.filter(r => r.fraud_reported === 'N' && r.total_claim_amount > 0).map(r => r.injury_claim / r.total_claim_amount);
+
+          Plotly.newPlot('plot-claim-share', [
+            {
+              y: notFraudShares,
+              type: 'box',
+              name: 'Not Fraud',
+              marker: { color: '#E8DFD7' }
+            },
+            {
+              y: fraudShares,
+              type: 'box',
+              name: 'Fraud',
+              marker: { color: '#FF4800' }
+            }
+          ], {
+            title: { text: 'Injury Share Distribution', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Injury Claim / Total Claim' },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            showlegend: false
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-claim-share'));
+
+        }
+      });
+
+      // Load the PREPROCESSED dataset for Visuals 4, 6
+      Papa.parse("../../assets/data/insurance_claims_preprocessed.csv", {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        complete: function (results) {
+          const processedData = results.data.filter(row => Object.keys(row).length > 1);
+
+          // --- 4. Cyclical Encoding Illustration ---
+          const hueMap = processedData.map(r => r.fraud_reported === 1 ? '#FF4800' : '#E8DFD7');
+          const hrColors = hueMap.slice(0, 300); // Subsample for visual clarity
+
+          Plotly.newPlot('plot-hour-cyclic', [{
+            x: processedData.map(r => r.hour_sin).slice(0, 300),
+            y: processedData.map(r => r.hour_cos).slice(0, 300),
+            mode: 'markers',
+            type: 'scatter',
+            marker: { color: hrColors, size: 8, opacity: 0.6 }
+          }], {
+            title: { text: '24-Hour Cycle (Sin/Cos Mapping)', font: { family: 'Shippori Mincho B1', size: 16 } },
+            xaxis: { title: 'Hour Sine', range: [-1.2, 1.2], zeroline: false },
+            yaxis: { title: 'Hour Cosine', range: [-1.2, 1.2], zeroline: false },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            showlegend: false,
+            height: 320
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-hour-cyclic'));
+
+          // --- 6. Raw vs Bucketed Example ---
+          // Assuming the preprocessed data might contain 'claim_amount_risk_band' 
+          // (or if not, we can simulate bucketing logic dynamically to demonstrate the concept)
+          // For visualization, let's group total_claim_amount into 5 quantile buckets
+
+          let claims = processedData.map(r => ({ amt: r.total_claim_amount, fraud: r.target || (r.fraud_reported === 'Y' ? 1 : 0) })).filter(r => typeof r.amt === 'number');
+          claims.sort((a, b) => a.amt - b.amt);
+
+          const numBuckets = 5;
+          const bucketSize = Math.floor(claims.length / numBuckets);
+
+          let bucketLabels = [];
+          let bucketFraudRates = [];
+
+          for (let i = 0; i < numBuckets; i++) {
+            let bucketSlice = claims.slice(i * bucketSize, (i + 1) * bucketSize);
+            if (bucketSlice.length === 0) continue;
+
+            let minAmt = Math.min(...bucketSlice.map(c => c.amt));
+            let maxAmt = Math.max(...bucketSlice.map(c => c.amt));
+            let frauds = bucketSlice.filter(c => c.fraud === 1).length;
+
+            bucketLabels.push(`${(minAmt / 1000).toFixed(0)}k - ${(maxAmt / 1000).toFixed(0)}k`);
+            bucketFraudRates.push((frauds / bucketSlice.length) * 100);
+          }
+
+          Plotly.newPlot('plot-bucket-example', [{
+            x: bucketLabels,
+            y: bucketFraudRates,
+            type: 'scatter',
+            mode: 'lines+markers',
+            marker: { color: '#FF4800', size: 12 },
+            line: { shape: 'hv', width: 3 } // Step-line to illustrate discrete buckets
+          }], {
+            title: { text: 'Fraud Rate by Claim Amount Buckets', font: { family: 'Shippori Mincho B1', size: 16 } },
+            xaxis: { title: 'Claim Amount Range' },
+            yaxis: { title: 'Fraud Rate (%)' },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-bucket-example'));
+
+        }
       });
     });
   </script>
 
 
 
-  <!-- Scripts --FEATURE DICTIONARY ---// -->
 
-  <script>
-    (function () {
-      // --- Adjust this path if you keep the original file name with spaces ---
-      // Recommended (renamed file):
-      const CSV_PATH = '../../assets/data/feature_dictionary.csv';
-      // If you keep the original: const CSV_PATH = '../../assets/data/Feature%20Dictionary%20-%20ChatGPT.csv';
-
-      // Minimal table styling (uses your CSS vars if present)
-      const style = document.createElement('style');
-      style.textContent = `
-            .table-scroll{overflow:auto;border:1px solid var(--plot-grid,#e5e7eb);border-radius:12px}
-            .feature-dict{width:100%;border-collapse:collapse;font-size:0.95rem}
-            .feature-dict th,.feature-dict td{padding:.6rem .8rem;border-bottom:1px solid var(--plot-grid,#e5e7eb);text-align:left;vertical-align:top}
-            .feature-dict thead th{position:sticky;top:0;background:var(--plot-surface,var(--clr-bg,#fff));z-index:1}
-            .feature-dict tbody tr:nth-child(odd){background:color-mix(in srgb, var(--plot-surface,#0000) 85%, transparent)}
-          `;
-      document.head.appendChild(style);
-
-      // Render helper
-      function renderTable(rows) {
-        const table = document.getElementById('feature-dict');
-        if (!table || !rows || !rows.length) return;
-
-        // Sort by first column (usually "feature" or similar)
-        const cols = Object.keys(rows[0]);
-        rows.sort((a, b) => (a[cols[0]] || '').localeCompare(b[cols[0]] || ''));
-
-        // Build thead
-        const thead = table.createTHead();
-        const trh = thead.insertRow();
-        cols.forEach(c => {
-          const th = document.createElement('th');
-          th.textContent = c;
-          trh.appendChild(th);
-        });
-
-        // Build tbody
-        const tbody = table.createTBody();
-        rows.forEach(r => {
-          const tr = tbody.insertRow();
-          cols.forEach(c => {
-            const td = tr.insertCell();
-            const val = (r[c] ?? '').toString().trim();
-
-            // Tiny enhancement: highlight the feature name column
-            if (c.toLowerCase().includes('feature') || c.toLowerCase() === 'name') {
-              const strong = document.createElement('strong');
-              strong.textContent = val;
-              td.appendChild(strong);
-            } else {
-              td.textContent = val;
-            }
-          });
-        });
-      }
-
-      // Load CSV via d3
-      if (typeof d3 === 'undefined') {
-        console.warn('d3 not found. Include d3 before this script.');
-        return;
-      }
-      d3.csv(CSV_PATH).then(renderTable).catch(err => {
-        console.error('Feature dictionary load failed:', err);
-      });
-    })();
-  </script>
 
 
 

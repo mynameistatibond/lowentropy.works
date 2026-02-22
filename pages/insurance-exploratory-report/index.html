@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-10</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Exploratory Signal Mapping</h1>
+        <p class="article-summary">
+          Mapping pre-model fraud concentration across structural and behavioral features.
+        </p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report presents the exploratory analysis conducted on the cleaned insurance claims dataset.</p>
+
+        <p>The objective at this stage is to understand how fraud distributes itself across the existing features —
+          before any model attempts to optimize, weight, or amplify those signals.</p>
+
+        <p>We examine:</p>
+        <ul>
+          <li><strong>Distribution behavior</strong> of financial variables</li>
+          <li><strong>Fraud concentration</strong> across categorical features</li>
+          <li><strong>Structural missingness</strong> patterns</li>
+          <li><strong>Temporal patterns</strong></li>
+          <li><strong>Claim composition</strong> differences</li>
+          <li><strong>Correlation structure</strong> across numeric variables</li>
+        </ul>
+
+        <div class="quote">
+          <p>The guiding question is simple: <strong>Where does fraud appear to cluster naturally within the
+              data?</strong></p>
+          <p>Understanding this landscape is essential. A model can only amplify what is already present.</p>
+        </div>
+
+        <div class="rule"></div>
+
+        <h2>1. Financial Variables: The Shape of Claims</h2>
+
+        <p>The primary monetary variables — <code>total_claim_amount</code>, <code>injury_claim</code>,
+          <code>property_claim</code>, <code>vehicle_claim</code> — display strong right-skewed distributions.
+        </p>
+
+        <p>Most claims are concentrated in moderate value ranges. A relatively small number extend into very high
+          amounts.</p>
+
+        <p>In practical terms:</p>
+        <ul>
+          <li>Typical claims cluster tightly.</li>
+          <li>A minority stretch far to the right.</li>
+          <li>Extreme claims are rare but large.</li>
+        </ul>
+
+        <p>This distribution shape has two important implications:</p>
+        <ol>
+          <li>Raw magnitude alone cannot reliably define fraud.</li>
+          <li>Large claim values will dominate statistical relationships unless normalized or restructured.</li>
+        </ol>
+
+        <p>Exploratory correlation inspection confirms high collinearity between total claim amount and its components.
+          This supports the later decision to create share-based features.</p>
+
+        <figure>
+          <div id="plot-claim-amount-dist" style="width: 100%; max-width: 800px; height: 400px; margin: 2rem auto;">
+          </div>
+          <figcaption>Claim amounts exhibit strong right-skew. A small number of high-value claims stretch the
+            distribution.</figcaption>
+        </figure>
+
+        <h2>2. Incident Severity: Clear Structural Separation</h2>
+
+        <p>When fraud rate is examined across <code>incident_severity</code> categories, a clear pattern emerges.</p>
+
+        <p>Higher-severity categories — particularly <strong>Major Damage</strong> and <strong>Total Loss</strong> —
+          show elevated fraud proportions relative to minor incidents.</p>
+
+        <p>This is one of the strongest categorical differentiators observed during exploration.</p>
+
+        <p><strong>Why this matters:</strong></p>
+        <p>Severity reflects both financial exposure and narrative plausibility. Severe accidents justify large claims.
+          That creates space where exaggeration or fabrication may be harder to distinguish from legitimate damage.</p>
+
+        <p>Severity therefore represents a structurally meaningful axis of separation.</p>
+
+        <figure>
+          <div id="plot-fraud-by-severity" style="width: 100%; max-width: 800px; height: 400px; margin: 2rem auto;">
+          </div>
+          <figcaption>Fraud proportion increases noticeably in higher-severity categories.</figcaption>
+        </figure>
+
+        <h2>3. Policy Tenure: Early Claims Concentration</h2>
+
+        <p>Using the derived variable <code>days_since_bind</code>, fraud distribution was analyzed across policy age
+          buckets.</p>
+
+        <p>The pattern shows:</p>
+        <ul>
+          <li>Higher fraud concentration in <strong>early tenure</strong> periods</li>
+          <li>Gradual stabilization as policy age increases</li>
+        </ul>
+
+        <p>Short-tenure claims appear disproportionately represented among fraud cases.</p>
+
+        <p>This is consistent with a behavioral hypothesis: Policies activated shortly before a claim may reflect
+          opportunistic timing. The effect is not extreme, but it is directional and consistent.</p>
+
+        <figure>
+          <div id="plot-fraud-by-tenure" style="width: 100%; max-width: 800px; height: 400px; margin: 2rem auto;"></div>
+          <figcaption>Fraud incidence appears elevated in early policy periods.</figcaption>
+        </figure>
+
+        <h2>4. Missing Documentation: Absence as Information</h2>
+
+        <p>Several categorical variables contained meaningful missing values:</p>
+        <ul>
+          <li><code>collision_type</code></li>
+          <li><code>police_report_available</code></li>
+          <li><code>property_damage</code></li>
+          <li><code>authorities_contacted</code></li>
+        </ul>
+
+        <p>Exploratory comparison between present vs missing categories shows that <strong>missing collision
+            information</strong> corresponds to a higher fraud proportion.</p>
+
+        <p>Missing documentation in insurance contexts can reflect:</p>
+        <ul>
+          <li>Incomplete reporting</li>
+          <li>Delayed documentation</li>
+          <li>Ambiguity in event description</li>
+        </ul>
+
+        <p>This is not interpreted as causal. However, the concentration pattern is clear enough to justify preserving
+          missingness as explicit signal rather than discarding or imputing it.</p>
+
+        <figure>
+          <div id="plot-missing-collision" style="width: 100%; max-width: 800px; height: 400px; margin: 2rem auto;">
+          </div>
+          <figcaption>Claims with missing collision type show elevated fraud proportion.</figcaption>
+        </figure>
+
+        <h2>5. Demographics: Broad Distribution, Limited Separation</h2>
+
+        <p>Exploration of demographic variables:</p>
+        <ul>
+          <li><code>insured_sex</code></li>
+          <li><code>insured_education_level</code></li>
+          <li><code>insured_occupation</code></li>
+        </ul>
+        <p>...reveals limited separation between fraud and non-fraud cases.</p>
+
+        <p>Fraud appears broadly distributed across categories without strong concentration in a single demographic
+          group.</p>
+
+        <p>This suggests:</p>
+        <ul>
+          <li>Fraud patterns in this dataset are more behavioral or structural than demographic.</li>
+          <li>Demographic features alone are unlikely to be dominant drivers.</li>
+        </ul>
+
+        <figure>
+          <div id="plot-fraud-by-gender" style="width: 100%; max-width: 800px; height: 250px; margin: 2rem auto;"></div>
+          <figcaption>Fraud distribution across gender categories shows minimal separation.</figcaption>
+        </figure>
+
+        <h2>6. Claim Composition: Internal Allocation Patterns</h2>
+
+        <p>Examining the ratio between sub-claims and total claim amount reveals additional structure.</p>
+
+        <p>By analyzing:</p>
+        <ul>
+          <li><code>injury_claim / total_claim_amount</code></li>
+          <li><code>property_claim / total_claim_amount</code></li>
+        </ul>
+
+        <p>...differences appear between fraud and non-fraud groups.</p>
+
+        <p>This suggests that not only total size, but <strong>allocation pattern</strong> may carry signal.</p>
+
+        <p>For example: Two claims may have identical totals, but differ in how that total is distributed across injury,
+          property, and vehicle damage. This observation motivated the later introduction of share-based features.</p>
+
+        <figure>
+          <div id="plot-injury-share-dist" style="width: 100%; max-width: 800px; height: 400px; margin: 2rem auto;">
+          </div>
+          <figcaption>Claim composition differences emerge when normalized by total claim amount.</figcaption>
+        </figure>
+
+        <h2>7. Correlation Structure: Monetary Redundancy</h2>
+
+        <p>Correlation analysis among numeric variables shows:</p>
+        <ul>
+          <li>Strong correlation between total claim and its components</li>
+          <li>Redundant financial structure</li>
+          <li>High multicollinearity risk if all raw amounts are used together</li>
+        </ul>
+
+        <p>This structural redundancy reinforces the need for normalized features and careful feature selection in later
+          stages.</p>
+
+        <figure>
+          <div id="plot-numeric-correlation" style="width: 100%; max-width: 800px; height: 500px; margin: 2rem auto;">
+          </div>
+          <figcaption>High correlation among financial variables indicates redundancy.</figcaption>
+        </figure>
+
+        <h2>8. Temporal Patterns: Weak Direct Separation</h2>
+
+        <p>Hour-of-day and weekday exploration shows limited direct fraud separation.</p>
+
+        <p>Fraud does not concentrate sharply around a single hour or weekday cluster.</p>
+
+        <p>This indicates:</p>
+        <ul>
+          <li>Raw hour is not a dominant standalone predictor.</li>
+          <li>If temporal effects exist, they may require structured representation rather than simple categorical
+            grouping.</li>
+        </ul>
+
+        <figure>
+          <div id="plot-fraud-by-hour" style="width: 100%; max-width: 800px; height: 400px; margin: 2rem auto;"></div>
+          <figcaption>Hour-of-day shows relatively flat fraud distribution.</figcaption>
+        </figure>
+
+        <div class="rule"></div>
+
+        <h2>9. Consolidated Observations</h2>
+
+        <p>Fraud concentration appears strongest along:</p>
+        <ul>
+          <li><strong>Incident severity</strong></li>
+          <li><strong>Early policy tenure</strong></li>
+          <li><strong>Missing documentation</strong></li>
+          <li><strong>Claim composition patterns</strong></li>
+        </ul>
+
+        <p>Fraud appears broadly distributed across:</p>
+        <ul>
+          <li><strong>Demographic categories</strong></li>
+          <li><strong>Time-of-day</strong></li>
+        </ul>
+
+        <p>Monetary variables require normalization due to skew and multicollinearity.</p>
+        <p>These findings define the structural landscape upon which modeling will operate.</p>
+
+        <h2>Key Takeaway</h2>
+        <p>The exploratory analysis reveals that fraud in this dataset is most visibly associated with:</p>
+        <ol>
+          <li>Structural event severity</li>
+          <li>Timing relative to policy initiation</li>
+          <li>Documentation completeness</li>
+          <li>Internal allocation of claim components</li>
+        </ol>
+
+        <p>It is less visibly associated with demographic variables or isolated temporal markers.</p>
+
+        <p>This mapping of signal concentration provides a grounded foundation for feature engineering and model design
+          in subsequent stages.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#fraud-detection</span>
+        <span class="tag">#eda</span>
+        <span class="tag">#signal-mapping</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const root = document.documentElement;
+
+      function getThemeVar(name, fallback) {
+        return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
+      }
+
+      function updateChartTheme(chartId) {
+        const axisColor = getThemeVar('--plot-axis', '#666');
+        const gridColor = getThemeVar('--plot-grid', '#ccc');
+        const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
+
+        const update = {
+          'font.color': axisColor,
+          'font.family': fontFamily,
+          'xaxis.linecolor': axisColor,
+          'xaxis.gridcolor': gridColor,
+          'xaxis.tickfont.color': axisColor,
+          'yaxis.linecolor': axisColor,
+          'yaxis.gridcolor': gridColor,
+          'yaxis.tickfont.color': axisColor,
+          'title.font.color': axisColor
+        };
+
+        Plotly.relayout(chartId, update).catch(e => console.error("Plotly theme update error:", e));
+      }
+
+      const observer = new MutationObserver(() => {
+        // Redraw axes
+        updateChartTheme('plot-claim-amount-dist');
+        updateChartTheme('plot-fraud-by-severity');
+        updateChartTheme('plot-fraud-by-tenure');
+        updateChartTheme('plot-missing-collision');
+        updateChartTheme('plot-fraud-by-gender');
+        updateChartTheme('plot-injury-share-dist');
+        updateChartTheme('plot-numeric-correlation');
+        updateChartTheme('plot-fraud-by-hour');
+      });
+      observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+      // --- Data Loading and Charting ---
+      Papa.parse("../../assets/data/insurance_claims.csv", {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        complete: function (results) {
+          const rawData = results.data.filter(row => Object.keys(row).length > 1);
+
+          // Helper to calculate fraud rate
+          const calcFraudRate = (subset) => {
+            if (subset.length === 0) return 0;
+            return (subset.filter(r => r.fraud_reported === 'Y').length / subset.length) * 100;
+          };
+
+          // --- Visual 1: Distribution of Total Claim Amount ---
+          const claimAmounts = rawData.map(r => r.total_claim_amount).filter(a => typeof a === 'number');
+
+          Plotly.newPlot('plot-claim-amount-dist', [{
+            x: claimAmounts,
+            type: 'histogram',
+            marker: { color: '#E8DFD7' },
+            opacity: 0.8
+          }], {
+            title: { text: 'Total Claim Amount Distribution', font: { family: 'Shippori Mincho B1', size: 16 } },
+            xaxis: { title: 'Total Claim Amount ($)' },
+            yaxis: { title: 'Count' },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            updatemenus: [{
+              y: 1.1, x: 1, xanchor: 'right', yanchor: 'top',
+              buttons: [
+                { method: 'relayout', args: ['xaxis.type', 'linear'], label: 'Linear' },
+                { method: 'relayout', args: ['xaxis.type', 'log'], label: 'Log Scale' }
+              ]
+            }]
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-claim-amount-dist'));
+
+
+          // --- Visual 2: Fraud Rate by Incident Severity ---
+          const severities = ['Trivial Damage', 'Minor Damage', 'Major Damage', 'Total Loss'];
+          const sevRates = severities.map(sev => {
+            return calcFraudRate(rawData.filter(r => r.incident_severity === sev));
+          });
+
+          Plotly.newPlot('plot-fraud-by-severity', [{
+            x: severities,
+            y: sevRates,
+            type: 'bar',
+            marker: { color: ['#E8DFD7', '#E8DFD7', '#FF4800', '#FF4800'] },
+            text: sevRates.map(r => r.toFixed(1) + '%'),
+            textposition: 'auto'
+          }], {
+            title: { text: 'Fraud Proportion by Severity', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Fraud Rate (%)', range: [0, 100] },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-fraud-by-severity'));
+
+
+          // --- Visual 3: Fraud Rate by Policy Age Bucket ---
+          const calcDays = (start, end) => {
+            if (!start || !end) return null;
+            return Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24));
+          };
+
+          let tenureBuckets = {
+            '0-3 Months': [],
+            '3-6 Months': [],
+            '6-12 Months': [],
+            '1-2 Years': [],
+            '2-3 Years': [],
+            '3-4 Years': [],
+            '4-5 Years': [],
+            '5-7 Years': [],
+            '7-10 Years': [],
+            '10-15 Years': [],
+            '15-20 Years': [],
+            '20+ Years': []
+          };
+          rawData.forEach(r => {
+            let d = calcDays(r.policy_bind_date, r.incident_date);
+            if (d === null) return;
+            if (d <= 90) tenureBuckets['0-3 Months'].push(r);
+            else if (d <= 180) tenureBuckets['3-6 Months'].push(r);
+            else if (d <= 365) tenureBuckets['6-12 Months'].push(r);
+            else if (d <= 365 * 2) tenureBuckets['1-2 Years'].push(r);
+            else if (d <= 365 * 3) tenureBuckets['2-3 Years'].push(r);
+            else if (d <= 365 * 4) tenureBuckets['3-4 Years'].push(r);
+            else if (d <= 365 * 5) tenureBuckets['4-5 Years'].push(r);
+            else if (d <= 365 * 7) tenureBuckets['5-7 Years'].push(r);
+            else if (d <= 365 * 10) tenureBuckets['7-10 Years'].push(r);
+            else if (d <= 365 * 15) tenureBuckets['10-15 Years'].push(r);
+            else if (d <= 365 * 20) tenureBuckets['15-20 Years'].push(r);
+            else tenureBuckets['20+ Years'].push(r);
+          });
+
+          const tenureLabels = Object.keys(tenureBuckets);
+          const tenureRates = tenureLabels.map(l => calcFraudRate(tenureBuckets[l]));
+          const maxTenureRate = Math.max(...tenureRates);
+          const tenureColors = tenureRates.map(r => r === maxTenureRate ? '#FF4800' : '#E8DFD7');
+
+          Plotly.newPlot('plot-fraud-by-tenure', [{
+            x: tenureLabels,
+            y: tenureRates,
+            type: 'bar',
+            marker: { color: tenureColors },
+            text: tenureRates.map(r => r > 0 ? r.toFixed(1) + '%' : ''),
+            textposition: 'auto'
+          }], {
+            title: { text: 'Fraud Rate by Policy Age', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Fraud Rate (%)', range: [0, 100] },
+            xaxis: { tickangle: -45 },
+            margin: { t: 40, b: 80, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-fraud-by-tenure'));
+
+
+          // --- Visual 4: Missing Collision Type vs Fraud ---
+          const isMissing = val => (val === '?' || val === '' || val === undefined || val === null);
+          const colMissing = rawData.filter(r => isMissing(r.collision_type));
+          const colPresent = rawData.filter(r => !isMissing(r.collision_type));
+
+          const colRates = [calcFraudRate(colPresent), calcFraudRate(colMissing)];
+
+          Plotly.newPlot('plot-missing-collision', [{
+            x: ['Recorded', 'Missing (?)'],
+            y: colRates,
+            type: 'bar',
+            marker: { color: ['#E8DFD7', '#FF4800'] },
+            text: colRates.map(r => r.toFixed(1) + '%'),
+            textposition: 'auto'
+          }], {
+            title: { text: 'Fraud Rate by Collision Type Presence', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Fraud Rate (%)', range: [0, 100] },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-missing-collision'));
+
+          // --- Visual 5: Fraud Rate by Gender ---
+          const genders = ['MALE', 'FEMALE']; // Adjust if dataset uses different casing
+          const genderRates = genders.map(g => calcFraudRate(rawData.filter(r => r.insured_sex === g || r.insured_sex === g.toLowerCase() || r.insured_sex === g.charAt(0) + g.slice(1).toLowerCase())));
+
+          Plotly.newPlot('plot-fraud-by-gender', [{
+            x: ['Male', 'Female'],
+            y: genderRates,
+            type: 'bar',
+            marker: { color: ['#E8DFD7', '#E8DFD7'] },
+            text: genderRates.map(r => r.toFixed(1) + '%'),
+            textposition: 'auto'
+          }], {
+            title: { text: 'Fraud Rate by Insured Gender', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Fraud Rate (%)', range: [0, 100] },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-fraud-by-gender'));
+
+
+          // --- Visual 6: Injury Share Distribution by Fraud Status ---
+          const fraudShares = rawData.filter(r => r.fraud_reported === 'Y' && r.total_claim_amount > 0).map(r => r.injury_claim / r.total_claim_amount);
+          const notFraudShares = rawData.filter(r => r.fraud_reported === 'N' && r.total_claim_amount > 0).map(r => r.injury_claim / r.total_claim_amount);
+
+          Plotly.newPlot('plot-injury-share-dist', [
+            { y: notFraudShares, type: 'box', name: 'Not Fraud', marker: { color: '#E8DFD7' } },
+            { y: fraudShares, type: 'box', name: 'Fraud', marker: { color: '#FF4800' } }
+          ], {
+            title: { text: 'Injury Share Distribution by Fraud Status', font: { family: 'Shippori Mincho B1', size: 16 } },
+            yaxis: { title: 'Injury Claim / Total Claim' },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            showlegend: false
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-injury-share-dist'));
+
+
+          // --- Visual 7: Numeric Correlation Heatmap ---
+          const numCols = ['total_claim_amount', 'injury_claim', 'property_claim', 'vehicle_claim', 'umbrella_limit', 'policy_annual_premium'];
+          const niceNames = ['Total Claim', 'Injury Claim', 'Property Claim', 'Vehicle Claim', 'Umbrella Limit', 'Annual Premium'];
+
+          const getMean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+          const pearsonCorr = (x, y) => {
+            let meanX = getMean(x), meanY = getMean(y);
+            let num = 0, den1 = 0, den2 = 0;
+            for (let i = 0; i < x.length; i++) {
+              let dx = x[i] - meanX, dy = y[i] - meanY;
+              num += dx * dy; den1 += dx * dx; den2 += dy * dy;
+            }
+            if (den1 === 0 || den2 === 0) return 0;
+            return num / Math.sqrt(den1 * den2);
+          };
+
+          let zData = [];
+          for (let i = 0; i < numCols.length; i++) {
+            let rowP = [];
+            for (let j = 0; j < numCols.length; j++) {
+              let arrI = rawData.map(r => r[numCols[i]] || 0);
+              let arrJ = rawData.map(r => r[numCols[j]] || 0);
+              rowP.push(pearsonCorr(arrI, arrJ));
+            }
+            zData.push(rowP);
+          }
+
+          Plotly.newPlot('plot-numeric-correlation', [{
+            z: zData, x: niceNames, y: niceNames,
+            type: 'heatmap',
+            colorscale: [
+              [0, '#82acff'],      // -1.0 (Mid Blue)
+              [0.5, '#E8DFD7'],    //  0.0 (Cashmere)
+              [0.65, '#ffa998'],   // +0.3 (Coral)
+              [0.85, '#FF7124'],   // +0.7 (Amber)
+              [1.0, '#FF4800']     // +1.0 (Vermilion)
+            ],
+            zmin: -1, zmax: 1
+          }], {
+            title: { text: 'Financial Variables Correlation Matrix', font: { family: 'Shippori Mincho B1', size: 16 } },
+            margin: { t: 40, b: 100, l: 120, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-numeric-correlation'));
+
+
+          // --- Visual 8: Fraud Rate by Hour of Day ---
+          let hours = Array.from({ length: 24 }, (_, i) => i);
+          let hourRates = hours.map(h => {
+            return calcFraudRate(rawData.filter(r => r.incident_hour_of_the_day === h));
+          });
+
+          Plotly.newPlot('plot-fraud-by-hour', [{
+            x: hours,
+            y: hourRates,
+            type: 'scatter',
+            mode: 'lines+markers',
+            marker: { color: '#FF4800', size: 8 },
+            line: { width: 3, shape: 'spline' }
+          }], {
+            title: { text: 'Fraud Rate by Incident Hour', font: { family: 'Shippori Mincho B1', size: 16 } },
+            xaxis: { title: 'Hour of Day (0-23)', dtick: 2 },
+            yaxis: { title: 'Fraud Rate (%)', range: [0, Math.max(...hourRates) * 1.2] },
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          }, { responsive: true, displayModeBar: false }).then(() => updateChartTheme('plot-fraud-by-hour'));
+
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -105,75 +105,6 @@
             <!-- Visualization -->
             <div id="fraud-distribution-chart" style="width:100%; max-width:600px; height:400px; margin: 2rem auto;">
             </div>
-            <script>
-              document.addEventListener('DOMContentLoaded', function () {
-                const chartId = 'fraud-distribution-chart';
-                const root = document.documentElement;
-
-                // Data matches notebook analysis
-                var data = [
-                  {
-                    x: ['Non-Fraud (N)', 'Fraud (Y)'],
-                    y: [752, 247],
-                    type: 'bar',
-                    marker: {
-                      color: ['#E8DFD7', '#FF4800'] // Cashmere (Normal), Vermilion (Fraud)
-                    },
-                    text: ['75.3%', '24.7%'],
-                    textposition: 'auto',
-                    hoverinfo: 'y+text'
-                  }
-                ];
-
-                // Initial Layout
-                var layout = {
-                  title: {
-                    text: 'Fraud vs Non-Fraud Distribution',
-                    font: { family: 'Shippori Mincho B1', size: 20 }
-                  },
-                  yaxis: { title: 'Count' },
-                  xaxis: { title: '' },
-                  showlegend: false,
-                  margin: { t: 50, b: 40, l: 50, r: 20 },
-                  paper_bgcolor: 'rgba(0,0,0,0)',
-                  plot_bgcolor: 'rgba(0,0,0,0)',
-                  font: { family: 'Helvetica, Arial, sans-serif' } // Default, updated by theme
-                };
-
-                var config = { responsive: true, displayModeBar: false };
-
-                Plotly.newPlot(chartId, data, layout, config).then(function () {
-                  updateChartTheme(); // Apply correct theme immediately
-                });
-
-                // Theme Sync Logic
-                function getThemeVar(name, fallback) {
-                  return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
-                }
-
-                function updateChartTheme() {
-                  const axisColor = getThemeVar('--plot-axis', '#666');
-                  const gridColor = getThemeVar('--plot-grid', '#ccc');
-                  const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
-
-                  Plotly.relayout(chartId, {
-                    'font.color': axisColor,
-                    'font.family': fontFamily,
-                    'xaxis.linecolor': axisColor,
-                    'xaxis.gridcolor': gridColor,
-                    'xaxis.tickfont.color': axisColor,
-                    'yaxis.linecolor': axisColor,
-                    'yaxis.gridcolor': gridColor,
-                    'yaxis.tickfont.color': axisColor,
-                    'title.font.color': axisColor
-                  });
-                }
-
-                // Watch for theme changes
-                new MutationObserver(updateChartTheme)
-                  .observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-              });
-            </script>
 
 
 
@@ -196,6 +127,8 @@
             <p>This mix introduces <strong>heterogeneous scales, cardinalities, and semantic meanings</strong>,
               requiring disciplined preprocessing.</p>
 
+            <div id="unique-counts-chart" style="width:100%; max-width:800px; height:600px; margin: 2rem auto;"></div>
+
             <h2>4. Missing Values & Structural Patterns</h2>
             <p>Several categorical variables contain missing or <code>"?"</code> values:</p>
             <ul>
@@ -205,100 +138,7 @@
               <li><code>authorities_contacted</code></li>
             </ul>
 
-            <div id="missingness-chart" style="width:100%; max-width:800px; height:600px; margin: 2rem auto;"></div>
-            <script>
-              document.addEventListener('DOMContentLoaded', function () {
-                const chartId = 'missingness-chart';
-                const root = document.documentElement;
-
-                // Data extracted from notebook analysis (Categorical Feature Summary)
-                // Sorted by unique count for readability
-                var y_clean = ["auto_model", "insured_hobbies", "auto_make", "insured_occupation", "incident_city", "incident_state", "insured_education_level", "insured_relationship", "incident_severity", "incident_type", "policy_csl", "policy_state", "insured_sex", "fraud_reported"];
-                var x_clean = [39, 20, 14, 14, 7, 7, 7, 6, 4, 4, 3, 3, 2, 2];
-
-                var y_missing = ["authorities_contacted", "collision_type", "police_report_available", "property_damage"];
-                var x_missing = [4, 4, 3, 3];
-
-                var data = [
-                  {
-                    type: 'bar',
-                    y: y_clean,
-                    x: x_clean,
-                    orientation: 'h',
-                    name: 'Clean (Valid)',
-                    marker: {
-                      color: '#E8DFD7' // Cashmere (Neutral/Good)
-                    },
-                    text: x_clean,
-                    textposition: 'auto',
-                    hoverinfo: 'x+y'
-                  },
-                  {
-                    type: 'bar',
-                    y: y_missing,
-                    x: x_missing,
-                    orientation: 'h',
-                    name: 'Has Missing (?)',
-                    marker: {
-                      color: '#FF4800' // Vermilion (Alert)
-                    },
-                    text: x_missing,
-                    textposition: 'auto',
-                    hoverinfo: 'x+y'
-                  }
-                ];
-
-                var layout = {
-                  title: {
-                    text: 'Categorical Feature Integrity: Unique Counts',
-                    font: { family: 'Shippori Mincho B1', size: 20 }
-                  },
-                  xaxis: { title: 'Number of Unique Categories' },
-                  yaxis: {
-                    title: '',
-                    automargin: true
-                  },
-                  margin: { t: 50, b: 40, l: 150, r: 20 },
-                  paper_bgcolor: 'rgba(0,0,0,0)',
-                  plot_bgcolor: 'rgba(0,0,0,0)',
-                  font: { family: 'Helvetica, Arial, sans-serif' },
-                  barmode: 'group',
-                  showlegend: true,
-                  legend: { orientation: 'h', y: -0.2 }
-                };
-
-                var config = { responsive: true, displayModeBar: false };
-
-                Plotly.newPlot(chartId, data, layout, config).then(function () {
-                  updateChartTheme();
-                });
-
-                function getThemeVar(name, fallback) {
-                  return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
-                }
-
-                function updateChartTheme() {
-                  const axisColor = getThemeVar('--plot-axis', '#666');
-                  const gridColor = getThemeVar('--plot-grid', '#ccc');
-                  const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
-
-                  Plotly.relayout(chartId, {
-                    'font.color': axisColor,
-                    'font.family': fontFamily,
-                    'xaxis.linecolor': axisColor,
-                    'xaxis.gridcolor': gridColor,
-                    'xaxis.tickfont.color': axisColor,
-                    'yaxis.linecolor': axisColor,
-                    'yaxis.gridcolor': gridColor,
-                    'yaxis.tickfont.color': axisColor,
-                    'title.font.color': axisColor
-                  });
-                }
-
-                new MutationObserver(updateChartTheme)
-                  .observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-              });
-            </script>
+            <div id="missingness-chart" style="width:100%; max-width:800px; height:300px; margin: 2rem auto;"></div>
             <p>Missingness is <strong>non-random</strong> and disproportionately associated with fraudulent claims (≈ 18
               % missing collision data overall).</p>
             <p><strong>Interpretation:</strong><br>Incomplete documentation is not noise — it reflects ambiguity or
@@ -322,11 +162,13 @@
               <li><strong>Empty column:</strong> <code>_c39</code> (dropped)</li>
               <li><strong>Unique identifiers:</strong> <code>policy_number</code>, <code>incident_location</code>
                 (dropped)</li>
-              <li><strong>Near-identifiers:</strong> <code>insured_zip</code> (≈ 1 : 1 with city/state)</li>
+              <li><strong>Near-identifiers:</strong> <code>insured_zip</code></li>
               <li><strong>Temporal inconsistencies:</strong> one policy bind date occurring after incident</li>
               <li><strong>Financial anomalies:</strong> negative umbrella limit values</li>
             </ul>
             <p>All were addressed <em>before</em> exploration to prevent silent leakage.</p>
+
+            <div id="cardinality-chart" style="width:100%; max-width:800px; height:400px; margin: 2rem auto;"></div>
 
             <h2>7. Visual Evidence (Minimal & Targeted)</h2>
             <p><strong>Included visuals for this report only:</strong></p>
@@ -416,6 +258,251 @@
   <script src="../../assets/js/intercom.js"></script>
 
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const root = document.documentElement;
+
+      Papa.parse('../../assets/data/insurance_claims.csv', {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+          const data = results.data;
+
+          // --- 1. Fraud Distribution Chart ---
+          let fraudCount = 0;
+          let nonFraudCount = 0;
+          data.forEach(row => {
+            if (row.fraud_reported === 'Y') fraudCount++;
+            else if (row.fraud_reported === 'N') nonFraudCount++;
+          });
+
+          const total = fraudCount + nonFraudCount;
+          const fraudPct = ((fraudCount / total) * 100).toFixed(1) + '%';
+          const nonFraudPct = ((nonFraudCount / total) * 100).toFixed(1) + '%';
+
+          var fraudData = [{
+            x: ['Non-Fraud (N)', 'Fraud (Y)'],
+            y: [nonFraudCount, fraudCount],
+            type: 'bar',
+            marker: { color: ['#E8DFD7', '#FF4800'] },
+            text: [nonFraudPct, fraudPct],
+            textposition: 'auto',
+            hoverinfo: 'y+text'
+          }];
+
+          var fraudLayout = {
+            title: { text: 'Fraud vs Non-Fraud Distribution', font: { family: 'Shippori Mincho B1', size: 20 } },
+            yaxis: { title: 'Count' },
+            xaxis: { title: '' },
+            showlegend: false,
+            margin: { t: 50, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          };
+
+          Plotly.newPlot('fraud-distribution-chart', fraudData, fraudLayout, { responsive: true, displayModeBar: false })
+            .then(() => updateChartTheme('fraud-distribution-chart'));
+
+          // --- 2. Categorical Feature Integrity Chart ---
+          const categoricalCols = ["auto_model", "insured_hobbies", "auto_make", "insured_occupation", "incident_city", "incident_state", "insured_education_level", "insured_relationship", "incident_severity", "incident_type", "policy_csl", "policy_state", "insured_sex", "fraud_reported", "authorities_contacted", "collision_type", "police_report_available", "property_damage"];
+          let uniqueCounts = {};
+          categoricalCols.forEach(c => uniqueCounts[c] = new Set());
+          let missingCols = new Set();
+
+          data.forEach(row => {
+            categoricalCols.forEach(col => {
+              let val = row[col];
+              if (val === '?' || val === undefined || val === '') {
+                missingCols.add(col);
+              } else if (val) {
+                uniqueCounts[col].add(val);
+              }
+            });
+          });
+
+          let cleanStats = [];
+          let mixMissingStats = [];
+
+          categoricalCols.forEach(col => {
+            let count = uniqueCounts[col].size;
+            if (missingCols.has(col)) {
+              mixMissingStats.push({ name: col, count: count });
+            } else {
+              cleanStats.push({ name: col, count: count });
+            }
+          });
+
+          cleanStats.sort((a, b) => a.count - b.count);
+          mixMissingStats.sort((a, b) => a.count - b.count);
+
+          var uniqueData = [
+            {
+              type: 'bar',
+              y: cleanStats.map(d => d.name),
+              x: cleanStats.map(d => d.count),
+              orientation: 'h',
+              name: 'Clean (Valid)',
+              marker: { color: '#E8DFD7' },
+              text: cleanStats.map(d => d.count),
+              textposition: 'auto',
+              hoverinfo: 'x+y'
+            },
+            {
+              type: 'bar',
+              y: mixMissingStats.map(d => d.name),
+              x: mixMissingStats.map(d => d.count),
+              orientation: 'h',
+              name: 'Has Missing (?)',
+              marker: { color: '#FF4800' },
+              text: mixMissingStats.map(d => d.count),
+              textposition: 'auto',
+              hoverinfo: 'x+y'
+            }
+          ];
+
+          var uniqueLayout = {
+            title: { text: 'Categorical Feature Integrity: Unique Counts', font: { family: 'Shippori Mincho B1', size: 20 } },
+            xaxis: { title: 'Number of Unique Categories' },
+            yaxis: { title: '', automargin: true },
+            margin: { t: 50, b: 40, l: 150, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            barmode: 'group',
+            showlegend: true,
+            legend: { orientation: 'h', y: -0.2 }
+          };
+
+          Plotly.newPlot('unique-counts-chart', uniqueData, uniqueLayout, { responsive: true, displayModeBar: false })
+            .then(() => updateChartTheme('unique-counts-chart'));
+
+          // --- 3. Missingness Chart ---
+          let missingCounts = {};
+
+          data.forEach(row => {
+            Object.keys(row).forEach(col => {
+              if (col === "_c39") return; // Ignore previously dropped empty column
+              let val = row[col];
+              if (val === '?' || val === undefined || val === '' || val === '-' || val === 'NA' || val === 'N/A') {
+                missingCounts[col] = (missingCounts[col] || 0) + 1;
+              }
+            });
+          });
+
+          let missingStats = [];
+          for (const [col, count] of Object.entries(missingCounts)) {
+            if (count > 0) {
+              missingStats.push({ name: col, count: count });
+            }
+          }
+
+          missingStats.sort((a, b) => a.count - b.count);
+
+          var missingData = [
+            {
+              type: 'bar',
+              y: missingStats.map(d => d.name),
+              x: missingStats.map(d => d.count),
+              orientation: 'h',
+              name: 'Missing Values',
+              marker: { color: '#E8DFD7' },
+              text: missingStats.map(d => d.count),
+              textposition: 'auto',
+              hoverinfo: 'x+y'
+            }
+          ];
+
+          var missingLayout = {
+            title: { text: 'Count of Missing Values per Feature', font: { family: 'Shippori Mincho B1', size: 20 } },
+            xaxis: { title: 'Number of Missing Values' },
+            yaxis: { title: '', automargin: true },
+            margin: { t: 50, b: 40, l: 150, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' },
+            showlegend: false
+          };
+
+          Plotly.newPlot('missingness-chart', missingData, missingLayout, { responsive: true, displayModeBar: false })
+            .then(() => updateChartTheme('missingness-chart'));
+
+          // --- 4. Feature Cardinality Chart ---
+          const totalRows = data.length;
+          let policyNumbers = new Set();
+          let incidentLocations = new Set();
+          let insuredZips = new Set();
+
+          data.forEach(row => {
+            if (row.policy_number) policyNumbers.add(row.policy_number);
+            if (row.incident_location) incidentLocations.add(row.incident_location);
+            if (row.insured_zip) insuredZips.add(row.insured_zip);
+          });
+
+          var cardData = [
+            {
+              type: 'bar',
+              x: ['Total Rows', 'Policy Number', 'Incident Location', 'Insured Zip'],
+              y: [totalRows, policyNumbers.size, incidentLocations.size, insuredZips.size],
+              marker: {
+                color: ['#E8DFD7', '#FF4800', '#FF4800', '#FF4800']
+              },
+              text: [totalRows, policyNumbers.size, incidentLocations.size, insuredZips.size],
+              textposition: 'auto',
+              hoverinfo: 'x+y'
+            }
+          ];
+
+          var cardLayout = {
+            title: { text: 'Unique Values (High Cardinality Red Flags)', font: { family: 'Shippori Mincho B1', size: 20 } },
+            yaxis: { title: 'Unique Count' },
+            xaxis: { title: '' },
+            margin: { t: 50, b: 40, l: 50, r: 20 },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Helvetica, Arial, sans-serif' }
+          };
+
+          Plotly.newPlot('cardinality-chart', cardData, cardLayout, { responsive: true, displayModeBar: false })
+            .then(() => updateChartTheme('cardinality-chart'));
+        }
+      });
+
+      // --- Theme Sync Logic ---
+      function getThemeVar(name, fallback) {
+        return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
+      }
+
+      function updateChartTheme(chartId) {
+        const axisColor = getThemeVar('--plot-axis', '#666');
+        const gridColor = getThemeVar('--plot-grid', '#ccc');
+        const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
+
+        const update = {
+          'font.color': axisColor,
+          'font.family': fontFamily,
+          'xaxis.linecolor': axisColor,
+          'xaxis.gridcolor': gridColor,
+          'xaxis.tickfont.color': axisColor,
+          'yaxis.linecolor': axisColor,
+          'yaxis.gridcolor': gridColor,
+          'yaxis.tickfont.color': axisColor,
+          'title.font.color': axisColor
+        };
+
+        Plotly.relayout(chartId, update).catch(e => console.error("Plotly theme update error:", e));
+      }
+
+      new MutationObserver(() => {
+        updateChartTheme('fraud-distribution-chart');
+        updateChartTheme('unique-counts-chart');
+        updateChartTheme('missingness-chart');
+        updateChartTheme('cardinality-chart');
+      }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    });
+  </script>
 </body>
 
 </html>

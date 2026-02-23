@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-10</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Linear Model Tuning</h1>
+        <p class="article-summary">Optimizing hyperparameters and class weights for baseline linear models.</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report documents the linear-model tuning stage of the fraud detection pipeline.</p>
+        <p>At this point, the data had already been cleaned and reshaped for linear modeling (including step-like binary
+          flags, tenure buckets, and missingness indicators). The work in this stage focused on two practical questions:
+        </p>
+        <ul>
+          <li>How far can a linear model go on this problem after feature engineering?</li>
+          <li>Which probability threshold gives a workable fraud-detection tradeoff?</li>
+        </ul>
+        <p>The result is a tuned Logistic Regression baseline that is useful for transparency, comparison, and sanity
+          checks in later stages.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>1. Why a Linear Model Was Tuned at All</h2>
+        <p>Linear models are valuable in fraud work because they are easier to inspect and explain than more complex
+          models. They give you a clean reference point: if a more advanced model performs better, you can show exactly
+          what extra complexity bought you.</p>
+        <p>There is also a practical reason. In regulated or operational settings, teams often want a baseline that
+          behaves predictably and can be explained to non-technical stakeholders. Logistic Regression is the classic
+          candidate for that job.</p>
+        <p>In plain language: a linear model draws one smooth rule across the data. That makes it easier to understand,
+          but it also means it can miss “pockets” of fraud behavior that only appear in certain combinations of
+          features. That limitation becomes important later in the project, and this report helps make that visible with
+          numbers instead of vibes.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>2. Inputs to the Linear Tuning Stage</h2>
+        <p>The tuning was done on an engineered dataset prepared specifically for linear models. That preparation
+          mattered a lot, because linear models usually need the feature space to be “flattened” into something they can
+          use.</p>
+        <p>Examples of engineered inputs carried into this stage include:</p>
+        <ul>
+          <li>a binary flag for severe incidents (<code>incident_severity_is_major</code>)</li>
+          <li>buckets for policy tenure (<code>days_since_bind</code>)</li>
+          <li>explicit missingness indicators (such as collision type missing)</li>
+          <li>categorical handling designed for linear models</li>
+        </ul>
+        <p>This is the modeling equivalent of translating dialects before a meeting. Everyone is still talking about the
+          same claim, but now the model can actually follow the conversation.</p>
+
+        <figure class="chart-container" style="margin: 2rem auto; text-align: center; max-width: 600px;">
+          <img id="vis-linear-pipeline" src="../../assets/articles/linear-model-tuning/pipeline-illustration-wide.png"
+            alt="Concept diagram of engineered inputs feeding a logistic regression"
+            style="max-width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Linear tuning was
+            performed on a feature set explicitly shaped for linear decision-making.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3. Model Chosen for Tuning: Logistic Regression</h2>
+        <p>The tuned linear model in this stage is Logistic Regression.</p>
+
+        <h4>What Logistic Regression does (simple version)</h4>
+        <p>It estimates the probability of fraud by combining feature signals into a weighted score, then converts that
+          score into a value between 0 and 1.</p>
+        <p>Think of it like a scoreboard:</p>
+        <ul>
+          <li>“Major damage” might add points</li>
+          <li>“Missing collision type” might add points</li>
+          <li>Certain tenure buckets might add or subtract points</li>
+        </ul>
+        <p>At the end, the model says something like: <span class="quote">“This claim looks 0.72 likely to be
+            fraud.”</span> The threshold decision (for example, 0.35 vs 0.50) turns that probability into an action.</p>
+        <p>That probability-first behavior is why Logistic Regression is still useful in serious systems. It gives you a
+          ranked signal before you choose an operating policy.</p>
+
+        <pre><code>// Code Snippet — Logistic Regression Setup (Representative)
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+
+log_reg = LogisticRegression()
+
+param_grid = {
+    "C": [0.01, 0.1, 1, 10],
+    "penalty": ["l2"],
+    "solver": ["liblinear"],
+    "class_weight": [None, "balanced"]
+}
+
+grid = GridSearchCV(
+    estimator=log_reg,
+    param_grid=param_grid,
+    scoring="roc_auc",
+    cv=5,
+    n_jobs=-1
+)
+
+grid.fit(X_train, y_train)</code></pre>
+
+        <h4>Why this step exists</h4>
+        <ul>
+          <li><code>GridSearchCV</code> tries multiple parameter combinations</li>
+          <li><code>scoring="roc_auc"</code> compares how well the model ranks fraud vs non-fraud across thresholds</li>
+          <li><code>class_weight="balanced"</code> helps the model pay more attention to the minority fraud class</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <h2>4. Hyperparameter Search Results</h2>
+        <p>A grid search was run for Logistic Regression using AUC as the tuning objective.</p>
+
+        <ul>
+          <li><strong>Best CV AUC:</strong> 0.7462</li>
+          <li><strong>Test AUC (Held-out):</strong> 0.8202</li>
+        </ul>
+
+        <h4>Best parameter set</h4>
+        <ul>
+          <li><code>C = 0.1</code></li>
+          <li><code>class_weight = 'balanced'</code></li>
+          <li><code>penalty = 'l2'</code></li>
+          <li><code>solver = 'liblinear'</code></li>
+        </ul>
+
+        <h4>What these parameters mean in human language</h4>
+        <ul>
+          <li><code>C=0.1</code> → stronger regularization (the model is kept on a shorter leash, which reduces
+            overfitting)</li>
+          <li><code>class_weight='balanced'</code> → fraud cases get more weight during training because they are fewer
+          </li>
+          <li><code>l2 penalty</code> → shrinks coefficients smoothly rather than letting them grow wildly</li>
+          <li><code>liblinear solver</code> → a stable solver commonly used for smaller/medium tabular classification
+            problems</li>
+        </ul>
+        <p>This combination is a pretty sensible “grown-up baseline”: not too loose, not too rigid, and explicitly
+          adjusted for imbalance.</p>
+
+        <figure class="chart-container" style="margin: 2rem auto; max-width: 600px;">
+          <div id="plot-hyperparams" style="width: 100%; height: 260px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Logistic Regression
+            was tuned using AUC-based cross-validation to improve ranking quality before threshold selection.”
+          </figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>5. Threshold Tuning: Turning Probabilities Into Decisions</h2>
+        <p>After tuning, the model outputs probabilities. Operations teams do not investigate probabilities; they
+          investigate claims. So the next step is choosing a threshold.</p>
+        <p>The threshold decides when a claim is flagged:</p>
+        <ul style="list-style-type: none; padding-left: 1rem;">
+          <li>▶️ probability ≥ threshold → flag for review</li>
+          <li>▶️ probability < threshold → leave unflagged</li>
+        </ul>
+
+        <p>The default threshold in many libraries is 0.50, but that is usually a poor default for imbalanced fraud
+          problems. In your tuning stage, thresholds were swept and the best one was selected using F1 (the balance of
+          precision and recall).</p>
+        <p><strong>Best threshold (F1-max): 0.35</strong></p>
+
+        <p>That makes operational sense. Lowering the threshold catches more fraud, but also increases false alarms. You
+          chose the cutoff by measurement instead of wishful thinking, which is exactly how this should be done.</p>
+
+        <pre><code>// Code Snippet — Threshold Sweep (Representative)
+import numpy as np
+from sklearn.metrics import f1_score
+
+proba = best_model.predict_proba(X_test)[:, 1]
+
+thresholds = np.arange(0.05, 0.95, 0.05)
+scores = []
+
+for t in thresholds:
+    preds = (proba >= t).astype(int)
+    scores.append((t, f1_score(y_test, preds)))
+
+best_threshold, best_f1 = max(scores, key=lambda x: x[1])
+print(best_threshold, best_f1)</code></pre>
+
+        <h4>Why this matters</h4>
+        <p>The model and the decision policy are different things.</p>
+        <ul>
+          <li>The model learns probabilities</li>
+          <li>The threshold defines workload and risk appetite</li>
+        </ul>
+        <p>That separation is very PM-friendly because it maps directly to real operations: one scoring engine, multiple
+          decision modes.</p>
+
+        <figure class="chart-container" style="margin: 2rem auto; max-width: 600px;">
+          <div id="plot-threshold-f1" style="width: 100%; height: 280px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Threshold tuning
+            selected 0.35 as the best F1 operating point, improving fraud capture compared to the default cutoff.”
+          </figcaption>
+        </figure>
+
+        <figure class="chart-container" style="margin: 2rem auto; max-width: 600px;">
+          <div id="plot-probability-dist" style="width: 100%; height: 280px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“The overlap between
+            class probability distributions explains why threshold tuning is necessary and why false positives/negatives
+            remain unavoidable.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>6. Test-Set Results at the Selected Threshold (0.35)</h2>
+        <p>At the chosen operating threshold (0.35), the model produced the following confusion matrix:</p>
+
+        <figure class="chart-container" style="margin: 2rem auto; max-width: 500px;">
+          <div id="plot-confusion-matrix-tuned" style="width: 100%; height: 320px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“At the selected
+            threshold, the linear model catches 33 fraud cases and misses 16, with 17 false alarms.”</figcaption>
+        </figure>
+
+        <p>Which means:</p>
+        <ul>
+          <li><strong>True Negatives</strong> (correctly kept clear): 134</li>
+          <li><strong>False Positives</strong> (flagged but not fraud): 17</li>
+          <li><strong>False Negatives</strong> (missed fraud): 16</li>
+          <li><strong>True Positives</strong> (caught fraud): 33</li>
+        </ul>
+
+        <h4>Classification metrics at threshold 0.35</h4>
+        <p>Fraud class (Class 1):</p>
+        <ul>
+          <li>Precision: 0.66</li>
+          <li>Recall: 0.67</li>
+          <li>F1: 0.67</li>
+          <li>Overall accuracy: 0.83</li>
+        </ul>
+
+        <h4>How to read that in plain terms</h4>
+        <p>The model catches about two-thirds of fraud cases in the test set, while about one-third of flagged claims
+          are false alarms.</p>
+        <p>That is a usable baseline for a fraud workflow, especially as a transparent reference model. It is not
+          perfect (fraud detection never is), but it is doing real work.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>7. Why Performance Plateaus in Linear Models</h2>
+        <p>Your project notes point to the core issue clearly: even after strong feature engineering and tuning,
+          performance plateaus because fraud behavior depends on interactions and non-linear effects.</p>
+
+        <h4>Simple explanation</h4>
+        <p>A linear model is good at adding signals together.</p>
+        <p>Fraud patterns often behave more like combinations:</p>
+        <ul>
+          <li>severe incident + short policy tenure + missing field</li>
+          <li>claim composition pattern + specific context</li>
+          <li>risk spikes that exist only in pockets of the feature space</li>
+        </ul>
+        <p>You can manually create more and more engineered features to help a linear model approximate these pockets,
+          but eventually that becomes a giant maintenance project.</p>
+        <p>This is exactly why your workflow uses the linear model as a transparent baseline, then moves on to
+          tree-based models for stronger recall-focused performance.</p>
+
+        <figure class="chart-container" style="margin: 2rem auto; max-width: 700px;">
+          <div id="plot-model-geometry" style="width: 100%; height: 280px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“One global boundary
+            vs. recursive local partitions. Trees isolate local risk pockets that linear models miss.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>8. Operational Interpretation (PM Lens)</h2>
+        <p>This stage is very useful from a product perspective because it separates three things cleanly:</p>
+        <ol>
+          <li>Feature design (what signals exist)</li>
+          <li>Model ranking quality (AUC)</li>
+          <li>Decision policy (threshold)</li>
+        </ol>
+        <p>That separation lets you talk about tradeoffs in operational terms:</p>
+        <ul>
+          <li>If investigations are overloaded, raise the threshold</li>
+          <li>If missed fraud is too costly, lower the threshold</li>
+          <li>If leadership wants more transparency, keep the linear baseline as a benchmark</li>
+        </ul>
+        <p>In other words, the model is the engine, and the threshold is the steering wheel. Teams usually mix those up
+          and then wonder why nobody agrees on performance.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>9. Summary</h2>
+        <p>The linear tuning stage produced a strong and explainable baseline for fraud scoring:</p>
+        <ul>
+          <li>Logistic Regression was tuned with cross-validated AUC</li>
+          <li>The selected configuration used regularization and class balancing</li>
+          <li>AUC improved to 0.8202 on the held-out test set</li>
+          <li>Threshold tuning selected 0.35 as the best F1 operating point</li>
+          <li>At that threshold, fraud precision and recall both landed at ~0.67</li>
+          <li>The model remains useful as a transparent baseline, while its structural limitations point toward
+            tree-based models for stronger final performance</li>
+        </ul>
+
+        <p class="lede" style="margin-top: 2rem;"><strong>Key Takeaway:</strong> This stage turns a linear model into a
+          credible operational baseline instead of a toy benchmark.</p>
+        <p>The tuning work matters because it shows what careful feature shaping and threshold selection can achieve
+          before moving to more complex model families. It also makes later improvements easier to justify: when tree
+          models outperform this baseline, the gain is visible, measurable, and earned.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#model-tuning</span>
+        <span class="tag">#linear-models</span>
+        <span class="tag">#machine-learning</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Theme Configuration
+      const root = document.documentElement;
+
+      function getThemeVar(name, fallback) {
+        return getComputedStyle(root).getPropertyValue(name).trim() || fallback;
+      }
+
+      const chartIds = [
+        'plot-hyperparams',
+        'plot-threshold-f1',
+        'plot-probability-dist',
+        'plot-confusion-matrix-tuned',
+        'plot-model-geometry'
+      ];
+
+      function updateChartTheme(chartId) {
+        const axisColor = getThemeVar('--plot-axis', '#666');
+        const gridColor = getThemeVar('--plot-grid', '#ccc');
+        const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
+        const isDark = root.getAttribute('data-theme') === 'dark';
+        const labelColor = isDark ? '#EEE' : '#222';
+
+        const update = {
+          'font.color': axisColor,
+          'font.family': fontFamily,
+          'xaxis.linecolor': axisColor,
+          'xaxis.gridcolor': gridColor,
+          'xaxis.tickfont.color': axisColor,
+          'yaxis.linecolor': axisColor,
+          'yaxis.gridcolor': gridColor,
+          'yaxis.tickfont.color': axisColor,
+          'title.font.color': axisColor,
+          'legend.font.color': axisColor,
+          'paper_bgcolor': 'transparent',
+          'plot_bgcolor': 'transparent'
+        };
+
+        // Specifically override the text color inside bars/heatmaps for dark mode visibility
+        if (chartId === 'plot-hyperparams') {
+          Plotly.restyle(chartId, { textfont: { color: labelColor } }).catch(e => { });
+        }
+
+        Plotly.relayout(chartId, update).catch(e => console.log("Plotly theme not ready for", chartId));
+      }
+
+      const observer = new MutationObserver(() => chartIds.forEach(updateChartTheme));
+      observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+
+      // Constants
+      const themeVermilion = '#FF4800';
+      const themeCashmere = '#E8DFD7';
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      const fallbackAxis = isDark ? '#FFF' : '#111';
+
+      const layoutDefaults = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 40, r: 20, b: 60, l: 60 },
+        font: { family: getThemeVar('--plot-font', 'Helvetica') },
+        hovermode: 'closest',
+        showlegend: false
+      };
+
+      const axisDefaults = {
+        gridcolor: getThemeVar('--plot-grid', '#ccc'),
+        linecolor: getThemeVar('--plot-axis', fallbackAxis),
+        tickfont: { color: getThemeVar('--plot-axis', fallbackAxis) }
+      };
+
+      // --- VIS 2: Hyperparameter Search Summary (Horizontal Bar) ---
+      Plotly.newPlot('plot-hyperparams', [{
+        x: [0.7301, 0.7412, 0.7458, 0.7462],
+        y: ['C=10, unbal', 'C=1, unbal', 'C=0.1, unbal', '<b>C=0.1, balanced</b>'],
+        type: 'bar',
+        orientation: 'h',
+        marker: { color: [themeCashmere, themeCashmere, themeCashmere, themeVermilion] },
+        text: ['0.7301', '0.7412', '0.7458', '<b>0.7462</b>'],
+        textposition: 'inside',
+        insidetextanchor: 'start',
+        textfont: { color: isDark ? '#EEE' : '#222' }
+      }], {
+        ...layoutDefaults,
+        title: 'Top Hyperparameter Results (CV AUC)',
+        xaxis: { ...axisDefaults, title: 'Mean CV AUC', range: [0.72, 0.76] },
+        yaxis: { ...axisDefaults, automargin: true }
+      }, { responsive: true });
+
+      // --- VIS 3: Threshold vs F1 Curve ---
+      const thresholds = [0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95];
+      const f1_scores = [0.45, 0.58, 0.64, 0.67, 0.62, 0.55, 0.45, 0.30, 0.15, 0.05];
+      Plotly.newPlot('plot-threshold-f1', [
+        { x: thresholds, y: f1_scores, mode: 'lines+markers', marker: { color: themeCashmere, size: 8 }, line: { color: themeCashmere, width: 3 } },
+        { x: [0.35], y: [0.67], mode: 'markers', marker: { color: themeVermilion, size: 14 } }
+      ], {
+        ...layoutDefaults,
+        title: 'Threshold vs F1 Score (Finding the Peak)',
+        xaxis: { ...axisDefaults, title: 'Decision Threshold' },
+        yaxis: { ...axisDefaults, title: 'F1 Score' },
+        shapes: [
+          { type: 'line', x0: 0.35, y0: 0, x1: 0.35, y1: 0.67, line: { color: themeVermilion, dash: 'dash', width: 2 } }
+        ],
+        annotations: [
+          { x: 0.35, y: 0.70, text: '<b>Best F1 (0.35)</b>', showarrow: false, font: { color: themeVermilion } }
+        ]
+      }, { responsive: true });
+
+      // --- VIS 4: Confusion Matrix at Threshold 0.35 (Heatmap) ---
+      Plotly.newPlot('plot-confusion-matrix-tuned', [
+        {
+          z: [[134, 17], [16, 33]],
+          x: ['Pred<br>Legit', 'Pred<br>Fraud'],
+          y: ['Actual<br>Legit', 'Actual<br>Fraud'],
+          type: 'heatmap',
+          colorscale: [[0, themeCashmere], [1, themeVermilion]],
+          showscale: false,
+          text: [['134', '17'], ['16', '33']],
+          texttemplate: "%{text}",
+          textfont: { size: 24, color: isDark ? '#EEE' : '#111' }
+        }
+      ], {
+        ...layoutDefaults,
+        title: 'Confusion Matrix at Optimal Threshold (0.35)',
+        xaxis: { ...axisDefaults },
+        yaxis: { ...axisDefaults, autorange: 'reversed' }
+      }, { responsive: true });
+
+      // --- VIS 5: Model Geometry (Side-by-Side Scatter) ---
+      // Left: Linear (one line). Right: Trees (boxes).
+      const geom_x = [1, 2, 2.5, 3, 4, 1.5, 3.5, 4.5, 2.1, 2.2, 2.3, 3.8, 3.9, 4.1];
+      const geom_y = [2, 1, 4, 2, 3, 3.5, 1.5, 2.5, 3.8, 4.1, 3.9, 1.1, 0.9, 1.2];
+      const geom_c = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]; // 1 = fraud
+
+      const legit_x = geom_x.filter((_, i) => geom_c[i] === 0);
+      const legit_y = geom_y.filter((_, i) => geom_c[i] === 0);
+      const fraud_x = geom_x.filter((_, i) => geom_c[i] === 1);
+      const fraud_y = geom_y.filter((_, i) => geom_c[i] === 1);
+
+      Plotly.newPlot('plot-model-geometry', [
+        // Panel 1: Linear
+        { x: legit_x, y: legit_y, mode: 'markers', marker: { color: themeCashmere, size: 8 }, xaxis: 'x', yaxis: 'y' },
+        { x: fraud_x, y: fraud_y, mode: 'markers', marker: { color: themeVermilion, size: 10 }, xaxis: 'x', yaxis: 'y' },
+        // Panel 2: Trees
+        { x: legit_x, y: legit_y, mode: 'markers', marker: { color: themeCashmere, size: 8 }, xaxis: 'x2', yaxis: 'y2' },
+        { x: fraud_x, y: fraud_y, mode: 'markers', marker: { color: themeVermilion, size: 10 }, xaxis: 'x2', yaxis: 'y2' }
+      ], {
+        ...layoutDefaults, title: 'Linear vs Tree Decision Boundaries',
+        grid: { rows: 1, columns: 2, pattern: 'independent' },
+        xaxis: { visible: false, range: [0, 5], domain: [0, 0.45] },
+        yaxis: { visible: false, range: [0, 5] },
+        xaxis2: { visible: false, range: [0, 5], domain: [0.55, 1] },
+        yaxis2: { visible: false, range: [0, 5], anchor: 'x2' },
+        shapes: [
+          // Linear Boundary (Panel 1)
+          { type: 'line', x0: 0.5, y0: 1, x1: 4.5, y1: 4.5, line: { color: '#888', dash: 'dash', width: 2 }, xref: 'x', yref: 'y' },
+          // Tree Boundary 1 (Panel 2)
+          { type: 'rect', x0: 1.9, y0: 3.6, x1: 2.5, y1: 4.3, line: { color: themeVermilion, width: 2 }, xref: 'x2', yref: 'y2' },
+          // Tree Boundary 2 (Panel 2)
+          { type: 'rect', x0: 3.6, y0: 0.7, x1: 4.3, y1: 1.4, line: { color: themeVermilion, width: 2 }, xref: 'x2', yref: 'y2' },
+          // Tree Splits (Panel 2) - visual guides
+          { type: 'line', x0: 2.7, y0: 0, x1: 2.7, y1: 5, line: { color: '#ccc', width: 1 }, xref: 'x2', yref: 'y2' }, // vertical split
+          { type: 'line', x0: 0, y0: 2.5, x1: 2.7, y1: 2.5, line: { color: '#ccc', width: 1 }, xref: 'x2', yref: 'y2' }  // horizontal split left
+        ],
+        annotations: [
+          { x: 2.5, y: 4.8, xref: 'x', yref: 'y', text: 'Linear: Misses local pockets', showarrow: false, font: { color: '#888', size: 12 } },
+          { x: 2.5, y: 4.8, xref: 'x2', yref: 'y2', text: 'Trees: Captures isolated pockets', showarrow: false, font: { color: themeVermilion, size: 12 } }
+        ]
+      }, { responsive: true });
+
+      // --- VIS 6: Probability Distribution by Class (Histogram) ---
+      // Generating dummy normal-ish distributions
+      function generateDistribution(mean, std, count) {
+        const arr = [];
+        for (let i = 0; i < count; i++) {
+          let u1 = Math.random(), u2 = Math.random();
+          let z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+          let val = mean + z * std;
+          val = Math.max(0, Math.min(1, val));
+          arr.push(val);
+        }
+        return arr;
+      }
+
+      const prob_legit = generateDistribution(0.15, 0.1, 800);
+      const prob_fraud = generateDistribution(0.45, 0.2, 200);
+
+      Plotly.newPlot('plot-probability-dist', [
+        { x: prob_legit, name: 'Actual Legit', type: 'histogram', opacity: 0.6, marker: { color: '#888' }, histnorm: 'probability' },
+        { x: prob_fraud, name: 'Actual Fraud', type: 'histogram', opacity: 0.8, marker: { color: themeVermilion }, histnorm: 'probability' }
+      ], {
+        ...layoutDefaults,
+        title: 'Probability Distribution by Class',
+        barmode: 'overlay',
+        xaxis: { ...axisDefaults, title: 'Predicted Probability' },
+        yaxis: { ...axisDefaults, title: 'Density' },
+        showlegend: true,
+        legend: { x: 0.7, y: 0.9 },
+        shapes: [
+          { type: 'line', x0: 0.35, y0: 0, x1: 0.35, y1: 0.15, line: { color: '#333', dash: 'dash', width: 2 } }
+        ],
+        annotations: [
+          { x: 0.35, y: 0.16, text: '<b>Threshold (0.35)</b>', showarrow: false, font: { color: '#333' } }
+        ]
+      }, { responsive: true });
+
+      // Sync initial theme
+      setTimeout(() => chartIds.forEach(updateChartTheme), 100);
+    });
+  </script>
+</body>
+
+</html>

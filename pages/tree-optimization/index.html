@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-11</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Tree Optimization</h1>
+        <p class="article-summary">Designing and tuning tree-based models for recall-first fraud triage, with a
+          tree-optimized feature representation</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report documents the tree-model optimization stage of the fraud detection system.</p>
+        <p>By this point, the linear baseline had already been tuned and gave a useful, interpretable reference. It also
+          showed a practical ceiling: fraud patterns in this dataset depend on interactions and local combinations, so
+          performance starts to plateau when a model relies on one global decision surface.</p>
+        <p>Tree-based models were introduced to handle that structure more naturally. They can split the data into local
+          regions and capture combinations such as:</p>
+        <ul>
+          <li>short policy tenure + severe incident</li>
+          <li>missing documentation + unusual claim composition</li>
+          <li>category combinations that become risky only in certain contexts</li>
+        </ul>
+        <p>A simple way to picture it:</p>
+        <ul>
+          <li><strong>Linear model</strong> → one long ruler across the page</li>
+          <li><strong>Tree model</strong> → branching checklist with follow-up questions</li>
+        </ul>
+        <p>This stage also compares <strong>two dataset representations</strong> because model families “see” data
+          differently:</p>
+        <ul>
+          <li><strong>Original dataset (50 features)</strong> — broader representation</li>
+          <li><strong>Trees dataset (42 features)</strong> — tree-optimized representation</li>
+        </ul>
+        <p>The central question is straightforward:</p>
+        <div class="quote">“Which tree model and feature representation produce the strongest fraud recall under
+          operational constraints?”</div>
+
+        <div class="rule"> . . . </div>
+
+        <h2>1. Why Trees Were Trained Separately from Linear Models</h2>
+        <p>Different model families need different kinds of feature representation. This is a design choice, not a
+          cosmetic one.</p>
+
+        <h4>How linear models read data</h4>
+        <p>Linear models work best when the signal has already been translated into:</p>
+        <ul>
+          <li>binary indicators</li>
+          <li>buckets</li>
+          <li>explicit threshold flags</li>
+          <li>one-hot encoded categories</li>
+        </ul>
+        <p>That is why the earlier linear pipeline used more manual shaping.</p>
+
+        <h4>How tree models read data</h4>
+        <p>Tree models can discover thresholds and interactions on their own. They benefit from richer structure and
+          usually need less “flattening.” In some cases, too much bucketing removes useful detail.</p>
+        <p>That is why this project keeps a <strong>separate tree pathway</strong> and compares two representations
+          directly.</p>
+
+        <h4>Dataset setup used in this stage</h4>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Dataset Version</th>
+                <th style="text-align: right;">Train Shape</th>
+                <th style="text-align: right;">Test Shape</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Original</td>
+                <td style="text-align: right;">(800, 50)</td>
+                <td style="text-align: right;">(200, 50)</td>
+                <td>Broader feature set</td>
+              </tr>
+              <tr>
+                <td>Trees</td>
+                <td style="text-align: right;">(800, 42)</td>
+                <td style="text-align: right;">(200, 42)</td>
+                <td>Tree-optimized representation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Both splits were stratified, and the training data preserved the same fraud imbalance pattern (about
+          <strong>3.04 non-fraud per 1 fraud</strong>), so the comparison stayed fair.
+        </p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>2. Optimization Strategy</h2>
+        <p>All candidate tree-family models were tuned using the same process, so the comparison reflects model behavior
+          rather than inconsistent setup.</p>
+
+        <h4>Candidate models screened and tuned</h4>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Model Family</th>
+                <th>Why Included</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>RandomForest</strong></td>
+                <td>Strong tabular baseline, captures interactions</td>
+              </tr>
+              <tr>
+                <td><strong>XGBoost</strong></td>
+                <td>Powerful boosting model, often excellent on structured data</td>
+              </tr>
+              <tr>
+                <td><strong>ExtraTrees</strong></td>
+                <td>High-randomness tree ensemble, often robust on noisy tabular data</td>
+              </tr>
+              <tr>
+                <td><strong>AdaBoost</strong></td>
+                <td>Sequential boosting with simpler learners</td>
+              </tr>
+              <tr>
+                <td><strong>Bagging (DecisionTree base)</strong></td>
+                <td>Ensemble stability benchmark</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Training and tuning setup</h4>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Configuration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cross-validation</td>
+                <td>5-fold StratifiedKFold</td>
+              </tr>
+              <tr>
+                <td>Search method</td>
+                <td>RandomizedSearchCV</td>
+              </tr>
+              <tr>
+                <td>Refit metric</td>
+                <td><strong>F2</strong></td>
+              </tr>
+              <tr>
+                <td>Additional tracking</td>
+                <td>PR-AUC</td>
+              </tr>
+              <tr>
+                <td>Objective priority</td>
+                <td>Recall-weighted fraud triage performance</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Why F2?</h4>
+        <p>F2 gives <strong>more weight to recall</strong> than precision. In fraud triage:</p>
+        <ul>
+          <li>missing a fraud case (false negative) usually costs more</li>
+          <li>reviewing one extra legitimate claim (false positive) is still costly, but often less severe</li>
+        </ul>
+        <p>That makes F2 a practical optimization target for this stage.</p>
+
+        <pre><code>// Code Snippet — Tree Tuning Pattern (Conceptual)
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
+from sklearn.metrics import make_scorer, fbeta_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import RobustScaler
+
+f2_scorer = make_scorer(fbeta_score, beta=2)
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+pipe = Pipeline([
+    ("scaler", RobustScaler()),
+    ("model", candidate_tree_model)
+])
+
+search = RandomizedSearchCV(
+    estimator=pipe,
+    param_distributions=param_grid,
+    n_iter=30,
+    scoring={"f2": f2_scorer, "pr_auc": "average_precision"},
+    refit="f2",
+    cv=cv,
+    random_state=42,
+    n_jobs=-1
+)
+
+search.fit(X_train, y_train)
+best_model = search.best_estimator_</code></pre>
+        <p><strong>Why this matters:</strong> The model is tuned using the metric that matches the business problem, and
+          the pipeline keeps preprocessing inside CV folds so evaluation stays clean.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3. Cross-Validation Results</h2>
+        <p>Cross-validation is the first real stress test. It checks whether a model performs consistently before the
+          held-out test set gets involved.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-cv-comparison" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Tree-optimized feature
+            representation improves cross-validated F2 for every tree-family model.”</figcaption>
+        </figure>
+
+        <h4>What this means</h4>
+        <p>The tree-optimized representation improves CV F2 <strong>across every model family</strong>. These are not
+          tiny gains. The feature representation is changing how well trees can split the risk space.</p>
+        <p>That’s the useful lesson here: feature engineering changes the “terrain” the model navigates.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>4. Best Hyperparameter Snapshot (Trees Dataset)</h2>
+        <p>Hyperparameters tell you how each model prefers to behave on this fraud problem. The values below are the
+          best-performing settings from CV on the <strong>Trees dataset</strong>.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-hyperparams-grid"
+            style="width: 100%; min-height: 400px; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+            <!-- Hyperparameter cards will be injected here via JS -->
+          </div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Top-performing tree
+            models converged on fraud-aware settings: class weighting, controlled depth, and regularization.”
+          </figcaption>
+        </figure>
+
+        <h4>Plain-English interpretation</h4>
+        <ul>
+          <li><strong>Class weighting / positive-class weighting</strong> appears repeatedly. That’s the models being
+            told: “Fraud is rarer, pay attention.”</li>
+          <li><strong>Depth limits + min_samples_leaf</strong> show up in strong models. That helps prevent memorizing
+            noise.</li>
+          <li><strong>XGBoost</strong> prefers a very low learning rate here, which means slower, more careful fitting.
+          </li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <h2>5. Test-Set Results (Threshold = 0.5)</h2>
+        <p>After tuning, the best models were evaluated on the held-out test set using the standard threshold of
+          <strong>0.5</strong> for a clean comparison.
+        </p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-test-leaderboard" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“ExtraTrees achieved
+            the strongest default-threshold F2 on the held-out test set, with high recall for fraud triage.”
+          </figcaption>
+        </figure>
+
+        <h4>What stands out</h4>
+        <ul>
+          <li><strong>XGBoost</strong> had the strongest CV F2 during tuning.</li>
+          <li><strong>ExtraTrees</strong> delivered the strongest <strong>test-set F2</strong> at threshold 0.5.</li>
+        </ul>
+        <p>That’s normal. Cross-validation and test evaluation often shuffle the order slightly. CV is the rehearsal;
+          test is opening night.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>6. Output Artifacts for Next Stages</h2>
+        <p>The tuned tree models were saved as <strong>uncalibrated</strong> artifacts for later stages. That separation
+          is intentional and useful:</p>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Question It Answers</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Training / Tuning</td>
+                <td>Which model family and settings perform best?</td>
+              </tr>
+              <tr>
+                <td>Threshold Design</td>
+                <td>How many claims get flagged, and how many frauds are caught?</td>
+              </tr>
+              <tr>
+                <td>Calibration (next)</td>
+                <td>Do the predicted probabilities behave honestly?</td>
+              </tr>
+              <tr>
+                <td>Interpretability (later)</td>
+                <td>Which features drove the score?</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Keeping these stages separate makes the system easier to audit, explain, and maintain.</p>
+
+        <figure class="chart-container" style="margin: 2rem auto; text-align: center; max-width: 800px;">
+          <!-- Placeholder for generated pipeline image -->
+          <img id="vis-stage-flow" src="../../assets/articles/tree-optimization/pipeline-flow-wide.png"
+            alt="Minimalist abstract sequence showing six geometric stages of a machine learning model pipeline"
+            style="max-width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Tree optimization
+            selects candidate models. Calibration and interpretability are handled as separate audit steps.”
+          </figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Key Takeaway</h2>
+        <p>Tree optimization is the point where the fraud pipeline becomes operationally strong.</p>
+        <p>Using separate pathways for linear and tree models was the right design decision because the model families
+          learn differently. The tree-optimized feature representation improved cross-validated F2 across all tree
+          families and produced stronger test performance overall.</p>
+        <p>At the default threshold, <strong>ExtraTrees</strong> delivered the strongest held-out F2 with high recall.
+          This uncalibrated ranking artifact will be passed directly into the thresholding and calibration stages.</p>
+        <p>In short: the modeling got stronger, and the candidate models are ready for operational evaluation.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#tree-models</span>
+        <span class="tag">#fraud-detection</span>
+        <span class="tag">#f2-optimization</span>
+        <span class="tag">#operational-ml</span>
+        <span class="tag">#decision-systems</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+  <!-- Tree Optimization Visualizations -->
+  <script src="../../assets/js/pages-tree-optimization.js" defer></script>
+
+
+</body>
+
+</html>

@@ -28,6 +28,7 @@
 }
 
 /* Light Theme */
+:root[data-theme="light"],
 body[data-theme="light"] {
   --clr-bg: #ffffff;
   --clr-text: #000000;
@@ -41,6 +42,7 @@ body[data-theme="light"] {
 }
 
 /* Dark Theme */
+:root[data-theme="dark"],
 body[data-theme="dark"] {
   --clr-bg: #0800ff;
   --clr-text: #ffffff;

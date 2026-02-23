@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-12</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Pipeline Consolidation Report</h1>
+        <p class="article-summary">This report documents the consolidation of the fraud detection modeling workflow into
+          a reproducible, production-ready ML pipeline.</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <p>The objective was not improving model accuracy.</p>
+        <p>The objective was engineering maturity:</p>
+        <ul>
+          <li>Deterministic preprocessing</li>
+          <li>Reproducible training</li>
+          <li>Clear separation of prediction vs decision</li>
+          <li>Deployment-ready inference contract</li>
+          <li>Auditability</li>
+        </ul>
+        <p>This transforms the project from “notebook experiment” into “production system component.”</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>System Overview</h2>
+
+        <h3>High-Level Architecture</h3>
+        <pre><code>Raw Claim Data
+      ↓
+Schema Validation
+      ↓
+Preprocessing Layer
+      ↓
+Feature Engineering
+      ↓
+Model Inference
+      ↓
+Calibration (optional)
+      ↓
+Threshold Policy
+      ↓
+Structured Decision Output</code></pre>
+
+        <p>Key principle:</p>
+        <div class="quote">“Prediction is not a decision. The model outputs probabilities. The system applies policy.”
+        </div>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Core Design Decisions</h2>
+
+        <h3>3.1 Separation of Concerns</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Responsibility</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Preprocessing</strong></td>
+                <td>Data cleaning & transformations</td>
+                <td>Prevent training/inference drift</td>
+              </tr>
+              <tr>
+                <td><strong>Model</strong></td>
+                <td>Probability estimation</td>
+                <td>Statistical task only</td>
+              </tr>
+              <tr>
+                <td><strong>Calibration</strong></td>
+                <td>Probability reliability</td>
+                <td>Mode-specific deployment</td>
+              </tr>
+              <tr>
+                <td><strong>Threshold Policy</strong></td>
+                <td>Business decision logic</td>
+                <td>Governance & flexibility</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>This prevents:</p>
+        <ul>
+          <li>Threshold baked into model weights</li>
+          <li>Calibration hard-coded</li>
+          <li>Hidden feature mismatch</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Pipeline Components</h2>
+
+        <h3>1. Input Schema Validation</h3>
+        <p>Before any transformation:</p>
+        <ul>
+          <li>Required columns checked</li>
+          <li>Data types validated</li>
+          <li>Feature order enforced</li>
+          <li>Unknown columns flagged</li>
+          <li>Missing fields handled explicitly</li>
+        </ul>
+
+        <p>Failure behavior:</p>
+        <ul>
+          <li>Hard error</li>
+          <li>No silent fallback</li>
+        </ul>
+
+        <h4>Why this matters:</h4>
+        <p>Most production ML failures are not model errors. They are schema drift errors.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>2. Preprocessing Layer</h3>
+        <p>Unified transformation module used in:</p>
+        <ul>
+          <li>Training</li>
+          <li>Inference</li>
+          <li>Batch scoring</li>
+          <li>API scoring</li>
+        </ul>
+
+        <p>Includes:</p>
+        <ul>
+          <li>Missing value imputation</li>
+          <li>Categorical encoding</li>
+          <li>Cyclical time encoding (hour → sin/cos)</li>
+          <li>Missing flags</li>
+          <li>Ratio normalization</li>
+          <li>Scaling (linear model path only)</li>
+        </ul>
+
+        <h4>Visual: Shared Pipeline</h4>
+        <pre><code>                 ┌───────────────────┐
+                 │  Base Transforms  │
+                 └─────────┬─────────┘
+                           │
+           ┌───────────────┴───────────────┐
+           │                               │
+   Linear Model Path                Tree Model Path
+   (Scaling applied)                 (No scaling)</code></pre>
+        <p>Shared logic reduces duplicated feature code.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>3. Feature Engineering Consolidation</h3>
+        <p>All feature logic extracted into configuration:</p>
+        <p><code>feature_config.json</code></p>
+        <p>Contains:</p>
+        <ul>
+          <li>Derived features</li>
+          <li>Ratio logic</li>
+          <li>Categorical mapping rules</li>
+          <li>Feature ordering</li>
+        </ul>
+        <p>No feature engineering lives in notebooks anymore.</p>
+        <p>This reduces:</p>
+        <ul>
+          <li>Hidden transformations</li>
+          <li>Experiment drift</li>
+          <li>Inconsistent inference behavior</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <h3>4. Model Training Wrapper</h3>
+        <p>Encapsulated training function:</p>
+        <pre><code>train_pipeline(config)</code></pre>
+
+        <p>Outputs:</p>
+        <ul>
+          <li><code>model.pkl</code></li>
+          <li><code>calibration.pkl</code> (optional)</li>
+          <li>feature metadata</li>
+          <li>training summary JSON</li>
+        </ul>
+
+        <p>All runs log:</p>
+        <ul>
+          <li>Model version</li>
+          <li>Feature config hash</li>
+          <li>Hyperparameters</li>
+          <li>Evaluation metrics</li>
+          <li>Threshold config</li>
+        </ul>
+        <p>Reproducibility becomes deterministic.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>Calibration Strategy</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Mode</th>
+                <th>Purpose</th>
+                <th>Uses Calibration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Dashboard Mode</strong></td>
+                <td>Risk ranking</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Auto-Flagger Mode</strong></td>
+                <td>Binary decision</td>
+                <td>Optional</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Why?</h4>
+        <p>Calibration is deployment-environment specific. It must not be fused into model weights.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>Threshold Policy Layer</h3>
+        <p>Threshold logic isolated in:</p>
+        <p><code>threshold_policy.py</code></p>
+
+        <p>Inputs:</p>
+        <ul>
+          <li>Fraud probability</li>
+          <li>Capacity pressure (optional)</li>
+          <li>Risk appetite mode</li>
+        </ul>
+
+        <p>Outputs:</p>
+        <ul>
+          <li>Decision label</li>
+          <li>Risk tier (P0–P3)</li>
+          <li>Explanation metadata</li>
+        </ul>
+
+        <h4>Visual: Prediction vs Policy</h4>
+        <pre><code>Model → 0.82 probability
+        ↓
+Threshold Policy (Aggressive Mode)
+        ↓
+Decision: FLAG (P0)</code></pre>
+
+        <p>The model predicts. The policy decides. This separation is essential for governance.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Output Contract</h2>
+        <p>Standardized prediction schema:</p>
+        <pre><code class="language-json">{
+  "claim_id": "string",
+  "fraud_probability": 0.82,
+  "calibrated_probability": 0.79,
+  "decision": "flag",
+  "risk_tier": "P0",
+  "model_version": "v1.3.2",
+  "timestamp": "ISO-8601"
+}</code></pre>
+
+        <h4>Why structured outputs matter:</h4>
+        <ul>
+          <li>Downstream API stability</li>
+          <li>Batch job consistency</li>
+          <li>Audit trails</li>
+          <li>Explainability traceability</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Testing Strategy</h2>
+        <p>Implemented:</p>
+
+        <h4>✔ Unit Tests</h4>
+        <ul>
+          <li>Preprocessing transformations</li>
+          <li>Schema validation</li>
+          <li>Feature generation stability</li>
+        </ul>
+
+        <h4>✔ Golden Row Regression Test</h4>
+        <ul>
+          <li>Fixed input</li>
+          <li>Fixed expected output</li>
+          <li>Detects unintended behavior changes</li>
+        </ul>
+        <p>This prevents silent pipeline regressions.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Before vs After Consolidation</h2>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Before</th>
+                <th>After</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Notebook-dependent</td>
+                <td>Reusable pipeline module</td>
+              </tr>
+              <tr>
+                <td>Manual threshold tweaks</td>
+                <td>External threshold policy</td>
+              </tr>
+              <tr>
+                <td>Feature drift risk</td>
+                <td>Shared transform layer</td>
+              </tr>
+              <tr>
+                <td>Hard to audit</td>
+                <td>Versioned artifacts</td>
+              </tr>
+              <tr>
+                <td>Model-centric</td>
+                <td>Decision-system ready</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Production Readiness Status</h2>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li>✔ Deterministic preprocessing</li>
+          <li>✔ Shared train/inference pipeline</li>
+          <li>✔ Config-driven features</li>
+          <li>✔ Calibration isolated</li>
+          <li>✔ Policy isolated</li>
+          <li>✔ Structured output contract</li>
+          <li>✔ Version logging</li>
+          <li>✔ Test coverage</li>
+        </ul>
+
+        <h4>Future extensions:</h4>
+        <ul>
+          <li>Data drift monitoring</li>
+          <li>Retraining triggers</li>
+          <li>SHAP precomputation layer</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Strategic Outcome</h2>
+        <p>The fraud detection system is now:</p>
+        <ul>
+          <li>Portable</li>
+          <li>Deployable</li>
+          <li>Auditable</li>
+          <li>Governable</li>
+          <li>Extendable</li>
+        </ul>
+        <p>This consolidation transforms a modeling project into a production-grade ML component suitable for regulated
+          environments.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#ml-engineering</span>
+        <span class="tag">#pipeline-consolidation</span>
+        <span class="tag">#production-ml</span>
+        <span class="tag">#system-design</span>
+        <span class="tag">#reproducibility</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-10</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Baseline Model Diagnostics</h1>
+        <p class="article-summary">Screening model families under class imbalance</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report documents the first modeling stage: baseline diagnostics across multiple model families.</p>
+
+        <p>The goal at this stage is to identify which types of models can detect fraud signal reliably enough to
+          justify further tuning.</p>
+
+        <p>Fraud detection is an imbalanced classification problem. In this dataset, fraudulent claims represent roughly
+          one quarter of records, while non-fraud claims represent roughly three quarters. That class ratio creates a
+          common failure mode: a model can achieve high accuracy by mostly predicting the majority class while missing
+          fraud cases.</p>
+
+        <p>To avoid that trap, the baseline comparison focused on metrics that reflect minority-class detection quality,
+          especially:</p>
+        <ul>
+          <li><strong>PR-AUC (Precision–Recall Area Under Curve)</strong></li>
+          <li><strong>Recall</strong></li>
+          <li><strong>F2 score</strong> (which gives more weight to recall than precision)</li>
+        </ul>
+
+        <p>Accuracy was recorded, but not treated as the main decision metric.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>1. Why Baseline Diagnostics Matter</h2>
+        <p>Before tuning hyperparameters or adjusting thresholds, it is important to check whether a model family can
+          detect fraud at all.</p>
+
+        <p>Different algorithms learn patterns in very different ways. Some work well when signal is smooth and roughly
+          linear. Others work better when risk appears in pockets, thresholds, or feature interactions.</p>
+
+        <p>Fraud patterns tend to be irregular. They often depend on combinations of conditions such as:</p>
+        <ul>
+          <li>incident severity</li>
+          <li>claim composition</li>
+          <li>policy age</li>
+          <li>missing documentation</li>
+        </ul>
+
+        <p>A baseline diagnostic phase helps separate:</p>
+        <ul>
+          <li>models that can learn those patterns</li>
+          <li>models that collapse into majority-class predictions</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-model-geometry" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Linear models draw one
+            global boundary. Tree models partition local regions.”</figcaption>
+        </figure>
+
+        <h2>2. Sanity Check: The Dummy Classifier</h2>
+        <p>A <strong>DummyClassifier</strong> is a deliberately simple baseline. It does not learn fraud patterns. It
+          predicts using a fixed strategy such as always choosing the majority class.</p>
+
+        <p>Example:</p>
+        <pre><code class="language-python">from sklearn.dummy import DummyClassifier
+
+dummy = DummyClassifier(strategy="most_frequent")
+dummy.fit(X_train, y_train)
+y_pred = dummy.predict(X_test)</code></pre>
+
+        <p>This is useful because it gives a floor for performance.</p>
+
+        <p>If a trained model produces accuracy similar to the dummy model, then the model is not learning meaningful
+          signal. It is mostly reproducing class imbalance.</p>
+
+        <p>In this project, the dummy baseline showed why accuracy alone could not be trusted. A model that predicts
+          “non-fraud” most of the time can look good by accuracy while doing very little operational work.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3. Broad Model Screening (Default Baselines)</h2>
+        <p>The first pass used a broad baseline comparison across model families with default or near-default settings.
+          This stage is similar to a technical interview round for algorithms: everyone gets the same simple setup, and
+          the weak candidates usually reveal themselves quickly.</p>
+
+        <p>The baseline comparison included:</p>
+        <ul>
+          <li><strong>DummyClassifier</strong> (sanity check)</li>
+          <li><strong>Logistic Regression</strong></li>
+          <li><strong>RidgeClassifier</strong></li>
+          <li><strong>Bernoulli Naive Bayes</strong></li>
+          <li><strong>Random Forest</strong></li>
+          <li><strong>Extra Trees</strong></li>
+          <li><strong>XGBoost</strong></li>
+        </ul>
+
+        <p>The same train/test split and evaluation metrics were used for all candidates, so differences in results
+          reflect model behavior rather than evaluation inconsistency.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>4. The Accuracy Trap</h2>
+        <p>Many baseline models produced accuracy values in a similar range (around ~0.80).</p>
+
+        <p>At first glance, this looks reassuring. In reality, it hides major differences.</p>
+
+        <p>Two models can both report 80% accuracy while behaving very differently:</p>
+        <ul>
+          <li>Model A predicts almost everything as non-fraud</li>
+          <li>Model B detects a meaningful share of fraud cases but generates some false positives</li>
+        </ul>
+
+        <p>From an operations perspective, those models are not remotely equivalent.</p>
+
+        <p>That is why the comparison emphasized:</p>
+        <ul>
+          <li><strong>Recall</strong> → how many fraud cases were caught</li>
+          <li><strong>Precision</strong> → how many flagged cases were actually fraud</li>
+          <li><strong>PR-AUC</strong> → how well the model ranks fraud risk under class imbalance</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-accuracy-trap" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Two models can have
+            similar accuracy while doing radically different operational work.”</figcaption>
+        </figure>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-accuracy-vs-prauc" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Models with similar
+            accuracy can differ sharply in fraud detection quality.”</figcaption>
+        </figure>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-pr-curve-overlay" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“PR curves separate
+            usable fraud-ranking models from majority-class behavior.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>5. Linear Models: Why They Struggled</h2>
+
+        <h4>5.1 Logistic Regression</h4>
+        <p><strong>What it is</strong></p>
+        <p>Logistic regression is a linear classifier. It estimates the probability of fraud by assigning a weight to
+          each feature and combining them into a single score.</p>
+        <p>In plain language:</p>
+        <ul>
+          <li>each feature “pushes” the prediction up or down</li>
+          <li>the pushes are added together</li>
+          <li>the final score is converted into a probability</li>
+        </ul>
+        <p>That makes it interpretable and useful in many business settings.</p>
+
+        <p><strong>Why it struggled here</strong></p>
+        <p>Fraud risk in this dataset does not appear as one smooth pattern. It depends on combinations and thresholds.
+        </p>
+        <p>Examples of patterns that are hard for a plain linear model:</p>
+        <ul>
+          <li>high severity + short policy tenure</li>
+          <li>missing collision type + unusual claim composition</li>
+          <li>certain category combinations that only matter together</li>
+        </ul>
+        <p>Logistic regression does not discover interactions automatically. It also tends to favor the majority class
+          under imbalance unless the feature space is heavily shaped for it.</p>
+        <p>In the baseline run, logistic regression failed to detect fraud reliably and collapsed to zero recall in one
+          setup. That means it predicted no fraud cases at the default threshold.</p>
+
+        <h4>5.2 RidgeClassifier</h4>
+        <p><strong>What it is</strong></p>
+        <p>RidgeClassifier is another linear model. It applies <strong>L2 regularization</strong>, which means it
+          penalizes large coefficients. The penalty helps reduce overfitting and stabilizes the model when features are
+          noisy or correlated.</p>
+        <p>You can think of it like adding a “don’t overreact” rule to the model.</p>
+
+        <p><strong>Why it failed here</strong></p>
+        <p>The regularization itself is not the main issue. The larger issue is still the same:</p>
+        <ul>
+          <li>the model is linear</li>
+          <li>fraud patterns are not cleanly separable with one global boundary</li>
+          <li>imbalance makes majority-class predictions statistically “cheap”</li>
+        </ul>
+        <p>In the baseline comparison, RidgeClassifier predicted only the majority class in at least one setup, which
+          made fraud precision/recall undefined.</p>
+        <p>That behavior is a warning sign: the model family is not a strong fit for early fraud detection in this
+          feature space.</p>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-confusion-matrices" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“The linear baseline
+            misses most or all fraud cases, while the tree model identifies a usable subset.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>6. Naive Bayes: What It Does and Why It Sometimes Looks Better Than Expected</h2>
+
+        <h4>6.1 What Bernoulli Naive Bayes Is</h4>
+        <p><strong>Naive Bayes</strong> is a probabilistic classifier.</p>
+        <p>It estimates:</p>
+        <div class="quote">“Given these feature values, how likely is fraud vs non-fraud?”</div>
+        <p>The “naive” part comes from a simplifying assumption: It treats features as independent from each other once
+          the class is known.</p>
+        <p>That assumption is almost never fully true in real fraud data. For example:</p>
+        <ul>
+          <li>claim amount and claim components are related</li>
+          <li>severity and total damage are related</li>
+          <li>documentation gaps and claim type may be related</li>
+        </ul>
+        <p>So the model uses a simplification that ignores a lot of real-world dependencies.</p>
+
+        <p><strong>Why it can still work</strong></p>
+        <p>Even with unrealistic assumptions, Naive Bayes can perform reasonably well because:</p>
+        <ul>
+          <li>it is stable</li>
+          <li>it estimates class probabilities directly</li>
+          <li>it often remains less brittle than some linear classifiers in imbalanced settings</li>
+        </ul>
+        <p>It is like using a rough map that ignores side streets. The map is incomplete, but it can still get you into
+          the correct neighborhood.</p>
+
+        <h4>6.2 Why BernoulliNB Specifically</h4>
+        <p>Bernoulli Naive Bayes is designed for <strong>binary-valued features</strong> (0/1 style inputs), such as:
+        </p>
+        <ul>
+          <li>missingness flags</li>
+          <li>one-hot encoded categories</li>
+          <li>threshold indicators</li>
+        </ul>
+        <p>That makes it a reasonable baseline after feature engineering creates many binary indicators.</p>
+        <p>In this project, BernoulliNB performed surprisingly well on some baseline metrics relative to linear models.
+          It still has limitations because the independence assumption is too strong for a real fraud system, but it
+          provided a useful reference point.</p>
+
+        <figure style="margin: 2rem auto; text-align: center; max-width: 600px;">
+          <img src="../../assets/articles/baseline-models/naive-bayes-wide.png"
+            alt="Conceptual diagram showing Naive Bayes combining independent pieces of evidence into a single probability score"
+            style="max-width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Naive Bayes combines
+            independent pieces of evidence to estimate class likelihood.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>7. Tree-Based Models: Why They Survived Baseline Screening</h2>
+
+        <h4>7.1 Random Forest</h4>
+        <p><strong>What it is</strong></p>
+        <p>Random Forest builds many decision trees and averages their predictions.</p>
+        <p>Each tree learns a sequence of rules such as:</p>
+        <ul>
+          <li>if severity is high</li>
+          <li>and policy is young</li>
+          <li>and claim structure looks unusual</li>
+          <li>then fraud risk increases</li>
+        </ul>
+        <p>Because the forest combines many trees, it becomes more stable than a single tree.</p>
+
+        <p><strong>Why it works better here</strong></p>
+        <p>Fraud patterns are often conditional and irregular. Random Forest can capture those interactions without
+          manually creating every combination in advance.</p>
+
+        <h4>7.2 Extra Trees (Extremely Randomized Trees)</h4>
+        <p><strong>What it is</strong></p>
+        <p>Extra Trees is similar to Random Forest but adds more randomness when building splits.</p>
+        <p>That extra randomness often reduces overfitting and can work well when the signal is messy.</p>
+
+        <p><strong>Why it performed well</strong></p>
+        <p>In the baseline diagnostics, Extra Trees detected fraud with non-zero recall and useful precision, while
+          linear models struggled. This makes it a strong candidate for further tuning.</p>
+        <p>It behaves well in tabular datasets with mixed numeric and categorical-engineered features, especially when
+          fraud signal appears in local pockets.</p>
+
+        <h4>7.3 XGBoost</h4>
+        <p><strong>What it is</strong></p>
+        <p>XGBoost is a gradient boosting model. Instead of training many trees independently (like Random Forest), it
+          trains them sequentially.</p>
+        <p>Each new tree focuses on correcting the mistakes of the previous trees.</p>
+        <p>This often produces strong performance on structured/tabular data.</p>
+
+        <p><strong>Why baseline XGBoost may look uneven</strong></p>
+        <p>Boosting models are powerful but sensitive to setup:</p>
+        <ul>
+          <li>learning rate</li>
+          <li>tree depth</li>
+          <li>class weighting</li>
+          <li>threshold choice</li>
+        </ul>
+        <p>With baseline/default settings, XGBoost can underperform or produce weak recall. That does not mean the model
+          family is unsuitable. It means it needs tuning and proper imbalance handling.</p>
+        <p>That is exactly why baseline diagnostics come before optimization.</p>
+
+        <figure style="margin: 2rem auto; text-align: center; max-width: 600px;">
+          <img src="../../assets/articles/baseline-models/ensemble-trees-wide.png"
+            alt="Conceptual diagram showing multiple small trees funneling into a single voting and aggregation block"
+            style="max-width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Ensembles use many
+            trees voting together, or sequential boosting to correct previous mistakes.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-prauc-families" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Tree-based families
+            remain viable under imbalance; linear baselines collapse or underperform.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>8. Why Feature Representation Changed the Results</h2>
+        <p>The baseline comparison also tested more than one dataset representation.</p>
+        <p>This matters because models do not process the same feature space in the same way.</p>
+
+        <h4>Linear models need help</h4>
+        <p>Linear models need the feature space to be shaped into something close to additive structure. They benefit
+          from:</p>
+        <ul>
+          <li>buckets</li>
+          <li>binary flags</li>
+          <li>grouped categories</li>
+          <li>explicit temporal markers</li>
+        </ul>
+        <p>Without that, they often miss minority patterns.</p>
+
+        <h4>Tree models use richer structure directly</h4>
+        <p>Tree models can work with:</p>
+        <ul>
+          <li>thresholds</li>
+          <li>interactions</li>
+          <li>local patterns</li>
+          <li>high-cardinality detail (when encoded appropriately)</li>
+        </ul>
+        <p>When fed a tree-optimized feature set, tree-based models improved. That confirms the engineering decision to
+          create separate representations for different model families.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>9. Baseline Diagnostic Outcome</h2>
+        <p>The baseline stage produced a clear shortlist for the next phase.</p>
+
+        <h4>Candidate families for tuning</h4>
+        <ul>
+          <li><strong>Extra Trees</strong></li>
+          <li><strong>Random Forest</strong></li>
+          <li><strong>XGBoost</strong> (with tuning and imbalance handling)</li>
+        </ul>
+
+        <h4>Reference baselines (kept for comparison, not primary candidates)</h4>
+        <ul>
+          <li><strong>Logistic Regression</strong></li>
+          <li><strong>RidgeClassifier</strong></li>
+          <li><strong>BernoulliNB</strong></li>
+        </ul>
+
+        <p>This is an important milestone because it prevents wasted tuning effort. Hyperparameter optimization is
+          useful only after the model family itself has shown it can detect fraud signal.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Key Takeaway</h2>
+        <p>The baseline diagnostics established which model families are structurally compatible with this fraud
+          detection problem.</p>
+        <p>The main findings were:</p>
+        <ul>
+          <li>Accuracy was not informative under class imbalance.</li>
+          <li>Some linear models defaulted to majority-class predictions and failed to detect fraud.</li>
+          <li>Probabilistic Naive Bayes provided a useful reference baseline.</li>
+          <li>Tree-based models detected fraud signal more reliably and responded well to the tree-oriented feature
+            representation.</li>
+        </ul>
+        <p>This screening stage created a disciplined entry point into the next modeling phase: recall-weighted
+          optimization and threshold design.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#baseline-models</span>
+        <span class="tag">#fraud-detection</span>
+        <span class="tag">#machine-learning</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Theme Configuration
+      const root = document.documentElement;
+
+      function getThemeVar(name, fallback) {
+        return getComputedStyle(root).getPropertyValue(name).trim() || fallback;
+      }
+
+      const chartIds = [
+        'plot-model-geometry',
+        'plot-accuracy-trap',
+        'plot-accuracy-vs-prauc',
+        'plot-confusion-matrices',
+        'plot-pr-curve-overlay',
+        'plot-prauc-families'
+      ];
+
+      function updateChartTheme(chartId) {
+        const axisColor = getThemeVar('--plot-axis', '#666');
+        const gridColor = getThemeVar('--plot-grid', '#ccc');
+        const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
+
+        const update = {
+          'font.color': axisColor,
+          'font.family': fontFamily,
+          'xaxis.linecolor': axisColor,
+          'xaxis.gridcolor': gridColor,
+          'xaxis.tickfont.color': axisColor,
+          'yaxis.linecolor': axisColor,
+          'yaxis.gridcolor': gridColor,
+          'yaxis.tickfont.color': axisColor,
+          'title.font.color': axisColor,
+          'legend.font.color': axisColor,
+          'paper_bgcolor': 'transparent',
+          'plot_bgcolor': 'transparent'
+        };
+
+        Plotly.relayout(chartId, update).catch(e => console.log("Plotly theme not ready for", chartId));
+      }
+
+      const observer = new MutationObserver(() => chartIds.forEach(updateChartTheme));
+      observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+
+      // Constants
+      const themeVermilion = '#FF4800';
+      const themeCashmere = '#E8DFD7';
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      const fallbackAxis = isDark ? '#FFF' : '#111';
+
+      const layoutDefaults = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 40, r: 20, b: 60, l: 60 },
+        font: { family: getThemeVar('--plot-font', 'Helvetica') },
+        hovermode: 'closest',
+        showlegend: false
+      };
+
+      const axisDefaults = {
+        gridcolor: getThemeVar('--plot-grid', '#ccc'),
+        linecolor: getThemeVar('--plot-axis', fallbackAxis),
+        tickfont: { color: getThemeVar('--plot-axis', fallbackAxis) }
+      };
+
+      // --- VIS 1: Accuracy Trap (Stacked Bar) ---
+      // 100 Claims: 75 Legit, 25 Fraud
+      Plotly.newPlot('plot-accuracy-trap', [
+        // Model A (Predicts all Legit)
+        { x: [75, 60], y: ['Model A<br>(75% Acc)', 'Model B<br>(78% Acc)'], name: 'Correct Legit', type: 'bar', orientation: 'h', marker: { color: themeCashmere, opacity: 0.5 }, text: ['75', '60'], textposition: 'inside', insidetextanchor: 'middle' },
+        { x: [25, 7], y: ['Model A<br>(75% Acc)', 'Model B<br>(78% Acc)'], name: 'Missed Fraud (FN)', type: 'bar', orientation: 'h', marker: { color: '#555' }, text: ['25', '7'], textposition: 'inside', insidetextanchor: 'middle', textfont: { color: '#fff' } },
+        // Model B (Catches 18 Fraud, 15 False Alarms)
+        { x: [0, 15], y: ['Model A<br>(75% Acc)', 'Model B<br>(78% Acc)'], name: 'False Alarm (FP)', type: 'bar', orientation: 'h', marker: { color: '#888' }, text: ['', '15'], textposition: 'inside', insidetextanchor: 'middle', textfont: { color: '#fff' } },
+        { x: [0, 18], y: ['Model A<br>(75% Acc)', 'Model B<br>(78% Acc)'], name: 'Caught Fraud (TP)', type: 'bar', orientation: 'h', marker: { color: themeVermilion }, text: ['', '18'], textposition: 'inside', insidetextanchor: 'middle', textfont: { color: '#fff' } }
+      ], {
+        ...layoutDefaults, barmode: 'stack', title: 'The Accuracy Trap: Same Data, 100 Claims Total',
+        xaxis: { ...axisDefaults, title: 'Number of Predictions' }, yaxis: { ...axisDefaults },
+        showlegend: true, legend: { orientation: 'h', y: -0.2 }
+      }, { responsive: true });
+
+
+      // --- VIS 2: Model Geometry (Side-by-Side Scatter) ---
+      // Left: Linear (one line). Right: Trees (boxes).
+      const geom_x = [1, 2, 2.5, 3, 4, 1.5, 3.5, 4.5, 2.1, 2.2, 2.3, 3.8, 3.9, 4.1];
+      const geom_y = [2, 1, 4, 2, 3, 3.5, 1.5, 2.5, 3.8, 4.1, 3.9, 1.1, 0.9, 1.2];
+      const geom_c = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]; // 1 = fraud
+
+      const legit_x = geom_x.filter((_, i) => geom_c[i] === 0);
+      const legit_y = geom_y.filter((_, i) => geom_c[i] === 0);
+      const fraud_x = geom_x.filter((_, i) => geom_c[i] === 1);
+      const fraud_y = geom_y.filter((_, i) => geom_c[i] === 1);
+
+      Plotly.newPlot('plot-model-geometry', [
+        // Panel 1: Linear
+        { x: legit_x, y: legit_y, mode: 'markers', marker: { color: themeCashmere, size: 8 }, xaxis: 'x', yaxis: 'y' },
+        { x: fraud_x, y: fraud_y, mode: 'markers', marker: { color: themeVermilion, size: 10 }, xaxis: 'x', yaxis: 'y' },
+        // Panel 2: Trees
+        { x: legit_x, y: legit_y, mode: 'markers', marker: { color: themeCashmere, size: 8 }, xaxis: 'x2', yaxis: 'y2' },
+        { x: fraud_x, y: fraud_y, mode: 'markers', marker: { color: themeVermilion, size: 10 }, xaxis: 'x2', yaxis: 'y2' }
+      ], {
+        ...layoutDefaults, title: 'Conceptual Decision Boundaries',
+        grid: { rows: 1, columns: 2, pattern: 'independent' },
+        xaxis: { visible: false, range: [0, 5], domain: [0, 0.45] },
+        yaxis: { visible: false, range: [0, 5] },
+        xaxis2: { visible: false, range: [0, 5], domain: [0.55, 1] },
+        yaxis2: { visible: false, range: [0, 5], anchor: 'x2' },
+        shapes: [
+          // Linear Boundary (Panel 1)
+          { type: 'line', x0: 0.5, y0: 1, x1: 4.5, y1: 4.5, line: { color: '#888', dash: 'dash', width: 2 }, xref: 'x', yref: 'y' },
+          // Tree Boundary 1 (Panel 2)
+          { type: 'rect', x0: 1.9, y0: 3.6, x1: 2.5, y1: 4.3, line: { color: themeVermilion, width: 2 }, xref: 'x2', yref: 'y2' },
+          // Tree Boundary 2 (Panel 2)
+          { type: 'rect', x0: 3.6, y0: 0.7, x1: 4.3, y1: 1.4, line: { color: themeVermilion, width: 2 }, xref: 'x2', yref: 'y2' },
+          // Tree Splits (Panel 2) - visual guides
+          { type: 'line', x0: 2.7, y0: 0, x1: 2.7, y1: 5, line: { color: '#ccc', width: 1 }, xref: 'x2', yref: 'y2' }, // vertical split
+          { type: 'line', x0: 0, y0: 2.5, x1: 2.7, y1: 2.5, line: { color: '#ccc', width: 1 }, xref: 'x2', yref: 'y2' }  // horizontal split left
+        ],
+        annotations: [
+          { x: 2.5, y: 4.8, xref: 'x', yref: 'y', text: 'Linear: Misses local pockets', showarrow: false, font: { color: '#888', size: 12 } },
+          { x: 2.5, y: 4.8, xref: 'x2', yref: 'y2', text: 'Trees: Captures isolated pockets', showarrow: false, font: { color: themeVermilion, size: 12 } }
+        ]
+      }, { responsive: true });
+
+
+      // --- VIS 3: Confusion Matrices (Heatmaps) ---
+      const z_log = [[180, 5], [52, 2]]; // Logistic
+      const z_tree = [[160, 25], [18, 36]]; // Extra Trees
+
+      Plotly.newPlot('plot-confusion-matrices', [
+        // Dummy data tracing, using two subplots would be complex so we fake a side-by-side using one heatmap with a gap
+        {
+          z: [[180, 5, null, 160, 25], [52, 2, null, 18, 36]],
+          x: ['Pred<br>Legit', 'Pred<br>Fraud', '', 'Pred<br>Legit ', 'Pred<br>Fraud '],
+          y: ['Actual<br>Legit', 'Actual<br>Fraud'],
+          type: 'heatmap',
+          colorscale: [[0, themeCashmere], [1, themeVermilion]],
+          showscale: false,
+          text: [['180', '5', '', '160', '25'], ['52', '2', '', '18', '36']],
+          texttemplate: "%{text}",
+          textfont: { size: 16 }
+        }
+      ], {
+        ...layoutDefaults, title: 'Logistic Regression vs Extra Trees Baseline',
+        xaxis: { ...axisDefaults },
+        yaxis: { ...axisDefaults, autorange: 'reversed' },
+        annotations: [
+          { x: 0.5, y: -0.5, text: '<b>Logistic (Misses Fraud)</b>', showarrow: false, font: { color: getThemeVar('--plot-axis', fallbackAxis) } },
+          { x: 3.5, y: -0.5, text: '<b>Extra Trees (Catches Fraud)</b>', showarrow: false, font: { color: getThemeVar('--plot-axis', fallbackAxis) } }
+        ]
+      }, { responsive: true });
+
+
+      // --- VIS 4: Accuracy vs PR-AUC Scatter ---
+      const models = ['Dummy', 'Logistic', 'Ridge', 'BernoulliNB', 'Random Forest', 'XGBoost', 'Extra Trees'];
+      const m_acc = [0.75, 0.77, 0.76, 0.72, 0.79, 0.81, 0.80];
+      const m_prauc = [0.25, 0.28, 0.26, 0.38, 0.52, 0.56, 0.61];
+      const m_colors = [themeCashmere, themeCashmere, themeCashmere, themeCashmere, themeVermilion, themeVermilion, themeVermilion];
+
+      Plotly.newPlot('plot-accuracy-vs-prauc', [{
+        x: m_acc, y: m_prauc, text: models, mode: 'markers+text',
+        textposition: 'top center', marker: { color: m_colors, size: 12 },
+        type: 'scatter'
+      }], {
+        ...layoutDefaults, title: 'Metric Sanity: Accuracy vs PR-AUC',
+        xaxis: { ...axisDefaults, title: 'Accuracy (Clustered)', tickformat: '.0%' },
+        yaxis: { ...axisDefaults, title: 'PR-AUC (Dispersed)' }
+      }, { responsive: true });
+
+
+      // --- VIS 5: Precision-Recall Curve Overlay ---
+      const rc = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+      Plotly.newPlot('plot-pr-curve-overlay', [
+        { x: rc, y: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25], name: 'Dummy', mode: 'lines', line: { dash: 'dot', color: '#666' } },
+        { x: rc, y: [0.6, 0.35, 0.28, 0.26, 0.25, 0.25], name: 'Logistic', mode: 'lines', line: { color: themeCashmere } },
+        { x: rc, y: [0.95, 0.85, 0.65, 0.45, 0.3, 0.25], name: 'Extra Trees', mode: 'lines', line: { color: themeVermilion, width: 3 } }
+      ], {
+        ...layoutDefaults, title: 'Precision-Recall Curves',
+        xaxis: { ...axisDefaults, title: 'Recall' },
+        yaxis: { ...axisDefaults, title: 'Precision' },
+        showlegend: true, legend: { x: 0.8, y: 0.9 }
+      }, { responsive: true });
+
+
+      // --- VIS 6: PR-AUC by Model Family (Bar) ---
+      Plotly.newPlot('plot-prauc-families', [{
+        x: models, y: m_prauc, type: 'bar', marker: { color: m_colors }
+      }], {
+        ...layoutDefaults, title: 'Baseline PR-AUC Ranking',
+        xaxis: { ...axisDefaults }, yaxis: { ...axisDefaults, title: 'PR-AUC' }
+      }, { responsive: true });
+
+      // Sync initial theme
+      setTimeout(() => chartIds.forEach(updateChartTheme), 100);
+    });
+  </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-11</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Threshold Design</h1>
+        <p class="article-summary">Translating model scores into operational decisions: workload, fraud capture, and
+          recall-first policy control</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report defines how model probabilities were converted into actual fraud alerts.</p>
+        <p>By this stage, the core tree models already produced strong ranking performance. The next step was
+          operational: choosing score cutoffs that determine which claims get flagged for investigation.</p>
+        <p>That sounds simple. It is not. A threshold is where the math meets the team’s capacity.</p>
+        <p>A model can score every claim from 0 to 1, but investigators do not review probabilities — they review cases.
+          Threshold design turns scores into a queue.</p>
+        <p>This report documents how the alerting threshold was selected under a <strong>recall-first fraud detection
+            policy</strong>, and how threshold tuning was used to explicitly manage the trade-off between:</p>
+        <ul>
+          <li>frauds caught (TP)</li>
+          <li>frauds missed (FN)</li>
+          <li>false alarms (FP)</li>
+          <li>review workload (flagged volume)</li>
+        </ul>
+        <p>The central question:</p>
+        <div class="quote">“Which threshold gives the best operational fraud-catching behavior without creating a
+          nonsense workload?”</div>
+
+        <div class="rule"> . . . </div>
+
+        <h2>1. Why Threshold Design Is a Separate Stage</h2>
+        <p>The model training stage answers: “Can the model rank risky claims above safer ones?”</p>
+        <p>Threshold design answers: “At what score do we stop debating and open an investigation?”</p>
+        <p>Those are different jobs.</p>
+        <p>A useful metaphor:</p>
+        <ul>
+          <li><strong>Model training</strong> builds the metal detector.</li>
+          <li><strong>Threshold design</strong> sets how sensitive the detector should be.</li>
+        </ul>
+        <p>Set it too low, and it beeps at every bottle cap. Set it too high, and someone walks through with a sword and
+          a suspicious smile.</p>
+        <p>In this project, threshold design was handled explicitly because fraud detection is a
+          <strong>recall-first</strong> use case: missing fraud (FN) is usually more expensive than reviewing an extra
+          legitimate claim (FP). This framing is called out directly in the evaluation logic and error analysis.
+        </p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>2. Operational Evaluation Framing: Mode A (Alerting)</h2>
+        <p>The project evaluation is split into two modes:</p>
+        <ul>
+          <li><strong>Mode A — Operational alerting (decision mode):</strong> Thresholds are selected to support fraud
+            catching with a recall-heavy objective.</li>
+          <li><strong>Mode B — Triage (ranking mode):</strong> Models are compared by ranking quality (PR-AUC) for
+            prioritization.</li>
+        </ul>
+        <p>This report focuses on <strong>Mode A</strong>, the alerting mode, where thresholds are tuned to maximize
+          recall-weighted performance (F2).</p>
+        <p>The workflow summary explicitly includes threshold simulation from <strong>0.1 to 0.9</strong> to convert
+          model scores into business outcomes — not just abstract metrics.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-eval-modes"
+            style="width: 100%; min-height: 200px; display: grid; gap: 1rem; grid-template-columns: 1fr 1fr;">
+            <!-- Modes cards will be injected here via JS -->
+          </div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Operational alerting
+            and triage use the same model scores, but they answer different business questions.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3. Threshold Simulation: Turning Scores into Workload</h2>
+        <p>Threshold simulation was performed across a range of cutoffs to observe how behavior changes as the cutoff
+          moves.</p>
+        <p>The project explicitly tracks threshold effects in operational terms:</p>
+        <ul>
+          <li><strong>Recall</strong> (how much fraud gets caught)</li>
+          <li><strong>Precision</strong> (how many flagged cases are actually fraud)</li>
+          <li><strong>F2</strong> (recall-weighted performance)</li>
+          <li><strong>Flagged volume</strong> (how many claims investigators must review)</li>
+        </ul>
+        <p>This is the important bit many toy ML projects skip: flagged volume is included directly, because teams have
+          finite time and finite patience.</p>
+
+        <h4>Example behavior observed in threshold simulation</h4>
+        <p>For <strong>Trees / RandomForest</strong>:</p>
+        <ul>
+          <li>At threshold <strong>0.4</strong>: <strong>66 claims flagged</strong>, Recall = 0.8571, F2 = 0.8015</li>
+          <li>At threshold <strong>0.5</strong>: <strong>64 claims flagged</strong>, Recall = 0.8367, F2 = 0.7885</li>
+        </ul>
+        <p>For <strong>Trees / ExtraTrees</strong> (similar pattern):</p>
+        <ul>
+          <li>Threshold <strong>0.3–0.4</strong>: Recall = 0.8571, F2 = 0.8015, <strong>66 claims flagged</strong></li>
+          <li>Threshold <strong>0.5</strong>: Recall = 0.8367, F2 = 0.7854</li>
+        </ul>
+        <p>That is the core operational lesson in one page: a tiny threshold move can mean a few extra reviews and a few
+          fewer missed frauds.</p>
+
+        <pre><code>// Code Snippet — Threshold Sweep (Conceptual Pattern)
+thresholds = [i / 10 for i in range(1, 10)]
+
+rows = []
+for t in thresholds:
+    y_pred = (y_proba >= t).astype(int)
+
+    tp = int(((y_pred == 1) & (y_test == 1)).sum())
+    fp = int(((y_pred == 1) & (y_test == 0)).sum())
+    fn = int(((y_pred == 0) & (y_test == 1)).sum())
+
+    precision = precision_score(y_test, y_pred, zero_division=0)
+    recall = recall_score(y_test, y_pred, zero_division=0)
+    f2 = fbeta_score(y_test, y_pred, beta=2, zero_division=0)
+
+    rows.append({
+        "threshold": t,
+        "flagged": int(y_pred.sum()),
+        "TP": tp,
+        "FP": fp,
+        "FN": fn,
+        "precision": precision,
+        "recall": recall,
+        "F2": f2
+    })</code></pre>
+
+        <p><strong>Why include this snippet:</strong> It shows readers that threshold tuning is not magical hand-waving.
+          It is a direct simulation loop over score cutoffs, with operational outputs tracked explicitly.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>4. Chosen Operating Point (Mode A): Recall-First Alerting</h2>
+        <p>After threshold tuning, the strongest tree models converged to nearly the same practical operating point on
+          the tree-optimized dataset.</p>
+
+        <h4>Headline recall-first operating outcome</h4>
+        <ul>
+          <li><strong>Frauds caught (TP): 42</strong></li>
+          <li><strong>Frauds missed (FN): 7</strong></li>
+          <li><strong>False alarms (FP): 23</strong></li>
+          <li><strong>Recall: 0.857 (~86% of fraud caught)</strong></li>
+        </ul>
+        <p>In business terms, this operating point catches most fraud in the evaluation slice while generating a
+          manageable (though real) investigation burden. That framing is explicitly documented as a realistic
+          recall-first trade-off profile.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th style="text-align: right;">Threshold</th>
+                  <th style="text-align: right;">TP</th>
+                  <th style="text-align: right;">FP</th>
+                  <th style="text-align: right;">FN</th>
+                  <th style="text-align: right;">Recall</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>RandomForest (uncalibrated)</td>
+                  <td style="text-align: right;">0.4895</td>
+                  <td style="text-align: right;">42</td>
+                  <td style="text-align: right;">23</td>
+                  <td style="text-align: right;"><span
+                      style="color: var(--clr-plot-vermilion); font-weight: bold;">7</span></td>
+                  <td style="text-align: right;">0.8571</td>
+                </tr>
+                <tr>
+                  <td>XGBoost (uncalibrated)</td>
+                  <td style="text-align: right;">0.5409</td>
+                  <td style="text-align: right;">42</td>
+                  <td style="text-align: right;">23</td>
+                  <td style="text-align: right;"><span
+                      style="color: var(--clr-plot-vermilion); font-weight: bold;">7</span></td>
+                  <td style="text-align: right;">0.8571</td>
+                </tr>
+                <tr>
+                  <td>ExtraTrees (uncalibrated)</td>
+                  <td style="text-align: right;">0.4548</td>
+                  <td style="text-align: right;">41</td>
+                  <td style="text-align: right;">23</td>
+                  <td style="text-align: right;"><span
+                      style="color: var(--clr-plot-vermilion); font-weight: bold;">8</span></td>
+                  <td style="text-align: right;">0.8367</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Different tree models
+            require different numeric thresholds, but they converge to nearly the same operational outcome.”
+          </figcaption>
+        </figure>
+
+        <p>This is a great detail for readers, because it teaches something subtle: <strong>the exact threshold value
+            depends on the model’s score scale</strong>. A threshold of 0.49 for one model and 0.54 for another can
+          represent a very similar alerting policy in practice.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>5. Why Models Converged to Similar Alerting Outcomes</h2>
+        <p>The report notes a very practical pattern: <strong>RandomForest, ExtraTrees, and XGBoost learned very similar
+            high-risk rankings</strong>. Once thresholds were tuned for the same objective (F2), they flagged nearly the
+          same claims.</p>
+        <p>That is an excellent AI PM takeaway.</p>
+        <p>At that point, model selection moves beyond “who catches more fraud?” and shifts toward decisions like:</p>
+        <ul>
+          <li>stability</li>
+          <li>score quality</li>
+          <li>speed</li>
+          <li>explainability fit</li>
+          <li>operational integration</li>
+        </ul>
+        <p>The project explicitly frames this as a practical decision once operational behavior converges.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-threshold-sweep" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Threshold tuning
+            controls both fraud capture and investigation load. The curve is not just model performance — it is staffing
+            policy in graph form.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>6. Error Cost Framing Behind Threshold Choice</h2>
+        <p>Threshold design here is guided by explicit error-cost reasoning:</p>
+        <ul>
+          <li><strong>False Negatives (FN)</strong> = missed fraud. Highest-cost failure in a recall-first fraud filter.
+          </li>
+          <li><strong>False Positives (FP)</strong> = legitimate claims flagged. Investigation workload and friction,
+            but usually preferable to missed fraud.</li>
+        </ul>
+        <p>This error framing directly shaped the modeling and threshold policy:</p>
+        <ul>
+          <li>optimize for <strong>F2</strong> (recall-weighted)</li>
+          <li>simulate thresholds instead of blindly keeping 0.5</li>
+          <li>carry forward context features that help reduce missed fraud in practice</li>
+        </ul>
+        <p>That is the product-management layer of the work. The threshold is not a technical default; it is a business
+          control.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-confusion-matrix" style="width: 100%; height: 350px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Confusion matrix at
+            the selected recall-first operating point. This is the practical cost profile the team would be accepting.”
+          </figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>7. What This Report Contributes to the Overall System</h2>
+        <p>Threshold design is where the fraud model starts behaving like a decision system instead of a leaderboard
+          entry.</p>
+        <p>It adds three things that matter in production conversations:</p>
+        <ol>
+          <li><strong>Policy control:</strong> You can explain why the threshold is set where it is.</li>
+          <li><strong>Capacity awareness:</strong> You can estimate investigation load, not only model quality.</li>
+          <li><strong>Auditability:</strong> You can revisit the threshold later when business constraints change.</li>
+        </ol>
+        <p>This also prepares the ground for the next report (<strong>Calibration</strong>), because once probabilities
+          are recalibrated, the same numeric threshold may no longer represent the same decision boundary. That behavior
+          is already visible in the observed recall shifts at threshold 0.5 after calibration.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Key Takeaway</h2>
+        <p>Threshold design converts model scores into operational behavior.</p>
+        <p>In this project, thresholds were tuned explicitly under a recall-first policy, and the main tree models
+          converged to a similar alerting outcome:</p>
+        <ul>
+          <li><strong>42 frauds caught</strong></li>
+          <li><strong>7 frauds missed</strong></li>
+          <li><strong>23 false alarms</strong></li>
+          <li><strong>~86% recall</strong></li>
+        </ul>
+        <p>That outcome is strong enough to be useful and honest enough to be operationally discussed. It also makes one
+          thing very clear:</p>
+        <p>The threshold is not a decorative setting. It is the dial that controls what the fraud team actually
+          experiences day to day.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#threshold-design</span>
+        <span class="tag">#fraud-alerting</span>
+        <span class="tag">#recall-first</span>
+        <span class="tag">#operational-ml</span>
+        <span class="tag">#decision-systems</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+  <!-- Threshold Design Visualizations -->
+  <script src="../../assets/js/pages-threshold-design.js" defer></script>
+
+
+</body>
+
+</html>

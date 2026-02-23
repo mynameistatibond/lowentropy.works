@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-10</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Feature Engineering Strategy</h1>
+        <p class="article-summary">Designing signal representations for different modeling geometries.</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report documents the feature engineering strategy applied after data cleaning and exploratory mapping.
+        </p>
+
+        <p>The objective at this stage was to:</p>
+        <ul>
+          <li>Translate domain patterns into structured variables</li>
+          <li>Preserve meaningful signal discovered during exploration</li>
+          <li>Control multicollinearity</li>
+          <li>Encode missingness explicitly</li>
+          <li>Design two different feature representations aligned with model behavior</li>
+        </ul>
+
+        <p>The dataset was transformed into:</p>
+        <ul>
+          <li>A <strong>shared core feature layer</strong></li>
+          <li>A <strong>Linear-optimized dataset</strong></li>
+          <li>A <strong>Tree-optimized dataset</strong></li>
+        </ul>
+
+        <p>Each design decision is documented below.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3A — Core Feature Engineering (Shared Across Pipelines)</h2>
+        <p>These features were created before model specialization and exist in both pipelines.</p>
+        <p>They convert raw structural information into usable signal.</p>
+        <p>Source: Step 1 Feature Engineering sections 3.1–3.3</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>1. Claim Composition Features</h3>
+
+        <h4>injury_share</h4>
+        <pre><code>[
+injury_claim / total_claim_amount
+]</code></pre>
+
+        <h4>property_share</h4>
+        <pre><code>[
+property_claim / total_claim_amount
+]</code></pre>
+
+        <h4>Why this matters</h4>
+        <p>Raw monetary variables are highly correlated (see Step 1 table, p.6–7).</p>
+        <p>If total claim is large, sub-claims are also large. Feeding both raw creates dominance and redundancy.</p>
+        <p>By using shares, we shift focus from “how big” to “how structured.”</p>
+
+        <p>This is like comparing:</p>
+        <ul>
+          <li>Someone spending €1000 total<br>vs</li>
+          <li>Someone spending 80% of it on one suspicious category</li>
+        </ul>
+        <p>The second case carries behavioral structure.</p>
+
+        <h4>Code Illustration</h4>
+        <pre><code class="language-python">df["injury_share"] = df["injury_claim"] / df["total_claim_amount"]
+df["property_share"] = df["property_claim"] / df["total_claim_amount"]</code></pre>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-share-vs-raw" style="width: 100%; height: 500px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Fraud cases show
+            composition differences beyond raw magnitude.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h3>2. Temporal Derivations</h3>
+
+        <h4>days_since_bind</h4>
+        <p>Policy age at time of incident.</p>
+        <pre><code class="language-python">df["days_since_bind"] = (
+    df["incident_date"] - df["policy_bind_date"]
+).dt.days</code></pre>
+        <p>This captures opportunistic early fraud behavior identified during exploration.</p>
+        <p>A raw date is a timestamp.<br>Policy age is behavioral timing.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h4>vehicle_age</h4>
+        <p>Derived from auto_year.</p>
+        <pre><code class="language-python">df["vehicle_age"] = 2015 - df["auto_year"]</code></pre>
+        <p>Manufacturing year was removed to prevent proxy effects (Step 1 audit table, p.4).</p>
+        <p>Vehicle age carries depreciation and exposure meaning.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>3. Cyclical Encoding of Time</h3>
+        <p>Hours wrap around.<br>23:00 is close to 00:00.</p>
+        <p>Linear models treat 23 and 0 as far apart unless we encode circularity.</p>
+
+        <h4>hour_sin / hour_cos</h4>
+        <pre><code class="language-python">df["hour_sin"] = np.sin(2 * np.pi * df["incident_hour"] / 24)
+df["hour_cos"] = np.cos(2 * np.pi * df["incident_hour"] / 24)</code></pre>
+        <p>Think of this as mapping time onto a clock circle rather than a straight ruler.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>4. Missingness Flags</h3>
+        <p>Missing values were preserved and encoded explicitly (Step 1 cleaning section, p.4–5).</p>
+        <p>Flags created for:</p>
+        <ul>
+          <li>collision_type_missing</li>
+          <li>property_damage_missing</li>
+          <li>police_report_available_missing</li>
+          <li>authorities_contacted_missing</li>
+        </ul>
+        <pre><code class="language-python">df["collision_type_missing"] = (df["collision_type"] == "Missing").astype(int)</code></pre>
+        <p>Missingness here reflects incomplete documentation patterns correlated with fraud.</p>
+        <p>In fraud systems, absence of documentation is often information.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>5. CSL Parsing</h3>
+        <p>policy_csl values like "250/500" were parsed into:</p>
+        <ul>
+          <li>csl_per_person</li>
+          <li>csl_per_incident</li>
+        </ul>
+        <pre><code class="language-python">df["csl_per_person"] = df["policy_csl"].str.split("/").str[0].astype(int)
+df["csl_per_incident"] = df["policy_csl"].str.split("/").str[1].astype(int)</code></pre>
+        <p>This converts structured strings into usable numeric exposure variables.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Why Feature Engineering Exists</h2>
+        <p>Before splitting pipelines, it’s important to understand:</p>
+        <p>Different models “see” the world differently.</p>
+        <p>Linear models draw straight decision lines.<br>Tree models carve stepwise decision regions.</p>
+        <p>You don’t feed both the same shape and expect identical behavior.</p>
+        <p>It’s like giving:</p>
+        <ul>
+          <li>A ruler to measure curves</li>
+          <li>Or giving a knife that can carve corners</li>
+        </ul>
+        <p>The tool determines how you prepare the material.</p>
+        <p>Now we split.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3B — Linear Model Feature Engineering</h2>
+        <p>Reshaping reality so a straight-line model can operate</p>
+        <p>Source: Step 1 Section 3.3 + Linear dataset description</p>
+        <p>Linear models assume additive relationships.</p>
+        <p>They cannot:</p>
+        <ul>
+          <li>Learn automatic interaction terms</li>
+          <li>Detect non-linear thresholds</li>
+          <li>Handle extreme skew gracefully</li>
+        </ul>
+        <p>So we transform reality into approximated segments.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>1. Risk Segmentation Buckets</h3>
+        <p>Continuous variables were discretized:</p>
+        <ul>
+          <li>claim_amount_risk_band</li>
+          <li>customer_tenure_bucket</li>
+          <li>umbrella_limit_bin</li>
+          <li>policy_annual_premium_bin</li>
+          <li>days_since_bind_bin</li>
+          <li>days_since_bind_bucket_final</li>
+        </ul>
+        <p>This converts curved risk patterns into step functions.</p>
+
+        <h4>Example Concept</h4>
+        <p>If fraud spikes under 30 days of tenure, then:<br>Instead of hoping the model learns a curve, we create
+          explicit tenure buckets.</p>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-tenure-buckets" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Bucketed tenure
+            stabilizes linear separability.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h3>2. Holiday & Calendar Features</h3>
+        <p>Linear dataset includes:</p>
+        <ul>
+          <li>incident_dow</li>
+          <li>incident_weekend</li>
+          <li>policy_bind_year</li>
+          <li>policy_bind_month</li>
+          <li>policy_bind_quarter</li>
+          <li>is_holiday</li>
+          <li>holiday_window_2d</li>
+        </ul>
+        <p>These create additive behavioral markers.</p>
+        <p>Trees can find interactions between month and severity automatically.<br>Linear models require explicit
+          signals.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>3. Premium Risk Proxy</h3>
+        <p>Feature:</p>
+        <ul>
+          <li>is_high_risk_premium</li>
+        </ul>
+        <p>Derived from premium threshold logic (Step 1 table p.6).</p>
+        <p>This compresses non-linear premium behavior into a binary additive factor.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>4. Categorical Encoding Strategy</h3>
+        <p>For linear models:</p>
+        <ul>
+          <li>One-hot encoding applied</li>
+          <li>High-cardinality features excluded:
+            <ul>
+              <li>auto_model</li>
+              <li>insured_hobbies</li>
+            </ul>
+          </li>
+        </ul>
+        <p>Reason:<br>One-hot on 39 car models creates sparse instability.</p>
+        <p>Trees tolerate sparsity.<br>Linear coefficients explode.</p>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-sparse-explosion" style="width: 100%; height: 300px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“High-cardinality
+            expansion increases dimensional instability for linear models.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3C — Tree-Optimized Feature Architecture</h2>
+        <p>Preserving structure for interaction discovery</p>
+        <p>Source: Step 1 Section 3.2</p>
+        <p>Trees operate differently.</p>
+        <p>They:</p>
+        <ul>
+          <li>Split data recursively</li>
+          <li>Learn thresholds automatically</li>
+          <li>Capture interactions without manual feature crossing</li>
+        </ul>
+        <p>So we preserve richness instead of compressing it.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>1. Retaining High-Cardinality Features</h3>
+        <p>Kept for Trees:</p>
+        <ul>
+          <li>auto_make</li>
+          <li>auto_model</li>
+          <li>insured_hobbies</li>
+        </ul>
+        <p>Trees can branch on:<br>“auto_model = X AND severity = Major”<br>without manual encoding of interactions.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>2. Preserving Continuous Features</h3>
+        <p>No aggressive bucketing applied.</p>
+        <p>Trees benefit from raw numeric structure.</p>
+        <p>They internally discover optimal split points.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h3>3. Hour Buckets (Coarse Behavioral Context)</h3>
+        <p>hour_bin_4:</p>
+        <ul>
+          <li>Night</li>
+          <li>Morning</li>
+          <li>Afternoon</li>
+          <li>Evening</li>
+        </ul>
+        <p>Coarse grouping supports behavioral clustering while retaining hour_sin/cos in shared layer.</p>
+
+        <div class="rule"> . . . </div>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-tree-split" style="width: 100%; height: 500px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Tree models learn
+            hierarchical interaction without manual crossing.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Why Two Representations Matter</h2>
+
+        <h4>Linear Model World:</h4>
+        <p>Decision boundary is a flat surface. If risk curves, you approximate it using steps.</p>
+
+        <h4>Tree Model World:</h4>
+        <p>Decision boundary is staircase-like. Model adapts naturally to curvature.</p>
+
+        <p>Same data. Different geometry. Different preparation.</p>
+
+        <p>This is architectural thinking — not just feature counting.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Summary of Engineering Philosophy</h2>
+
+        <h4>Shared Layer:</h4>
+        <ul>
+          <li>Normalize structure</li>
+          <li>Encode missingness</li>
+          <li>Convert temporal signals</li>
+          <li>Remove leakage</li>
+        </ul>
+
+        <h4>Linear Dataset:</h4>
+        <ul>
+          <li>Add buckets</li>
+          <li>Reduce dimensional explosion</li>
+          <li>Encode interactions explicitly</li>
+        </ul>
+
+        <h4>Tree Dataset:</h4>
+        <ul>
+          <li>Preserve cardinality</li>
+          <li>Retain non-linear numeric structure</li>
+          <li>Allow interaction discovery</li>
+        </ul>
+
+        <p>This approach produced two modeling-ready datasets with different geometric assumptions, both grounded in the
+          same cleaned base.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#feature-engineering</span>
+        <span class="tag">#fraud-detection</span>
+        <span class="tag">#machine-learning</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Theme Configuration
+      const root = document.documentElement;
+
+      function getThemeVar(name, fallback) {
+        return getComputedStyle(root).getPropertyValue(name).trim() || fallback;
+      }
+
+      const chartIds = [
+        'plot-share-vs-raw',
+        'plot-tenure-buckets',
+        'plot-sparse-explosion',
+        'plot-tree-split'
+      ];
+
+      function updateChartTheme(chartId) {
+        const axisColor = getThemeVar('--plot-axis', '#666');
+        const gridColor = getThemeVar('--plot-grid', '#ccc');
+        const fontFamily = getThemeVar('--plot-font', 'Helvetica, Arial, sans-serif');
+
+        const update = {
+          'font.color': axisColor,
+          'font.family': fontFamily,
+          'xaxis.linecolor': axisColor,
+          'xaxis.gridcolor': gridColor,
+          'xaxis.tickfont.color': axisColor,
+          'yaxis.linecolor': axisColor,
+          'yaxis.gridcolor': gridColor,
+          'yaxis.tickfont.color': axisColor,
+          'title.font.color': axisColor,
+          'legend.font.color': axisColor,
+          'paper_bgcolor': 'transparent',
+          'plot_bgcolor': 'transparent'
+        };
+
+        Plotly.relayout(chartId, update).catch(e => console.log("Plotly theme not ready for", chartId));
+      }
+
+      // Sync theme on dark mode toggle
+      const observer = new MutationObserver(() => {
+        chartIds.forEach(updateChartTheme);
+      });
+      observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+
+      // 2. Data Loading & Generation
+      Papa.parse("../../assets/data/insurance_claims.csv", {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        error: function (err, file) { console.error("PapaParse error:", err, file); },
+        complete: function (results) {
+          const data = results.data.filter(d => d.total_claim_amount != null);
+          const themeVermilion = '#FF4800';
+          const themeCashmere = '#E8DFD7';
+          const themeNight = '#111111';
+          const isDark = root.getAttribute('data-theme') === 'dark';
+          const fallbackAxis = isDark ? '#FFF' : '#111';
+
+          // Helper: layout defaults
+          const layoutDefaults = {
+            paper_bgcolor: 'transparent',
+            plot_bgcolor: 'transparent',
+            margin: { t: 40, r: 20, b: 60, l: 60 },
+            font: { family: getThemeVar('--plot-font', 'Helvetica') },
+            hovermode: 'closest',
+            showlegend: false
+          };
+
+          const axisDefaults = {
+            gridcolor: getThemeVar('--plot-grid', '#ccc'),
+            linecolor: getThemeVar('--plot-axis', fallbackAxis),
+            tickfont: { color: getThemeVar('--plot-axis', fallbackAxis) }
+          };
+
+          // --- VISUAL 1: Share vs Raw Scatter ---
+          const v1_raw = data.map(d => d.total_claim_amount);
+          const v1_share = data.map(d => (d.injury_claim || 0) / d.total_claim_amount);
+          const v1_fraud = data.map(d => d.fraud_reported);
+
+          const trace1_no = {
+            x: v1_raw.filter((_, i) => v1_fraud[i] === 'N'),
+            y: v1_share.filter((_, i) => v1_fraud[i] === 'N'),
+            mode: 'markers',
+            type: 'scatter',
+            name: 'Legitimate',
+            marker: { color: themeCashmere, size: 6, opacity: 0.6, line: { width: 0.5, color: '#333' } }
+          };
+          const trace1_yes = {
+            x: v1_raw.filter((_, i) => v1_fraud[i] === 'Y'),
+            y: v1_share.filter((_, i) => v1_fraud[i] === 'Y'),
+            mode: 'markers',
+            type: 'scatter',
+            name: 'Fraud',
+            marker: { color: themeVermilion, size: 7, opacity: 0.9, line: { width: 0.5, color: '#000' } }
+          };
+
+          Plotly.newPlot('plot-share-vs-raw', [trace1_no, trace1_yes], {
+            ...layoutDefaults,
+            title: 'Injury Claim Share vs Total Claim Amount',
+            xaxis: { ...axisDefaults, title: 'Total Claim Amount ($)' },
+            yaxis: { ...axisDefaults, title: 'Injury Share (%)', tickformat: '.0%' },
+            showlegend: true,
+            legend: { x: 0.8, y: 1 }
+          }, { responsive: true });
+
+          // --- VISUAL 2: Tenure Buckets ---
+          // Emulate buckets
+          const tenure_buckets = {
+            "0-3 Months": { total: 0, fraud: 0, order: 1 },
+            "3-6 Months": { total: 0, fraud: 0, order: 2 },
+            "6-12 Months": { total: 0, fraud: 0, order: 3 },
+            "1-2 Years": { total: 0, fraud: 0, order: 4 },
+            "2-5 Years": { total: 0, fraud: 0, order: 5 },
+            "5-10 Years": { total: 0, fraud: 0, order: 6 },
+            "10-20 Years": { total: 0, fraud: 0, order: 7 },
+            "20+ Years": { total: 0, fraud: 0, order: 8 }
+          };
+
+          data.forEach(d => {
+            if (!d.incident_date || !d.policy_bind_date) return;
+            // Hacky approximation of months
+            const iDate = new Date(d.incident_date);
+            const bDate = new Date(d.policy_bind_date);
+            const months = (iDate - bDate) / (1000 * 60 * 60 * 24 * 30.44);
+
+            let b = "20+ Years";
+            if (months <= 3) b = "0-3 Months";
+            else if (months <= 6) b = "3-6 Months";
+            else if (months <= 12) b = "6-12 Months";
+            else if (months <= 24) b = "1-2 Years";
+            else if (months <= 60) b = "2-5 Years";
+            else if (months <= 120) b = "5-10 Years";
+            else if (months <= 240) b = "10-20 Years";
+
+            tenure_buckets[b].total++;
+            if (d.fraud_reported === 'Y') tenure_buckets[b].fraud++;
+          });
+
+          const sortedBuckets = Object.keys(tenure_buckets).sort((a, b) => tenure_buckets[a].order - tenure_buckets[b].order);
+          const v2_x = sortedBuckets;
+          const v2_y = sortedBuckets.map(b => tenure_buckets[b].total > 0 ? (tenure_buckets[b].fraud / tenure_buckets[b].total) * 100 : 0);
+
+          // Highlight highest fraud
+          const maxFraud = Math.max(...v2_y);
+          const v2_colors = v2_y.map(v => v === maxFraud ? themeVermilion : themeCashmere);
+
+          Plotly.newPlot('plot-tenure-buckets', [{
+            x: v2_x, y: v2_y, type: 'bar', marker: { color: v2_colors }
+          }], {
+            ...layoutDefaults,
+            title: 'Fraud Rate by Customer Tenure Bucket',
+            xaxis: { ...axisDefaults, title: 'Tenure (Time Since Bind)' },
+            yaxis: { ...axisDefaults, title: 'Fraud Rate (%)' },
+          }, { responsive: true });
+
+
+          // --- VISUAL 3: Sparse Explosion ---
+          Plotly.newPlot('plot-sparse-explosion', [{
+            y: ['Base Features', 'One-Hot Encoded (w/ auto_model)'],
+            x: [32, 71],
+            type: 'bar',
+            orientation: 'h',
+            marker: { color: [themeCashmere, themeVermilion] }
+          }], {
+            ...layoutDefaults,
+            title: 'Dimensional Explosion from High-Cardinality Variables',
+            xaxis: { ...axisDefaults, title: 'Number of Feature Columns' },
+            yaxis: { ...axisDefaults, automargin: true },
+            margin: { l: 200, r: 20, t: 40, b: 60 }
+          }, { responsive: true });
+
+
+          // --- VISUAL 4: Tree Split Example ---
+          const v4_x = data.map(d => d.incident_severity);
+          const v4_y = data.map(d => (d.injury_claim || 0) / d.total_claim_amount);
+
+          // Add some jitter to x for categorical scatter
+          const jitter = (val) => {
+            const map = { 'Minor Damage': 1, 'Trivial Damage': 2, 'Major Damage': 3, 'Total Loss': 4 };
+            return (map[val] || 0) + (Math.random() - 0.5) * 0.4;
+          };
+          const v4_x_jittered = v4_x.map(jitter);
+
+          const trace4_no = {
+            x: v4_x_jittered.filter((_, i) => v1_fraud[i] === 'N'),
+            y: v4_y.filter((_, i) => v1_fraud[i] === 'N'),
+            mode: 'markers',
+            type: 'scatter',
+            name: 'Legitimate',
+            marker: { color: themeCashmere, size: 5, opacity: 0.5 }
+          };
+          const trace4_yes = {
+            x: v4_x_jittered.filter((_, i) => v1_fraud[i] === 'Y'),
+            y: v4_y.filter((_, i) => v1_fraud[i] === 'Y'),
+            mode: 'markers',
+            type: 'scatter',
+            name: 'Fraud',
+            marker: { color: themeVermilion, size: 6, opacity: 0.8 }
+          };
+
+          Plotly.newPlot('plot-tree-split', [trace4_no, trace4_yes], {
+            ...layoutDefaults,
+            title: 'Simulating a Tree Decision Split',
+            xaxis: {
+              ...axisDefaults,
+              title: 'Incident Severity',
+              tickvals: [1, 2, 3, 4],
+              ticktext: ['Minor', 'Trivial', 'Major', 'Total Loss']
+            },
+            yaxis: { ...axisDefaults, title: 'Injury Share (%)', tickformat: '.0%' },
+            shapes: [
+              // Vertical split line (isolating major/total loss)
+              {
+                type: 'line', x0: 2.5, x1: 2.5, y0: 0, y1: 1,
+                line: { color: getThemeVar('--plot-axis', fallbackAxis), width: 2, dash: 'dash' }
+              },
+              // Horizontal split line (within major damages)
+              {
+                type: 'line', x0: 2.5, x1: 4.5, y0: 0.25, y1: 0.25,
+                line: { color: getThemeVar('--plot-axis', fallbackAxis), width: 2, dash: 'dash' }
+              }
+            ],
+            annotations: [
+              { x: 3.5, y: 0.8, text: 'High Fraud Probability Node', showarrow: false, font: { color: themeVermilion, size: 14 } }
+            ]
+          }, { responsive: true });
+
+          // Sync initial theme
+          setTimeout(() => chartIds.forEach(updateChartTheme), 100);
+        }
+      });
+    });
+  </script>
+
+
+</body>
+
+</html>

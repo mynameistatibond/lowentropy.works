@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-11</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Probability Calibration</h1>
+        <p class="article-summary">Making fraud risk scores numerically trustworthy for ranking, triage, and
+          probability-based decisions</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report documents the probability calibration stage for the tuned tree models.</p>
+        <p>By this point, the models were already good at separating suspicious claims from normal ones. The remaining
+          issue was more subtle: the <strong>score values themselves</strong> (0.2, 0.6, 0.9, etc.) are often not
+          “honest probabilities” out of the box for tree ensembles.</p>
+        <p>In fraud work, that matters a lot.</p>
+        <p>A score is used for more than a yes/no decision. It is also used for:</p>
+        <ul>
+          <li>ranking which claims analysts review first</li>
+          <li>setting triage cutoffs by team capacity</li>
+          <li>comparing risk across batches</li>
+          <li>generating explainable risk narratives</li>
+        </ul>
+        <p>If the score scale is distorted, the queue becomes messy even when the classifier still looks good on recall.
+        </p>
+        <p>This stage calibrates the tree models so the probability scale becomes more reliable for decision support.
+          The project also keeps both versions (uncalibrated and calibrated), because they serve different operational
+          purposes.</p>
+        <p>The central question:</p>
+        <div class="quote">“How do we turn model scores into risk estimates that are usable in real fraud triage
+          workflows?”</div>
+
+        <div class="rule"> . . . </div>
+
+        <h2>1. Why Calibration Exists at All</h2>
+        <p>Tree models (RandomForest, XGBoost, ExtraTrees, AdaBoost, Bagging) often produce strong ranking performance,
+          but their raw probability outputs can be “overconfident” or “underconfident.”</p>
+        <p>Simple version:</p>
+        <ul>
+          <li>the model may rank fraud cases correctly,</li>
+          <li>but the number <strong>0.80</strong> does not always mean “about 80% fraud likelihood.”</li>
+        </ul>
+        <p>That is exactly the problem calibration solves: it reshapes the score scale so probability values behave more
+          consistently for ranking and triage decisions. This calibration step was explicitly introduced for that reason
+          in your pipeline.</p>
+
+        <h4>Plain-language metaphor</h4>
+        <p>Imagine a bathroom scale that always puts heavier people above lighter people, so the ordering is fine — but
+          it adds +7 kg to everyone. It still sorts people correctly, but the numbers are wrong.</p>
+        <p>Calibration fixes the <strong>numbers</strong>, not just the order.</p>
+        <p>That distinction is gold in fraud systems.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>2. Why Calibration Matters Specifically for Fraud</h2>
+        <p>Fraud detection is rarely “predict and forget.” It behaves like a <strong>triage queue</strong>:</p>
+        <ul>
+          <li>Claims are sorted by risk score</li>
+          <li>A review team has limited capacity</li>
+          <li>A threshold is set depending on workload and tolerance for misses</li>
+        </ul>
+        <p>That means two separate needs exist at the same time:</p>
+
+        <h4>A) Capture-oriented mode (recall-heavy)</h4>
+        <p>Useful when you want aggressive fraud capture and are willing to review more claims.</p>
+
+        <h4>B) Probability-oriented mode (risk scoring / ranking)</h4>
+        <p>Useful when the team depends on the score itself for prioritization, routing, or consistent downstream logic.
+        </p>
+        <p>Your project explicitly keeps both uncalibrated and calibrated models because those two modes are real, not
+          theoretical. Uncalibrated models were kept for aggressive threshold tuning, while calibrated versions were
+          kept for trustworthy risk scores and probability-based decisions.</p>
+        <p>That is a very sane system design choice. Many people mash these together and wonder why operations get weird
+          later.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3. Calibration Methods Used in This Project</h2>
+        <p>Your pipeline used <code>CalibratedClassifierCV</code> for tree model calibration, with two calibration
+          strategies depending on the model family:</p>
+        <ul>
+          <li><strong>XGBoost → Platt scaling (sigmoid)</strong></li>
+          <li><strong>Other tree models → Isotonic regression</strong></li>
+        </ul>
+
+        <h4>What these methods do (simple explanation)</h4>
+        <p><strong>Platt scaling (sigmoid)</strong><br>
+          Platt scaling fits a smooth S-shaped curve on top of the model’s raw scores. It is a good choice when:</p>
+        <ul>
+          <li>score distortion is smooth and monotonic</li>
+          <li>you want a stable, compact mapping</li>
+          <li>you want less risk of overfitting calibration on smaller data</li>
+        </ul>
+        <p>In your pipeline, XGBoost used this approach.</p>
+
+        <p><strong>Isotonic regression</strong><br>
+          Isotonic regression fits a monotonic step-like mapping from raw scores to calibrated probabilities. It is more
+          flexible than Platt scaling, because it does not force an S-shape. It is useful when:</p>
+        <ul>
+          <li>calibration error is not well-described by one smooth curve</li>
+          <li>you want a more data-driven mapping</li>
+          <li>the score behavior is irregular (common with tree ensembles)</li>
+        </ul>
+        <p>Your other tree models used isotonic regression.</p>
+
+        <h4>Why this split makes sense in your setup</h4>
+        <p>This was a practical choice for the model families you trained:</p>
+        <ul>
+          <li>XGBoost often benefits from a smoother probability remapping (Platt/sigmoid)</li>
+          <li>Bagged/ensemble trees can have more jagged score distributions, where isotonic can adapt better</li>
+        </ul>
+        <p>That is consistent with the calibration design in your pipeline. The key point is that calibration was
+          treated as a <strong>probability-quality step</strong>, not as a retraining trick.</p>
+
+        <pre><code>// Code Snippet — Applying Calibration
+from sklearn.calibration import CalibratedClassifierCV
+
+# XGBoost -> Platt scaling (sigmoid)
+xgb_calibrated = CalibratedClassifierCV(
+    xgb_best_model,
+    method="sigmoid",
+    cv=5
+)
+
+# Other tree models -> isotonic regression
+rf_calibrated = CalibratedClassifierCV(
+    rf_best_model,
+    method="isotonic",
+    cv=5
+)
+
+xgb_calibrated.fit(X_train, y_train)
+rf_calibrated.fit(X_train, y_train)</code></pre>
+
+        <div class="rule"> . . . </div>
+
+        <h2>4. Alternatives You Could Use</h2>
+        <p>For readers who haven’t touched calibration before, here are the common alternatives:</p>
+        <ul>
+          <li><strong>Temperature scaling:</strong> Often used in deep learning. It adjusts confidence with one scalar
+            “temperature.” Very clean for neural nets, less common as the main choice for mixed tree ensembles.</li>
+          <li><strong>Histogram binning / quantile binning:</strong> Groups scores into bins and recalculates empirical
+            fraud rates per bin. Easy to explain, but can become coarse and unstable depending on sample size.</li>
+          <li><strong>Beta calibration:</strong> A more flexible parametric calibration method than Platt in some
+            settings. Useful, but less standard in many scikit-style pipelines.</li>
+        </ul>
+
+        <h4>Why your setup is strong for this project</h4>
+        <p>Using <code>CalibratedClassifierCV</code> with Platt + isotonic is a very practical and defensible choice for
+          classical ML fraud pipelines: widely used, integrates cleanly with sklearn workflows, easy to reproduce, and
+          provides clear separation between model fitting and probability correction.</p>
+        <p>And crucially, your results show why calibration must be evaluated with context: calibration improves
+          probability quality, but it can move recall at a fixed threshold because the score scale changes. That
+          behavior appears directly in your metrics.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>5. What Calibration Changes in Practice</h2>
+        <p>Calibration does <strong>not</strong> change the underlying fraud pattern learned by the model.</p>
+        <p>It changes how score values map to risk.</p>
+        <p>That means the same threshold (for example, <strong>0.5</strong>) can behave differently before and after
+          calibration, because <strong>0.5 now means something different on the recalibrated scale</strong>.</p>
+        <p>Your project notes exactly this effect in the tree models: recall often drops at the default 0.5 threshold
+          after calibration, because the probability scale has been reshaped. This is expected behavior, and it is one
+          reason threshold selection remains an operational choice after calibration.</p>
+
+        <h4>Simple metaphor</h4>
+        <p>Think of calibration like changing from Fahrenheit to Celsius.</p>
+        <p>The weather did not change. The <strong>numbers</strong> changed. If you keep the same cutoff number after
+          changing the scale, you will make weird decisions.</p>
+        <p>That is why “calibrate first, then re-check thresholds” is the grown-up move.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-reliability-curve" style="width: 100%; height: 400px;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Calibration aligns
+            predicted fraud probabilities with observed fraud frequency, improving the trustworthiness of risk scores
+            used in triage.”</figcaption>
+        </figure>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-prob-distribution" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Calibration reshapes
+            the score distribution. A threshold like 0.5 will select different claims after calibration, even when the
+            model’s learned patterns remain the same.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>6. Calibration Results (Original Feature Representation)</h2>
+        <p>Below is a clean summary of the calibration comparison at the default threshold (0.5) for the
+          <strong>Original</strong> dataset representation.
+        </p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Version</th>
+                  <th style="text-align: right;">Precision</th>
+                  <th style="text-align: right;">Recall</th>
+                  <th style="text-align: right;">F1</th>
+                  <th style="text-align: right;">PR-AUC</th>
+                  <th style="text-align: right;">ROC-AUC</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>RandomForest</td>
+                  <td>Uncalibrated</td>
+                  <td style="text-align: right;">0.6207</td>
+                  <td style="text-align: right;">0.7347</td>
+                  <td style="text-align: right;">0.6729</td>
+                  <td style="text-align: right;">0.5356</td>
+                  <td style="text-align: right;">0.7883</td>
+                </tr>
+                <tr>
+                  <td>RandomForest</td>
+                  <td>Calibrated</td>
+                  <td style="text-align: right;">0.6275</td>
+                  <td style="text-align: right;">0.6531</td>
+                  <td style="text-align: right;">0.6400</td>
+                  <td style="text-align: right;">0.5510</td>
+                  <td style="text-align: right;">0.7940</td>
+                </tr>
+                <tr>
+                  <td>XGBoost</td>
+                  <td>Uncalibrated</td>
+                  <td style="text-align: right;">0.6087</td>
+                  <td style="text-align: right;">0.5714</td>
+                  <td style="text-align: right;">0.5895</td>
+                  <td style="text-align: right;">0.4545</td>
+                  <td style="text-align: right;">0.7546</td>
+                </tr>
+                <tr>
+                  <td>XGBoost</td>
+                  <td><strong style="color: var(--clr-plot-vermilion);">Calibrated</strong></td>
+                  <td style="text-align: right;">0.6078</td>
+                  <td style="text-align: right;"><strong>0.6327</strong></td>
+                  <td style="text-align: right;"><strong>0.6200</strong></td>
+                  <td style="text-align: right;"><strong>0.5447</strong></td>
+                  <td style="text-align: right;"><strong>0.8077</strong></td>
+                </tr>
+                <tr>
+                  <td>ExtraTrees</td>
+                  <td>Uncalibrated</td>
+                  <td style="text-align: right;">0.6207</td>
+                  <td style="text-align: right;">0.7347</td>
+                  <td style="text-align: right;">0.6729</td>
+                  <td style="text-align: right;">0.5180</td>
+                  <td style="text-align: right;">0.7804</td>
+                </tr>
+                <tr>
+                  <td>ExtraTrees</td>
+                  <td>Calibrated</td>
+                  <td style="text-align: right;">0.6222</td>
+                  <td style="text-align: right;">0.5714</td>
+                  <td style="text-align: right;">0.5957</td>
+                  <td style="text-align: right;">0.4860</td>
+                  <td style="text-align: right;">0.7725</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Calibration affects
+            threshold metrics and ranking metrics differently across model families; the impact depends on score-shape
+            distortion.”</figcaption>
+        </figure>
+
+        <h4>What stands out here</h4>
+        <p><strong>XGBoost benefited a lot</strong> after calibration on the Original dataset. PR-AUC improved
+          noticeably, ROC-AUC improved over 5 points, and Recall improved at threshold 0.5. That is a strong example of
+          calibration improving score quality and also helping operational behavior at the default threshold.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>7. Calibration Results (Tree-Optimized Feature Representation)</h2>
+        <p>You also evaluated calibrated vs uncalibrated models on the <strong>Trees</strong> dataset representation.
+        </p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Version</th>
+                  <th style="text-align: right;">Precision</th>
+                  <th style="text-align: right;">Recall</th>
+                  <th style="text-align: right;">F1</th>
+                  <th style="text-align: right;">PR-AUC</th>
+                  <th style="text-align: right;">ROC-AUC</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>XGBoost</td>
+                  <td>Uncalibrated</td>
+                  <td style="text-align: right;">0.6364</td>
+                  <td style="text-align: right;"><strong>0.8571</strong></td>
+                  <td style="text-align: right;">0.7304</td>
+                  <td style="text-align: right;">0.5583</td>
+                  <td style="text-align: right;">0.8214</td>
+                </tr>
+                <tr>
+                  <td>XGBoost</td>
+                  <td>Calibrated</td>
+                  <td style="text-align: right;">0.6129</td>
+                  <td style="text-align: right;">0.7755</td>
+                  <td style="text-align: right;">0.6858</td>
+                  <td style="text-align: right;">0.5227</td>
+                  <td style="text-align: right;">0.8014</td>
+                </tr>
+                <tr>
+                  <td>ExtraTrees</td>
+                  <td>Uncalibrated</td>
+                  <td style="text-align: right;">0.6406</td>
+                  <td style="text-align: right;"><strong>0.8367</strong></td>
+                  <td style="text-align: right;">0.7257</td>
+                  <td style="text-align: right;">0.5448</td>
+                  <td style="text-align: right;">0.8134</td>
+                </tr>
+                <tr>
+                  <td>ExtraTrees</td>
+                  <td>Calibrated</td>
+                  <td style="text-align: right;">0.6034</td>
+                  <td style="text-align: right;">0.7143</td>
+                  <td style="text-align: right;">0.6542</td>
+                  <td style="text-align: right;">0.5137</td>
+                  <td style="text-align: right;">0.8019</td>
+                </tr>
+                <tr>
+                  <td>VotingEnsemble</td>
+                  <td>Uncalibrated</td>
+                  <td style="text-align: right;">0.6269</td>
+                  <td style="text-align: right;">0.8571</td>
+                  <td style="text-align: right;">0.7242</td>
+                  <td style="text-align: right;">0.5538</td>
+                  <td style="text-align: right;">0.8192</td>
+                </tr>
+                <tr>
+                  <td>VotingEnsemble</td>
+                  <td>Calibrated</td>
+                  <td style="text-align: right;">0.6071</td>
+                  <td style="text-align: right;">0.6939</td>
+                  <td style="text-align: right;">0.6476</td>
+                  <td style="text-align: right;">0.5421</td>
+                  <td style="text-align: right;">0.8154</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </figure>
+
+        <h4>What stands out here</h4>
+        <p>For the strongest tree models, calibration <strong>reduced recall at the default threshold (0.5)</strong>.
+          Your own summary correctly explains why: calibration changed the probability scale, so 0.5 now cuts the score
+          distribution differently.</p>
+        <p>Example: <strong>Trees / XGBoost recall drops from 0.8571 → 0.7755</strong> after calibration at threshold
+          0.5.</p>
+        <p>This does <strong>not</strong> mean the calibrated model is “worse” in a general sense. It means the
+          threshold now needs to be re-tuned on the new score scale if your goal is recall-heavy capture. That is
+          exactly why separating <strong>Threshold Design</strong> and <strong>Calibration</strong> into different
+          reports was the right move.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>8. What Changed Operationally After Calibration</h2>
+        <p>Calibration gives you a cleaner foundation for:</p>
+
+        <h4>Risk ranking</h4>
+        <p>When analysts open a queue sorted by fraud probability, calibrated scores are more trustworthy for ordering
+          and prioritization. Your pipeline explicitly frames calibrated outputs as better for ranking/triage.</p>
+
+        <h4>Probability-based policies</h4>
+        <p>If you later define business rules like:</p>
+        <ul>
+          <li>> 0.80 = urgent review</li>
+          <li>0.55–0.80 = standard review</li>
+          <li>
+            < 0.55=low-risk queue</li>
+        </ul>
+        <p>those cutoffs make more sense when the score scale has been calibrated.</p>
+
+        <h4>Model communication</h4>
+        <p>Calibration also helps when presenting results to non-ML stakeholders. “Risk score” becomes less mystical and
+          more numerically defensible.</p>
+        <p>That matters in fraud work, because product and operations teams will ask:</p>
+        <ul>
+          <li>“Why is this one higher than that one?”</li>
+          <li>“Can we trust 0.72?”</li>
+          <li>“What happens if we shift the cutoff?”</li>
+        </ul>
+        <p>Calibrated probabilities make those conversations less hand-wavy.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>9. Practical Guidance for Using Calibrated vs Uncalibrated Models in This System</h2>
+        <p>Your project’s design already points to a very practical split:</p>
+
+        <h4>Keep uncalibrated models for capture-oriented threshold sweeps</h4>
+        <p>These often preserve the strongest recall behavior for aggressive fraud catching when you tune thresholds
+          directly. Your recorded notes explicitly keep them for that use case.</p>
+
+        <h4>Use calibrated models for risk scoring and triage queues</h4>
+        <p>These are better when the numeric probability itself matters (rank ordering, queue prioritization,
+          probability-based rules, downstream decision contracts). This is a strong systems decision because it avoids
+          forcing one artifact to do two jobs badly.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Key Takeaway</h2>
+        <p>Calibration is the stage where model scores stop being “just outputs” and start becoming usable risk
+          estimates.</p>
+        <p>In this fraud pipeline, tree models were calibrated using <code>CalibratedClassifierCV</code>, with
+          <strong>Platt scaling for XGBoost</strong> and <strong>isotonic regression for the other tree
+            ensembles</strong>. The project also preserves both calibrated and uncalibrated versions because they
+          support different operational goals: high-recall thresholding vs trustworthy probability-based triage.
+        </p>
+        <p>The results show a pattern that matters in real deployments:</p>
+        <ul>
+          <li>calibration can improve ranking quality and probability trustworthiness,</li>
+          <li>and it can also change recall/precision at the same threshold because the score scale has shifted.</li>
+        </ul>
+        <p>In plain English: the model already knew who looked suspicious; calibration taught it how to speak in more
+          honest numbers.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#calibration</span>
+        <span class="tag">#fraud-risk-scoring</span>
+        <span class="tag">#triage-systems</span>
+        <span class="tag">#probability-quality</span>
+        <span class="tag">#operational-ml</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+  <!-- Calibration Visualizations -->
+  <script src="../../assets/js/pages-calibration.js" defer></script>
+
+
+</body>
+
+</html>

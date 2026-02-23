@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-12</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Interpretability (SHAP)</h1>
+        <p class="article-summary">Opening the fraud model and inspecting how individual features and feature
+          combinations drive risk scores</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report documents the interpretability stage of the fraud detection pipeline using <strong>SHAP</strong>
+          (Shapley Additive Explanations).</p>
+        <p>By this point, the project already has trained tree-based models and calibrated variants. The next step is to
+          inspect how the model reaches its risk scores:</p>
+        <ul>
+          <li>which features drive fraud predictions globally</li>
+          <li>how feature effects behave across value ranges</li>
+          <li>which feature combinations interact</li>
+          <li>how a single flagged claim is explained case-by-case</li>
+        </ul>
+        <p>This matters for a fraud decision system because a score alone is not enough. Operations teams need to
+          understand <strong>why</strong> a claim was ranked as high risk, especially when the model affects
+          investigation priority.</p>
+        <p>A useful mental model:</p>
+        <div class="quote">“Think of the model’s fraud score like a final bill in a restaurant. SHAP breaks the bill
+          into line items and shows which features added cost and which ones reduced it.”</div>
+
+        <div class="rule"> . . . </div>
+
+        <h2>1. SHAP Setup in This Project</h2>
+        <p>The interpretability workflow loads the prepared datasets and the calibrated tree-model bundle, then unwraps
+          the base estimator when needed.</p>
+
+        <h4>Datasets loaded</h4>
+        <p>Two processed datasets are used in the project:</p>
+        <ul>
+          <li><strong>Preprocessed dataset</strong>: shape <strong>(1000, 51)</strong></li>
+          <li><strong>Trees dataset</strong>: shape <strong>(1000, 43)</strong></li>
+        </ul>
+        <p>Both retain the same target distribution:</p>
+        <ul>
+          <li>Non-fraud: <strong>753</strong></li>
+          <li>Fraud: <strong>247</strong></li>
+          <li>Fraud rate: <strong>24.7%</strong></li>
+        </ul>
+
+        <h4>Why the model is unwrapped before SHAP</h4>
+        <p>The SHAP workflow loads the calibrated models, then extracts the underlying estimator from the calibration
+          wrapper (<code>calibrated_classifiers_[0].estimator</code>) before running <code>TreeExplainer</code>.</p>
+        <p>That design is practical and correct:</p>
+        <ul>
+          <li>calibration improves probability quality</li>
+          <li>SHAP explains the tree model structure itself</li>
+          <li>the explanation step should inspect the actual decision logic learned by the tree ensemble</li>
+        </ul>
+        <p>In plain language: calibration adjusts how the score is <strong>spoken</strong>, while SHAP inspects how the
+          score was <strong>thought</strong>.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>2. Pipeline Recovery and Feature Name Alignment</h2>
+        <p>This is one of the most important engineering steps in the SHAP notebook, and frankly one of the most
+          annoying parts of real ML work.</p>
+        <p>Tree models are often trained inside a preprocessing pipeline (for encoding, scaling, etc.). Once the data
+          passes through that pipeline:</p>
+        <ul>
+          <li>the original columns become transformed columns</li>
+          <li>categorical variables may become many one-hot encoded features</li>
+          <li>feature names can become hard to recover</li>
+        </ul>
+        <p>Your SHAP workflow explicitly solves this.</p>
+
+        <h4>What the code does</h4>
+        <ul>
+          <li>Detects whether the model is a pipeline (<code>prep</code> + <code>clf</code>)</li>
+          <li>Applies the exact same <code>prep.transform(...)</code> used during training</li>
+          <li>Converts sparse matrices to dense if needed</li>
+          <li>Extracts transformed feature names via <code>get_feature_names_out()</code></li>
+          <li>Runs a dimensionality sanity check before SHAP</li>
+        </ul>
+
+        <h4>Example from the run</h4>
+        <p>For the selected <strong>XGBoost on Trees</strong> setup:</p>
+        <ul>
+          <li>pipeline was detected</li>
+          <li>preprocessing was applied</li>
+          <li>feature names were successfully extracted</li>
+          <li>SHAP matrix was aligned to <strong>171 transformed features</strong></li>
+        </ul>
+        <p>That last part is crucial. If feature names and columns are misaligned, SHAP plots become decorative fiction.
+        </p>
+
+        <pre><code>// Code Snippet — Pipeline Recovery for SHAP
+if hasattr(base_model, "named_steps") and "prep" in base_model.named_steps:
+    prep = base_model.named_steps["prep"]
+    clf = base_model.named_steps["clf"]
+
+    X_train_t = prep.transform(X_train)
+    X_test_t = prep.transform(X_test)
+
+    if hasattr(X_train_t, "toarray"):
+        X_train_t = X_train_t.toarray()
+        X_test_t = X_test_t.toarray()
+
+    feature_names = list(prep.get_feature_names_out())
+else:
+    clf = base_model
+    X_train_t = X_train.values
+    X_test_t = X_test.values
+    feature_names = list(X_train.columns)</code></pre>
+
+        <h4>Why readers should care</h4>
+        <p>This is the plumbing that keeps the interpretation honest. Without it, a chart might say “feature_42” is
+          important, which is about as useful as a treasure map that says “dig somewhere.”</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3. Global SHAP Analysis (Top Drivers)</h2>
+        <p>The global SHAP step computes feature contributions on a subsample of training data
+          (<code>X_train_t[:300]</code>) and summarizes average absolute impact. This gives the <strong>overall driver
+            ranking</strong> for the selected model.</p>
+
+        <h4>Selected global model in the run</h4>
+        <ul>
+          <li><strong>Model:</strong> XGBoost</li>
+          <li><strong>Dataset:</strong> Trees</li>
+          <li><strong>Explainer:</strong> <code>shap.TreeExplainer</code></li>
+        </ul>
+
+        <h4>Top global drivers (mean |SHAP|)</h4>
+        <p>From your run, the strongest global drivers included:</p>
+        <ol>
+          <li><code>incident_severity_Major Damage</code> — <strong>0.7272</strong></li>
+          <li><code>insured_hobbies_chess</code> — <strong>0.2851</strong></li>
+          <li><code>insured_hobbies_cross-fit</code> — <strong>0.2101</strong></li>
+          <li><code>injury_share</code> — <strong>0.0516</strong></li>
+          <li><code>months_as_customer</code> — <strong>0.0389</strong></li>
+          <li><code>vehicle_age</code> — <strong>0.0353</strong></li>
+          <li><code>incident_state_VA</code> — <strong>0.0280</strong></li>
+          <li><code>insured_occupation_exec-managerial</code> — <strong>0.0278</strong></li>
+          <li><code>days_since_bind</code> — <strong>0.0263</strong></li>
+          <li><code>witnesses</code> — <strong>0.0259</strong></li>
+        </ol>
+
+        <h4>What this tells the reader</h4>
+        <p>This global ranking shows a mix of:</p>
+        <ul>
+          <li><strong>incident severity signal</strong> (very strong)</li>
+          <li><strong>claim composition / financial structure signal</strong> (e.g., <code>injury_share</code>)</li>
+          <li><strong>tenure/context variables</strong> (<code>months_as_customer</code>, <code>days_since_bind</code>)
+          </li>
+          <li><strong>encoded categorical effects</strong> (occupation, state, collision type, hobbies, auto model)</li>
+        </ul>
+        <p>It also immediately raises a governance question around hobby-related features, because they rank unusually
+          high. That’s exactly the kind of thing SHAP is supposed to surface early, before anyone gets too attached to
+          leaderboard metrics.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-beeswarm" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Global SHAP summary
+            showing the strongest fraud-risk drivers and the direction of feature impact across claims.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>4. Dependence Plots (How Continuous Features Behave)</h2>
+        <p>Global importance tells you which features matter. Dependence plots show <strong>how</strong> they matter
+          across their value range.</p>
+        <p>Your workflow explicitly generated dependence plots for a list of continuous features (when present in the
+          transformed feature set), including:</p>
+        <ul>
+          <li><code>policy_annual_premium</code></li>
+          <li><code>days_since_bind</code></li>
+          <li><code>total_claim_amount</code></li>
+          <li><code>months_as_customer</code></li>
+          <li><code>capital-loss</code></li>
+          <li><code>capital-gains</code></li>
+          <li><code>age</code></li>
+          <li><code>incident_hour_of_the_day</code></li>
+          <li><code>hour_cos</code></li>
+          <li><code>hour_sin</code></li>
+          <li><code>vehicle_age</code></li>
+        </ul>
+
+        <h4>Why these plots are useful</h4>
+        <p>A dependence plot helps answer questions like:</p>
+        <ul>
+          <li>Does risk increase steadily with higher values?</li>
+          <li>Is there a threshold effect?</li>
+          <li>Does the effect flatten after a point?</li>
+          <li>Does the feature only matter in a certain region?</li>
+        </ul>
+        <p>This is much more useful than a simple correlation number, because tree models often learn step-like or
+          curved effects.</p>
+
+        <h4>Simple metaphor</h4>
+        <p>A correlation is like asking, “Does the road generally go uphill?”</p>
+        <p>A dependence plot shows the actual road:</p>
+        <ul>
+          <li>where it climbs</li>
+          <li>where it flattens</li>
+          <li>where it suddenly turns weird</li>
+        </ul>
+        <p>That “weird part” is often where fraud signal lives.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-dependence-bind" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Dependence plot for
+            policy tenure, showing how time since policy bind influences fraud risk contribution across the observed
+            range.”</figcaption>
+        </figure>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-dependence-injury" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Dependence plot for
+            claim composition / amount feature, showing where fraud contribution becomes stronger or weaker.”
+          </figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>5. SHAP Interaction Analysis (Feature Synergies)</h2>
+        <p>Fraud patterns often come from combinations, not single variables.</p>
+        <p>Your SHAP workflow includes a dedicated interaction analysis module that:</p>
+        <ul>
+          <li>computes <code>shap_interaction_values(...)</code> on a small sample (<code>X_train_t[:80]</code>)</li>
+          <li>calculates mean absolute interaction strength</li>
+          <li>removes self-interactions (diagonal)</li>
+          <li>ranks the strongest feature pairs</li>
+        </ul>
+        <p>This is exactly the right move for a fraud system, because suspicious patterns are often conditional.</p>
+
+        <h4>Top 5 interactions from your run (XGBoost on Trees)</h4>
+        <ol>
+          <li><code>insured_hobbies_chess × incident_severity_Major Damage</code> — <strong>0.1039</strong> (moderate
+            joint effect)</li>
+          <li><code>insured_hobbies_cross-fit × incident_severity_Major Damage</code> — <strong>0.0876</strong></li>
+          <li><code>insured_hobbies_chess × insured_hobbies_cross-fit</code> — <strong>0.0267</strong></li>
+          <li><code>insured_occupation_handlers-cleaners × incident_severity_Major Damage</code> —
+            <strong>0.0200</strong>
+          </li>
+          <li><code>capital-loss × incident_severity_Major Damage</code> — <strong>0.0185</strong></li>
+        </ol>
+
+        <h4>What stands out</h4>
+        <p><code>incident_severity_Major Damage</code> appears repeatedly in the top interactions.</p>
+        <p>That suggests the model is not treating severity as a simple isolated signal. It acts more like a
+          <strong>context amplifier</strong>:
+        </p>
+        <ul>
+          <li>severity + claim composition</li>
+          <li>severity + tenure</li>
+          <li>severity + category-level encoded traits</li>
+        </ul>
+        <p>From a product perspective, this is useful because it points toward composite investigation heuristics, not
+          just one-column alert rules. It also reinforces why tree models earned their place earlier in the project:
+          they can learn these local combinations naturally.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-interactions" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Top SHAP interaction
+            pairs reveal where fraud signal emerges from combinations rather than standalone features.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>6. Targeted Interaction Visuals (Insurance-Specific Pairs)</h2>
+        <p>Beyond ranking interactions, your workflow also creates targeted interaction scatter plots for selected
+          insurance-relevant feature pairs.</p>
+        <p>Examples included:</p>
+        <ul>
+          <li><code>umbrella_limit × incident_severity_Major Damage</code></li>
+          <li><code>total_claim_amount × incident_severity_Major Damage</code></li>
+          <li><code>vehicle_age × incident_hour_of_the_day</code></li>
+          <li><code>policy_annual_premium × months_as_customer</code></li>
+          <li><code>policy_annual_premium × injury_share</code></li>
+        </ul>
+
+        <h4>Why this is excellent</h4>
+        <p>This turns abstract “interaction strength” into something a human can actually inspect.</p>
+        <p>It helps readers see patterns like:</p>
+        <ul>
+          <li>whether a feature matters only under major damage</li>
+          <li>whether premium behaves differently for short vs long customers</li>
+          <li>whether claim composition changes effect direction</li>
+        </ul>
+        <p>These charts are especially useful for your website because they show actual model behavior without forcing
+          people to read a wall of metrics.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-scatter-interaction" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Targeted interaction
+            view showing how claim amount contribution changes depending on incident severity.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>7. Case-Level SHAP (Waterfall Explanations)</h2>
+        <p>Global analysis is great for trust. Case-level explanations are where SHAP becomes operational.</p>
+        <p>Your notebook includes two case-level workflows:</p>
+
+        <h4>A) Waterfall plots (first case-level module)</h4>
+        <ul>
+          <li>Selects fraud cases in test set where:
+            <ul>
+              <li>predicted probability ≥ 0.5</li>
+              <li>true label = fraud</li>
+            </ul>
+          </li>
+          <li>Plots SHAP waterfall explanations for the selected cases</li>
+        </ul>
+
+        <h4>B) Extended waterfall run (dedicated block)</h4>
+        <p>A second run explicitly selects:</p>
+        <ul>
+          <li><strong>Dataset:</strong> Trees</li>
+          <li><strong>Model:</strong> ExtraTrees</li>
+          <li><strong>Threshold:</strong> 0.5</li>
+          <li><strong>Cases shown:</strong> up to <strong>10 fraud cases</strong></li>
+        </ul>
+
+        <h4>What a waterfall plot shows (simple explanation)</h4>
+        <p>A waterfall plot starts from the model’s <strong>baseline risk</strong> (average prediction level), then
+          stacks feature contributions:</p>
+        <ul>
+          <li>some push risk <strong>up</strong></li>
+          <li>some push risk <strong>down</strong></li>
+        </ul>
+        <p>The final value becomes the claim’s score. It’s basically a receipt for one prediction. That is exactly the
+          format investigators and auditors tend to understand fastest.</p>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-waterfall-single" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Case-level SHAP
+            waterfall showing which features increased and decreased the fraud score for a single flagged claim.”
+          </figcaption>
+        </figure>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-waterfall-gallery" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Comparing multiple
+            case waterfalls reveals recurring patterns and feature combinations behind flagged fraud claims.”
+          </figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>8. Force Plots (Interactive Explanations)</h2>
+        <p>Your workflow also generates SHAP <strong>force plots</strong> (JS mode) for the selected fraud cases.</p>
+        <p>A force plot is like a compact horizontal tug-of-war:</p>
+        <ul>
+          <li>one side pushes the score up</li>
+          <li>the other side pushes it down</li>
+        </ul>
+        <p>You also limited the plot to the <strong>top 15 features by absolute SHAP value</strong> for readability,
+          which is a smart move. Full-force plots with 150+ transformed features become visual soup very quickly.</p>
+
+        <h4>Why this matters for your website</h4>
+        <p>Force plots are great for an interactive version of the project:</p>
+        <ul>
+          <li>they feel intuitive</li>
+          <li>they work well as “open this case → inspect drivers”</li>
+          <li>they support the PM framing of <strong>decision support</strong>, not just model scoring</li>
+        </ul>
+
+        <figure class="chart-container" style="margin: 2rem 0;">
+          <div id="plot-shap-force" style="width: 100%;"></div>
+          <figcaption style="margin-top: 1rem; font-size: 0.9rem; color: var(--clr-text-muted);">“Interactive force plot
+            showing the main features pushing a claim’s fraud risk score upward or downward.”</figcaption>
+        </figure>
+
+        <div class="rule"> . . . </div>
+
+        <h2>9. What This SHAP Stage Adds to the System (Product Perspective)</h2>
+        <p>This stage turns the fraud model into something a real team can reason about.</p>
+
+        <h4>A) It supports model validation beyond metrics</h4>
+        <p>Metrics tell you whether the model performs well. SHAP shows whether the model is using <strong>sensible
+            logic</strong> or weird shortcuts. That is a very different question.</p>
+
+        <h4>B) It exposes proxy-risk behavior early</h4>
+        <p>The strong appearance of hobby features in global and interaction analysis is exactly the kind of thing that
+          should trigger review. Even when performance looks good, these patterns may be unstable, socially problematic,
+          or hard to justify in production. SHAP helps surface that before deployment.</p>
+
+        <h4>C) It enables case review workflows</h4>
+        <p>Waterfalls and force plots are useful for:</p>
+        <ul>
+          <li>QA</li>
+          <li>model debugging</li>
+          <li>analyst training</li>
+          <li>stakeholder demos</li>
+          <li>documentation</li>
+        </ul>
+        <p>You can show one claim and explain the score without hand-waving.</p>
+
+        <h4>D) It strengthens the “AI PM” angle</h4>
+        <p>This stage is not about “nice plots.” It is about making the decision system:</p>
+        <ul>
+          <li>inspectable</li>
+          <li>debuggable</li>
+          <li>governable</li>
+        </ul>
+        <p>That is exactly what mature AI product work looks like.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Key Takeaway</h2>
+        <p>The SHAP stage opens the fraud model and shows how risk scores are built, feature by feature.</p>
+        <p>In this project, the interpretability workflow:</p>
+        <ul>
+          <li>correctly restores transformed feature names from the preprocessing pipeline</li>
+          <li>computes global SHAP drivers on the tree-optimized feature representation</li>
+          <li>inspects continuous feature behavior with dependence plots</li>
+          <li>surfaces feature synergies through SHAP interaction analysis</li>
+          <li>generates case-level waterfall and force explanations for flagged fraud claims</li>
+        </ul>
+        <p>The global results show a strong role for incident severity, claim composition, and contextual features,
+          while also surfacing potentially problematic proxy-like signals (such as hobby-related features) that deserve
+          governance review.</p>
+        <p>That combination is exactly what interpretability is for: understanding the model’s strengths, and catching
+          the parts that need adult supervision.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#shap</span>
+        <span class="tag">#model-interpretability</span>
+        <span class="tag">#fraud-detection</span>
+        <span class="tag">#responsible-ai</span>
+        <span class="tag">#decision-systems</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+  <!-- Interpretability SHAP Visuals -->
+  <script src="../../assets/js/pages-interpretability.js" defer></script>
+
+
+</body>
+
+</html>

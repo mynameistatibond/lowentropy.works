@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Low Entropy Works — AI & Data Strategy</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/loading.css">
+  <link rel="stylesheet" href="../../assets/css/plotly.css">
+  <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+  <link rel="stylesheet" href="../../assets/css/components/header.css">
+  <link rel="stylesheet" href="../../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../../assets/css/consent.css">
+
+
+
+
+
+
+
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+
+  <!-- Loader -->
+  <div id="loader">
+
+  </div>
+
+
+  <!-- Header -->
+  <div data-include="header"></div>
+
+
+
+
+
+  <main class="article">
+
+    <article class="article-shell">
+      <div class="article-hero">
+        <p class="article-eyebrow">Technical Report · 2025-12</p>
+        <h1 class="article-title">Claim Fraud Detection (ML): Bias & Fairness Analysis</h1>
+        <p class="article-summary">Assessing proxy risk, segment-level error distribution, and investigation burden
+          stability</p>
+      </div>
+
+      <div class="rule"> . . . </div>
+
+      <section class="article-body">
+        <h2>Purpose</h2>
+        <p>This report documents the bias and fairness audit of the fraud detection system following model calibration
+          and SHAP-based interpretability analysis.</p>
+        <p>Fraud detection models differ from allocation systems such as credit scoring or hiring models. They do not
+          distribute resources. Instead, they prioritize claims for investigation. The fairness question therefore
+          shifts from “who receives” to “who is disproportionately scrutinized.”</p>
+        <p>The model was tuned with an F2 objective, prioritizing recall in order to reduce missed fraud cases. While
+          this improves financial risk coverage, it increases the number of flagged claims. Fairness evaluation must
+          therefore focus on how investigative burden and error rates are distributed across segments.</p>
+        <p>This report evaluates:</p>
+        <ul>
+          <li>Proxy feature stability</li>
+          <li>Segment-level false positive and false negative rates</li>
+          <li>Concentration of flagged claims</li>
+          <li>Threshold effects on burden distribution</li>
+          <li>Monitoring implications for production deployment</li>
+        </ul>
+
+        <div class="rule"> . . . </div>
+
+        <h2>1. Fairness Framing in Fraud Systems</h2>
+        <p>In credit scoring, fairness is often defined through approval parity or equalized odds. In fraud detection,
+          the outcome is suspicion rather than approval. A false positive does not deny a resource but triggers
+          additional scrutiny. However, if specific groups are consistently flagged at higher rates without clear
+          operational justification, the system can create disproportionate investigative pressure.</p>
+        <p>Fraud models are particularly sensitive to this issue because:</p>
+        <ul>
+          <li>They operate in rare-event settings</li>
+          <li>They amplify outliers</li>
+          <li>They frequently rely on high-cardinality categorical features</li>
+        </ul>
+        <p>This makes proxy risk and error dispersion especially important to examine.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>2. Proxy Feature Assessment</h2>
+
+        <h3><code>insured_hobbies</code> as a Stability Risk</h3>
+        <p>SHAP analysis identified <code>insured_hobbies</code> as a high-impact feature in global importance rankings.
+        </p>
+        <p>The presence of predictive signal alone is insufficient justification for production use. Features must also
+          demonstrate operational plausibility. In this case, hobbies lack a clear causal relationship to fraud
+          likelihood. Their predictive contribution may reflect indirect correlations with age, socioeconomic
+          background, or dataset construction artifacts.</p>
+        <p>To assess dependency on this feature, a removal simulation was conducted.</p>
+
+        <h3>Feature Removal Simulation</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Model Variant</th>
+                <th>PR-AUC</th>
+                <th>Recall</th>
+                <th>FPR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Full Feature Set</strong></td>
+                <td>0.41</td>
+                <td>0.82</td>
+                <td>0.23</td>
+              </tr>
+              <tr>
+                <td><strong>Without Hobbies</strong></td>
+                <td>0.39</td>
+                <td>0.79</td>
+                <td>0.20</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Removing hobbies reduces performance slightly but also lowers false positive concentration across certain
+          occupation segments.</p>
+        <p>This suggests that while hobbies contribute signal, they may also amplify segment-specific risk patterns. In
+          production settings, such trade-offs must be explicitly evaluated rather than implicitly accepted.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>3. Segment-Level Error Distribution</h2>
+        <p>Fairness in fraud detection is best assessed through comparison of error rates across segments.</p>
+        <p>The following metrics were evaluated:</p>
+        <ul>
+          <li>Flag Rate (percentage of claims flagged)</li>
+          <li>False Positive Rate (FPR)</li>
+          <li>False Negative Rate (FNR)</li>
+        </ul>
+
+        <h3>Illustrative Segment Distribution</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Segment</th>
+                <th>Flag Rate</th>
+                <th>FPR</th>
+                <th>FNR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Age &lt; 25</td>
+                <td>18%</td>
+                <td>0.12</td>
+                <td>0.19</td>
+              </tr>
+              <tr>
+                <td>Age 50+</td>
+                <td>24%</td>
+                <td>0.18</td>
+                <td>0.10</td>
+              </tr>
+              <tr>
+                <td>Region A</td>
+                <td>30%</td>
+                <td>0.22</td>
+                <td>0.09</td>
+              </tr>
+              <tr>
+                <td>Hobby Cluster X</td>
+                <td>35%</td>
+                <td>0.25</td>
+                <td>0.08</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Even when global metrics appear stable, disproportionate concentration of false positives can indicate
+          structural imbalance.</p>
+
+        <h4>A visual representation clarifies this effect:</h4>
+        <pre><code>False Positive Rate by Segment
+
+Segment A   ████████████ 0.12
+Segment B   ██████████████████ 0.18
+Region A    ███████████████████████ 0.22
+Hobby X     ███████████████████████████ 0.25</code></pre>
+
+        <p>Higher FPR in specific segments increases investigation burden for those groups. Whether this reflects true
+          risk differences or proxy amplification must be carefully evaluated.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>4. Threshold Effects on Burden Distribution</h2>
+        <p>The model is optimized for recall. Lowering the classification threshold increases sensitivity and reduces
+          false negatives. However, this also expands the number of flagged claims.</p>
+
+        <h4>Conceptually:</h4>
+        <pre><code>Higher threshold → fewer claims flagged → lower FPR
+Lower threshold  → more claims flagged → higher FPR</code></pre>
+
+        <p>If baseline fraud probabilities differ slightly across segments, threshold adjustments can amplify those
+          differences.</p>
+        <p>For example, if one segment’s average predicted probability is marginally higher due to correlated features,
+          lowering the threshold increases its flagging rate disproportionately. This makes threshold selection both a
+          performance decision and a fairness control parameter.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>5. Temporal Stability Considerations</h2>
+        <p>Fraud patterns evolve over time. Regional trends, claim types, and reporting behaviors can shift.</p>
+        <p>A fairness evaluation performed at a single time point may not remain valid after distributional changes.
+          Segment-level error rates should therefore be monitored longitudinally.</p>
+        <p>Without ongoing monitoring, a model that appears balanced at deployment can drift toward disproportionate
+          burden allocation.</p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>6. Production Monitoring Requirements</h2>
+        <p>Before production deployment, the following safeguards are recommended:</p>
+        <ul>
+          <li>Validation of high-impact proxy features</li>
+          <li>Segment-level error dashboards</li>
+          <li>Regular threshold review</li>
+          <li>Drift-triggered fairness re-evaluation</li>
+        </ul>
+        <p>These mechanisms ensure that performance optimization does not unintentionally lead to sustained imbalance.
+        </p>
+
+        <div class="rule"> . . . </div>
+
+        <h2>Conclusion</h2>
+        <p>The fraud detection system demonstrates strong predictive capability and calibrated probability outputs.
+          However, fairness analysis highlights:</p>
+        <ul>
+          <li>Sensitivity to proxy features</li>
+          <li>Error concentration risk under recall-heavy tuning</li>
+          <li>Dependence on threshold selection</li>
+          <li>Need for temporal monitoring</li>
+        </ul>
+        <p>These findings do not invalidate the model. They clarify the operational conditions required for responsible
+          deployment.</p>
+
+      </section>
+
+      <div class="rule"></div>
+
+      <footer class="article-meta">
+        <span class="tag">#responsible-ai</span>
+        <span class="tag">#algorithmic-fairness</span>
+        <span class="tag">#model-governance</span>
+        <span class="tag">#fraud-detection</span>
+        <span class="tag">#mlsp</span>
+      </footer>
+    </article>
+
+
+
+
+
+
+
+
+
+
+
+  </main>
+
+
+
+
+
+
+
+  <!-- Footer -->
+
+  <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="../../assets/js/loading.js"></script>
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <script src="../../assets/js/plotly-bootstrap.js" defer></script>
+  <script src="../../assets/js/include-components.js"></script>
+  <script src="../../assets/js/consent.js"></script>
+  <script src="../../assets/js/posthog.js"></script>
+  <script src="../../assets/js/intercom.js"></script>
+
+
+</body>
+
+</html>

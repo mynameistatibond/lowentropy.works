@@ -1,3 +1,16 @@
+# CI/CD Strategy & Working Agreements
+
+## ⚠️ Critical Rules
+
+> [!IMPORTANT]
+> **Deployment Rule**: Do NOT push anything to production (remote `main` branch) without explicit user approval.
+> 1.  **Work Locally**: Make changes and commit locally.
+> 2.  **Verify**: Test all changes in the local environment (`http://localhost:8000`).
+> 3.  **Request Approval**: Explicitly ask the user: "Ready to push to prod?"
+> 4.  **Push**: Only push to `origin/main` AFTER receiving clear confirmation.
+
+---
+
 # CI/CD Strategy Proposal
 
 ## Context

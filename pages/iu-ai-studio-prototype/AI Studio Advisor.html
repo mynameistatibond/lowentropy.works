@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IU AI Studio — AI Advisor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ── TOKENS ─────────────────────────────────────────────── */
+        :root {
+            --color-bg-base: #ffffff;
+            --color-surface: #fdfdfd;
+            --color-surface-elevated: #fafafa;
+            --color-sidebar: #fafafa;
+            --color-sidebar-hover: rgba(0, 0, 0, .04);
+            --color-sidebar-active: rgba(0, 0, 0, .08);
+            --color-border: rgba(0, 0, 0, .1);
+            --color-accent: #0800ff;
+            --color-accent-muted: #82acff;
+            --color-text-primary: #000000;
+            --color-text-secondary: #333333;
+            --color-text-muted: #888888;
+            --topbar-height: 56px;
+            --sidebar-width: 240px;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .03);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, .06);
+            --font-sans: 'Shippori Mincho B1', serif;
+            --transition: 200ms ease;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-family: var(--font-sans);
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--color-bg-base);
+            color: var(--color-text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── SHELL ── */
+        .app-shell {
+            display: grid;
+            grid-template-rows: var(--topbar-height) 1fr;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-areas: "topbar topbar" "sidebar main";
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            grid-area: topbar;
+            background: var(--color-surface-elevated);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px 0 0;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .topbar-left {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-right: 1px solid var(--color-border);
+            height: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-mark {
+            height: 30px;
+            padding: 0 10px;
+            background: var(--color-accent);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            letter-spacing: -.01em;
+        }
+
+        .topbar-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+
+        .page-breadcrumb a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+        }
+
+        .page-breadcrumb a:hover {
+            color: var(--color-text-primary);
+        }
+
+        .page-breadcrumb .sep {
+            opacity: .5;
+        }
+
+        .page-breadcrumb .current {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ── SEARCH BAR ── */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, .04);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 7px 12px;
+            min-width: 280px;
+            cursor: text;
+        }
+
+        .search-icon {
+            color: var(--color-text-muted);
+            opacity: .7;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--color-text-primary);
+            font-family: var(--font-sans);
+            font-size: 13.5px;
+            flex: 1;
+        }
+
+        .search-input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .search-kbd {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            background: rgba(0, 0, 0, .05);
+            border: 1px solid var(--color-border);
+            border-radius: 5px;
+            padding: 2px 6px;
+            flex-shrink: 0;
+        }
+
+        /* ── NOTIF BADGE ── */
+        .notif-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 16px;
+            height: 16px;
+            background: #e74c3c;
+            border: 2px solid var(--color-surface-elevated);
+            border-radius: 50%;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── ACCOUNT BUTTON ── */
+        .account-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 8px 5px 6px;
+            border-radius: var(--radius-md);
+            margin-left: 4px;
+            transition: background var(--transition);
+        }
+
+        .account-btn:hover {
+            background: rgba(0, 0, 0, .05);
+        }
+
+        .account-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .chevron-icon {
+            color: var(--color-text-muted);
+            transition: transform var(--transition);
+        }
+
+        /* ── SIDEBAR FOOTER ── */
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 10px 14px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sidebar-version {
+            font-size: 10.5px;
+            color: var(--color-text-muted);
+            font-family: var(--font-mono);
+            opacity: .5;
+        }
+
+        .feedback-pill {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-accent);
+            background: rgba(8, 0, 255, .06);
+            border: 1px solid rgba(8, 0, 255, .15);
+            border-radius: 99px;
+            padding: 3px 10px;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .feedback-pill:hover {
+            background: rgba(8, 0, 255, .12);
+        }
+
+        /* ── ACCOUNT DROPDOWN ── */
+        .account-dropdown {
+            position: absolute;
+            top: calc(var(--topbar-height) + 8px);
+            right: 12px;
+            width: 240px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+            z-index: 200;
+            display: none;
+            animation: dropIn .14s ease;
+        }
+
+        .account-dropdown.open {
+            display: block;
+        }
+
+        @keyframes dropIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .dropdown-user-block {
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .dropdown-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .dropdown-user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .dropdown-user-email {
+            font-size: 11.5px;
+            color: var(--color-text-muted);
+        }
+
+        .dropdown-role-badge {
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(8, 0, 255, .08);
+            color: var(--color-accent);
+            border-radius: 99px;
+            padding: 2px 7px;
+            display: inline-block;
+            margin-top: 3px;
+        }
+
+        .dropdown-sep {
+            height: 1px;
+            background: var(--color-border);
+        }
+
+        .dropdown-item {
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .dropdown-item:hover {
+            background: var(--color-sidebar-hover);
+            color: var(--color-text-primary);
+        }
+
+        .dropdown-item.danger {
+            color: #c0392b;
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(192, 57, 43, .06);
+        }
+
+        .icon-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            transition: background var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: var(--color-sidebar-hover);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--color-text-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* ── SIDEBAR NAV ── */
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--color-sidebar);
+            border-right: 1px solid var(--color-border);
+            padding: 24px 0;
+            overflow-y: auto;
+            position: sticky;
+            top: var(--topbar-height);
+            height: calc(100vh - var(--topbar-height));
+        }
+
+        .nav-section {
+            padding: 0 10px;
+        }
+
+        /* role indicator */
+        .role-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px 8px;
+        }
+
+        .role-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .role-dot.blue {
+            background: var(--color-accent);
+        }
+
+        .role-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .role-change {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            margin-left: auto;
+            cursor: pointer;
+        }
+
+        .role-change:hover {
+            color: var(--color-text-primary);
+        }
+
+        .nav-section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            padding: 0 8px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: background var(--transition), color var(--transition);
+            margin-bottom: 2px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--color-sidebar-hover);
+            color: var(--color-text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--color-sidebar-active);
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 3px;
+            background: var(--color-accent);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+            flex-shrink: 0;
+            color: currentColor;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 99px;
+            background: var(--color-text-primary);
+            color: #fff;
+        }
+
+        .nav-badge.new {
+            background: var(--color-accent);
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--color-border);
+            margin: 12px 10px;
+        }
+
+        /* ── MAIN ── */
+        .main {
+            grid-area: main;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - var(--topbar-height));
+            overflow: hidden;
+        }
+
+        /* ── ACADEMY HEADER ── */
+        .academy-header {
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface);
+            flex-shrink: 0;
+        }
+
+        .academy-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .academy-badge {
+            font-size: 9.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            padding: 2px 7px;
+            border-radius: 99px;
+            background: rgba(8, 0, 255, .08);
+            color: var(--color-accent);
+            border: 1px solid rgba(8, 0, 255, .15);
+        }
+
+        .academy-subtitle {
+            font-size: 12.5px;
+            color: var(--color-text-muted);
+            margin-top: 3px;
+        }
+
+        /* ── COURSE GRID ── */
+        .academy-section {
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface-elevated);
+            flex-shrink: 0;
+            overflow-y: auto;
+            max-height: 46vh;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--color-text-muted);
+            margin-bottom: 0;
+        }
+
+        .course-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            transition: box-shadow var(--transition), border-color var(--transition), background var(--transition);
+        }
+
+        .course-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(8, 0, 255, .2);
+            background: #fff;
+        }
+
+        .course-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .course-body {
+            min-width: 0;
+        }
+
+        .course-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .course-desc {
+            font-size: 11.5px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+            line-height: 1.45;
+        }
+
+        .course-tag {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 9.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+
+        /* ── CHAT SECTION ── */
+        .chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 28px;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface);
+            flex-shrink: 0;
+        }
+
+        .chat-header-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-md);
+            background: rgba(8, 0, 255, .08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .chat-header-label {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .chat-header-sub {
+            font-size: 11.5px;
+            color: var(--color-text-muted);
+            margin-top: 1px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 28px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* message rows */
+        .msg {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            max-width: 680px;
+        }
+
+        .msg.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .msg-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .msg-avatar.ai {
+            background: var(--color-accent);
+        }
+
+        .msg-avatar.user-av {
+            background: var(--color-text-primary);
+        }
+
+        .msg-bubble {
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            line-height: 1.55;
+        }
+
+        .msg.ai .msg-bubble {
+            background: var(--color-surface-elevated);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            border-radius: 2px var(--radius-md) var(--radius-md) var(--radius-md);
+        }
+
+        .msg.user .msg-bubble {
+            background: var(--color-accent);
+            color: #fff;
+            border-radius: var(--radius-md) 2px var(--radius-md) var(--radius-md);
+        }
+
+        .msg-time {
+            font-size: 10.5px;
+            color: var(--color-text-muted);
+            margin-top: 4px;
+            padding: 0 2px;
+        }
+
+        .msg.user .msg-time {
+            text-align: right;
+        }
+
+        /* suggestion chips */
+        .suggestion-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px 28px 0;
+            flex-shrink: 0;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 11px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--color-surface-elevated);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: background var(--transition), border-color var(--transition), color var(--transition);
+        }
+
+        .chip:hover {
+            background: rgba(8, 0, 255, .05);
+            border-color: rgba(8, 0, 255, .2);
+            color: var(--color-accent);
+        }
+
+        /* chat input */
+        .chat-input-wrap {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            padding: 12px 28px 16px;
+            background: var(--color-surface);
+            border-top: 1px solid var(--color-border);
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: var(--color-bg-base);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 9px 14px;
+            transition: border-color var(--transition);
+        }
+
+        .chat-input:focus-within {
+            border-color: var(--color-accent-muted);
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: var(--font-sans);
+            font-size: 13.5px;
+            color: var(--color-text-primary);
+            resize: none;
+            line-height: 1.5;
+            max-height: 120px;
+            min-height: 22px;
+        }
+
+        .chat-input textarea::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .chat-send-btn {
+            width: 34px;
+            height: 34px;
+            background: var(--color-accent);
+            border: none;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background var(--transition), transform var(--transition);
+        }
+
+        .chat-send-btn:hover {
+            background: #0600cc;
+            transform: scale(1.04);
+        }
+
+        .chat-send-btn:disabled {
+            background: var(--color-border);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .chat-send-btn svg {
+            color: #fff;
+        }
+
+        .chat-tools {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chat-tool-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .chat-tool-btn:hover {
+            background: var(--color-sidebar-hover);
+            color: var(--color-text-secondary);
+        }
+
+        .chat-disclaimer {
+            font-size: 10.5px;
+            color: var(--color-text-muted);
+            text-align: center;
+            padding-bottom: 4px;
+        }
+
+        /* typing indicator */
+        .typing {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px;
+        }
+
+        .typing span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-text-muted);
+            animation: bounce 1.2s infinite;
+        }
+
+        .typing span:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        .typing span:nth-child(3) {
+            animation-delay: .4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+                opacity: .5;
+            }
+
+            40% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+
+        /* scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+
+    <!-- ══ SHARED NAVBAR ════════════════════════════════════ -->
+    <script src="./_navbar.js"></script>
+
+
+<!-- MAIN -->
+        <main class="main">
+
+            <!-- ACADEMY HEADER -->
+            <div class="academy-header">
+                <div class="academy-title">
+                    AI Academy
+                    <span class="academy-badge">New resources weekly</span>
+                </div>
+                <div class="academy-subtitle">Curated tools, courses &amp; concepts to help you work smarter with AI at
+                    IU.</div>
+            </div>
+
+            <!-- COURSE GRID -->
+            <div class="academy-section">
+                <div class="section-label">AI Tools — Take a Course</div>
+                <div class="course-grid">
+
+                    <a class="course-card" href="https://notebooklm.google/" target="_blank">
+                        <div class="course-icon" style="background:rgba(66,133,244,.1)">📓</div>
+                        <div class="course-body">
+                            <div class="course-name">NotebookLM</div>
+                            <div class="course-desc">Upload your lecture notes, PDFs &amp; papers — then ask questions,
+                                generate study guides &amp; summaries from your own sources.</div>
+                            <span class="course-tag" style="background:rgba(66,133,244,.1);color:#4285f4">Google ·
+                                Free</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://gamma.app/" target="_blank">
+                        <div class="course-icon" style="background:rgba(124,58,237,.1)">⚡</div>
+                        <div class="course-body">
+                            <div class="course-name">Gamma AI</div>
+                            <div class="course-desc">Turn a prompt or document into polished presentations, decks &amp;
+                                one-pagers in seconds — no design skills required.</div>
+                            <span class="course-tag" style="background:rgba(124,58,237,.1);color:#7c3aed">Presentations
+                                · Freemium</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://www.anthropic.com/claude" target="_blank">
+                        <div class="course-icon" style="background:rgba(210,139,60,.1)">🤖</div>
+                        <div class="course-body">
+                            <div class="course-name">Claude &amp; Claude Code</div>
+                            <div class="course-desc">Advanced AI assistant for research, writing, coding &amp; analysis.
+                                Claude Code lets you build &amp; iterate on code with conversational prompts.</div>
+                            <span class="course-tag" style="background:rgba(210,139,60,.1);color:#d08b3c">Anthropic ·
+                                Freemium</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://www.lovable.dev/" target="_blank">
+                        <div class="course-icon" style="background:rgba(236,72,153,.1)">💜</div>
+                        <div class="course-body">
+                            <div class="course-name">Lovable</div>
+                            <div class="course-desc">Describe an app in plain English and get a working, deployable web
+                                application. Great for prototyping learning tools &amp; student projects.</div>
+                            <span class="course-tag" style="background:rgba(236,72,153,.1);color:#ec4899">App Builder ·
+                                Freemium</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://learnprompting.org/" target="_blank">
+                        <div class="course-icon" style="background:rgba(8,0,255,.08)">✍️</div>
+                        <div class="course-body">
+                            <div class="course-name">Prompt Engineering</div>
+                            <div class="course-desc">Learn how to write precise, effective AI prompts — the core skill
+                                for getting high-quality results from any LLM tool.</div>
+                            <span class="course-tag" style="background:rgba(8,0,255,.08);color:#0800ff">Free Course ·
+                                Self-paced</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://www.deeplearning.ai/courses/ai-python-for-beginners/"
+                        target="_blank">
+                        <div class="course-icon" style="background:rgba(16,185,129,.1)">🐍</div>
+                        <div class="course-body">
+                            <div class="course-name">What is Data Science?</div>
+                            <div class="course-desc">An accessible intro to data science, machine learning pipelines
+                                &amp; how models learn from data — no coding background needed.</div>
+                            <span class="course-tag"
+                                style="background:rgba(16,185,129,.1);color:#10b981">DeepLearning.ai · Free</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://www.youtube.com/watch?v=zjkBMFhNj_g" target="_blank">
+                        <div class="course-icon" style="background:rgba(239,68,68,.1)">🧠</div>
+                        <div class="course-body">
+                            <div class="course-name">How Do LLMs Work?</div>
+                            <div class="course-desc">Understand Transformers, attention mechanisms &amp; why large
+                                language models can reason, summarise &amp; generate language.</div>
+                            <span class="course-tag" style="background:rgba(239,68,68,.1);color:#ef4444">Explainer · 1
+                                hr video</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://www.coursera.org/specializations/generative-ai-for-educators"
+                        target="_blank">
+                        <div class="course-icon" style="background:rgba(245,158,11,.1)">🎓</div>
+                        <div class="course-body">
+                            <div class="course-name">AI for Educators</div>
+                            <div class="course-desc">Specialisation course on integrating generative AI into teaching —
+                                lesson design, assessment integrity &amp; student guidance.</div>
+                            <span class="course-tag" style="background:rgba(245,158,11,.1);color:#b45309">Coursera ·
+                                Audit free</span>
+                        </div>
+                    </a>
+
+                    <a class="course-card" href="https://futurepedia.io/" target="_blank">
+                        <div class="course-icon" style="background:rgba(99,102,241,.1)">🔍</div>
+                        <div class="course-body">
+                            <div class="course-name">AI Tool Directory</div>
+                            <div class="course-desc">Searchable directory of 5000+ AI tools — find the right tool by use
+                                case: writing, research, image, code, audio &amp; more.</div>
+                            <span class="course-tag" style="background:rgba(99,102,241,.1);color:#6366f1">Directory ·
+                                Free</span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- CHAT SECTION -->
+            <div class="chat-section">
+                <div class="chat-header">
+                    <div class="chat-header-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)"
+                            stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="chat-header-label">AI Advisor Chat</div>
+                        <div class="chat-header-sub">Ask questions about AI tools, compliance, ethics &amp; how to use
+                            AI at IU</div>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <div class="msg ai">
+                        <div class="msg-avatar ai">AI</div>
+                        <div>
+                            <div class="msg-bubble">
+                                Hello! I'm the IU AI Studio Advisor.<br><br>
+                                I can help you with:<br>
+                                • <strong>AI tool recommendations</strong> for teaching &amp; research<br>
+                                • <strong>IU AI policy &amp; compliance</strong> guidelines<br>
+                                • <strong>AI ethics</strong> — fairness, bias &amp; transparency<br>
+                                • <strong>Practical how-to</strong> — prompting, document analysis, quiz
+                                creation<br><br>
+                                What would you like to know?
+                            </div>
+                            <div class="msg-time">Today, 17:10</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggestion chips -->
+                <div class="suggestion-row" id="suggestions">
+                    <button class="chip" onclick="sendChip(this, 'What AI tools are approved for use at IU?')">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                        </svg>
+                        Approved AI tools at IU
+                    </button>
+                    <button class="chip" onclick="sendChip(this, 'What does the EU AI Act mean for universities?')">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                        EU AI Act for universities
+                    </button>
+                    <button class="chip" onclick="sendChip(this, 'Can students use ChatGPT for assignments?')">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        ChatGPT &amp; academic integrity
+                    </button>
+                    <button class="chip" onclick="sendChip(this, 'How can I use NotebookLM for my course materials?')">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
+                        NotebookLM for course materials
+                    </button>
+                    <button class="chip"
+                        onclick="sendChip(this, 'What are best practices for AI-generated content disclosure?')">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 20h9" />
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                        </svg>
+                        Disclosing AI-generated content
+                    </button>
+                </div>
+
+                <!-- Input -->
+                <div class="chat-input-wrap">
+                    <div class="chat-input">
+                        <textarea id="chat-textarea" rows="1"
+                            placeholder="Ask about AI tools, compliance, ethics or how to get started…"
+                            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+                        <div class="chat-tools">
+                            <button class="chat-tool-btn" title="Attach file">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="chat-send-btn" id="send-btn" onclick="sendMessage()" title="Send">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="chat-disclaimer">AI Advisor responses are for guidance only. Always verify with IU's
+                    official policies.</div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // ── Canned responses ──────────────────────────────────────
+        const responses = {
+            default: "That's a great question. In a fully integrated system, I'd search IU's policy documents and AI tool database to give you a precise answer. For now, I'd recommend checking the <strong>IU Guidelines folder</strong> in the Knowledge Base, or referring to the <a href='https://www.iu.org' target='_blank' style='color:var(--color-accent)'>IU official policy portal</a>.",
+            'approved': "IU currently endorses a number of AI tools depending on use case:<br><br>• <strong>NotebookLM</strong> — document Q&A and study materials (approved for personal use)<br>• <strong>Grammarly</strong> — writing assistance<br>• <strong>DALL·E / Midjourney</strong> — image generation for clearly labelled illustrative use<br>• <strong>IU AI Studio</strong> chatbot — internal, GDPR-compliant AI interactions<br><br>Tools that process sensitive student data (ChatGPT, Claude) require explicit disclosure and must not include identifiable student information.",
+            'eu ai act': "The EU AI Act (2024) classifies AI systems by risk level. Universities are mainly affected by:<br><br>• <strong>High-risk AI</strong> (e.g., automated grading, student monitoring) → requires transparency, human oversight &amp; impact assessment<br>• <strong>General-purpose AI</strong> (ChatGPT, Gemini) → providers must document capabilities and risks<br><br>For IU, this means any AI used in admissions, assessment or student tracking needs formal documentation and a human-in-the-loop review process.",
+            'chatgpt': "IU's position on student AI use follows these principles:<br><br>1. <strong>Disclose</strong> — students must declare if AI was used in their submission<br>2. <strong>Don't submit AI output as your own work</strong> — using AI to draft an essay without transparency is treated as academic misconduct<br>3. <strong>Permitted with disclosure</strong> — using AI to brainstorm, check grammar, or structure ideas is acceptable when declared<br><br>Each module may have its own policy — always check the course syllabus first.",
+            'notebooklm': "NotebookLM is excellent for course materials! Here's how to use it:<br><br>1. Upload lecture slides, readings &amp; your own notes as <em>sources</em><br>2. Ask it to <strong>summarise</strong> a specific reading<br>3. Generate a <strong>study guide</strong> from all uploaded content<br>4. Ask <strong>quiz questions</strong> to test your understanding<br>5. Use the <strong>audio overview</strong> feature to create a podcast-style summary<br><br>Tip: Keep sources private and don't upload student personal data.",
+            'disclos': "Best practices for AI-generated content disclosure at IU:<br><br>• Add a statement at the end of your document: <em>\"Parts of this work were assisted by [tool name]. All content was reviewed and verified by the author.\"</em><br>• For academic papers, follow the IU referencing guide for AI citations<br>• In presentations: label AI-generated slides/images visually<br>• For student feedback: disclose if AI was used to draft initial comments"
+        };
+
+        function getResponse(text) {
+            const t = text.toLowerCase();
+            if (t.includes('approv') || t.includes('tool')) return responses['approved'];
+            if (t.includes('eu ai') || t.includes('act') || t.includes('compliance') || t.includes('regulation')) return responses['eu ai act'];
+            if (t.includes('chatgpt') || t.includes('student') || t.includes('assignment') || t.includes('integrity')) return responses['chatgpt'];
+            if (t.includes('notebooklm') || t.includes('notebook')) return responses['notebooklm'];
+            if (t.includes('disclos') || t.includes('disclosing') || t.includes('generated content')) return responses['disclos'];
+            return responses['default'];
+        }
+
+        const msgs = document.getElementById('chat-messages');
+        const textarea = document.getElementById('chat-textarea');
+
+        function now() {
+            return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function appendMsg(role, html) {
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            const av = document.createElement('div');
+            av.className = role === 'ai' ? 'msg-avatar ai' : 'msg-avatar user-av';
+            av.textContent = role === 'ai' ? 'AI' : 'SM';
+            const inner = document.createElement('div');
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.innerHTML = html;
+            const time = document.createElement('div');
+            time.className = 'msg-time';
+            time.textContent = `Today, ${now()}`;
+            inner.appendChild(bubble);
+            inner.appendChild(time);
+            div.appendChild(av);
+            div.appendChild(inner);
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+            return div;
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'msg ai';
+            div.id = 'typing-indicator';
+            div.innerHTML = `<div class="msg-avatar ai">AI</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        function sendMessage() {
+            const text = textarea.value.trim();
+            if (!text) return;
+            textarea.value = '';
+            textarea.style.height = '';
+            document.getElementById('suggestions').style.display = 'none';
+            appendMsg('user', text);
+            showTyping();
+            setTimeout(() => {
+                removeTyping();
+                appendMsg('ai', getResponse(text));
+            }, 900 + Math.random() * 600);
+        }
+
+        function sendChip(btn, text) {
+            textarea.value = text;
+            sendMessage();
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+    </script>
+</body>
+
+</html>

@@ -91,6 +91,19 @@
   opacity: 0.9;
 }
 
+/* Inline links */
+.article-body a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--clr-text) 20%, transparent);
+  transition: opacity 0.25s ease, border-color 0.25s ease;
+}
+
+.article-body a:hover {
+  opacity: 0.7;
+  border-bottom-color: var(--clr-text);
+}
+
 /* Code blocks */
 .article-body pre {
   background: color-mix(in srgb, var(--clr-text) 5%, transparent);
@@ -209,6 +222,31 @@
   border-bottom: 1px solid var(--plot-grid, #e5e7eb);
   text-align: left;
   vertical-align: top
+}
+
+/* Metadata Table styling (softened, themed) */
+.article-body table.metadata-table {
+  background: color-mix(in srgb, var(--clr-text) 3%, transparent);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--clr-text) 10%, transparent);
+  margin: 2rem 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.article-body table.metadata-table td {
+  border-bottom: 1px solid color-mix(in srgb, var(--clr-text) 8%, transparent);
+  padding: 0.8rem 1.2rem;
+}
+
+.article-body table.metadata-table tr:last-child td {
+  border-bottom: none;
+}
+
+.article-body table.metadata-table td:first-child {
+  width: 30%;
+  color: color-mix(in srgb, var(--clr-text) 70%, transparent);
 }
 
 blockquote {

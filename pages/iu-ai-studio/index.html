@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IU AI Studio — MVP Platform Shell & Role-Aware Architecture</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/theme.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/loading.css">
+    <link rel="stylesheet" href="../../assets/css/pages/article-template.css">
+    <link rel="stylesheet" href="../../assets/css/components/header.css">
+    <link rel="stylesheet" href="../../assets/css/components/footer.css">
+    <link rel="stylesheet" href="../../assets/css/consent.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading">
+    <!-- Loader -->
+    <div id="loader"></div>
+
+    <!-- Header include -->
+    <div data-include="header"></div>
+
+    <main class="article">
+        <article class="article-shell">
+            <div class="article-hero">
+                <p class="article-eyebrow">TECHNICAL SPECIFICATION · 2026-03</p>
+                <h1 class="article-title">IU AI Studio MVP Main Page — UI Shell Specification</h1>
+                <p class="article-summary">
+                    Base platform shell · Navigation · Account · Dashboard layout
+                </p>
+            </div>
+
+            <div class="rule"> . . . </div>
+
+            <section class="article-body">
+
+                <table class="metadata-table">
+                    <tbody>
+                        <tr>
+                            <td><strong>Version</strong></td>
+                            <td>1.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>For</strong></td>
+                            <td>Internal review</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Team</strong></td>
+                            <td>AI Enablement Team, TechEd IU</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Document Type</strong></td>
+                            <td>Frontend Tech Spec</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scope</strong></td>
+                            <td>MVP — Phase 1</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Status</strong></td>
+                            <td>Draft for Review</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Component</strong></td>
+                            <td>Main Page Shell</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Table of Contents</h3>
+                <ul>
+                    <li><a href="#overview">1. Overview & Goals</a></li>
+                    <li><a href="#tech-stack">2. Tech Stack</a></li>
+                    <li><a href="#layout">3. Page Layout Architecture</a>
+                        <ul>
+                            <li><a href="#layout-grid">3.1 Layout Grid & Zone Map</a></li>
+                            <li><a href="#layout-breakpoints">3.2 Responsive Breakpoints</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#zone-a">4. Zone A — Top Navigation Bar</a>
+                        <ul>
+                            <li><a href="#zone-a-inventory">4.1 Component Inventory</a></li>
+                            <li><a href="#zone-a-logo">4.2 Logo & Brand Mark</a></li>
+                            <li><a href="#zone-a-search">4.3 Global Search</a></li>
+                            <li><a href="#zone-a-bell">4.4 Notification Bell</a></li>
+                            <li><a href="#zone-a-account">4.5 User Account Menu</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#zone-b">5. Zone B — Left Sidebar Navigation</a>
+                        <ul>
+                            <li><a href="#zone-b-role">5.1 Role Indicator</a></li>
+                            <li><a href="#zone-b-navitems">5.2 Navigation Items</a></li>
+                            <li><a href="#zone-b-states">5.3 Sidebar States (expanded / collapsed)</a></li>
+                            <li><a href="#zone-b-footer">5.4 Sidebar Footer</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#zone-c">6. Zone C — Main Content Area</a>
+                        <ul>
+                            <li><a href="#zone-c-welcome">6.1 Welcome Header</a></li>
+                            <li><a href="#zone-c-quickactions">6.2 Quick Actions Grid</a></li>
+                            <li><a href="#zone-c-recent">6.3 Recent Activity Strip</a></li>
+                            <li><a href="#zone-c-announcements">6.4 Announcements / Team Updates</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#zone-d">7. Zone D — Right Context Panel</a></li>
+                    <li><a href="#design-tokens">8. Design Tokens</a>
+                        <ul>
+                            <li><a href="#tokens-color">8.1 Color System</a></li>
+                            <li><a href="#tokens-typo">8.2 Typography Scale</a></li>
+                            <li><a href="#tokens-space">8.3 Spacing & Elevation</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#component-states">9. Component States</a></li>
+                    <li><a href="#a11y">10. Accessibility Requirements</a></li>
+                    <li><a href="#structure">11. File & Folder Structure</a></li>
+                </ul>
+
+                <h2 id="overview">1. Overview & Goals</h2>
+                <p><strong>What this spec covers and what the MVP shell must achieve</strong></p>
+                <p>This document specifies the frontend technical implementation of the IU AI Studio MVP main page
+                    shell. It covers the authenticated user experience after login — the persistent layout frame,
+                    navigation system, account controls, and dashboard content scaffold. No AI functionality is
+                    implemented in this phase; the spec defines the application chrome and page structure that all
+                    subsequent features will be built within.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Goal</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Establish layout chrome</td>
+                            <td>Persistent top bar, sidebar, and content grid that all MVP screens share</td>
+                        </tr>
+                        <tr>
+                            <td>Role-aware entry point</td>
+                            <td>User's selected role is reflected in UI — sidebar, greeting, quick actions</td>
+                        </tr>
+                        <tr>
+                            <td>Navigation foundation</td>
+                            <td>All primary destinations are accessible and correctly routed</td>
+                        </tr>
+                        <tr>
+                            <td>Account & session</td>
+                            <td>User identity, role badge, settings, and logout accessible from any page</td>
+                        </tr>
+                        <tr>
+                            <td>Notification surface</td>
+                            <td>Bell icon with badge count — no notification logic yet, just the UI</td>
+                        </tr>
+                        <tr>
+                            <td>Design token baseline</td>
+                            <td>All colors, type, spacing, and elevation defined as CSS variables</td>
+                        </tr>
+                        <tr>
+                            <td>Responsive shell</td>
+                            <td>Works at 1440px (desktop), 1024px (laptop), 768px (tablet)</td>
+                        </tr>
+                        <tr>
+                            <td>Accessibility baseline</td>
+                            <td>WCAG 2.1 AA contrast, keyboard navigation, ARIA landmarks</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>The shell must feel fast, intentional, and professional from day one. First impressions set adoption
+                    expectations — a polished chrome earns trust before a single AI feature is live.</p>
+
+                <h2 id="tech-stack">2. Tech Stack</h2>
+                <p><strong>Recommended technologies for the MVP frontend shell</strong></p>
+                <p>The following stack is recommended for the MVP shell. It prioritizes developer velocity, component
+                    reusability, and maintainability over architectural novelty. The stack should be finalized with the
+                    engineering team before implementation begins.</p>
+
+                <h3>Framework</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technology</th>
+                            <th>Role / Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>React 18+</td>
+                            <td>Component model, concurrent rendering, Suspense for lazy loading</td>
+                        </tr>
+                        <tr>
+                            <td>Next.js 14 (App Router)</td>
+                            <td>Routing, SSR for initial load performance, layouts for persistent shell</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Styling</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technology</th>
+                            <th>Role / Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Tailwind CSS v3</td>
+                            <td>Utility-first; CSS token layer built on top. Consistent spacing/color.</td>
+                        </tr>
+                        <tr>
+                            <td>CSS Custom Properties</td>
+                            <td>Design tokens (colors, spacing, radius) defined as var(--) globally</td>
+                        </tr>
+                        <tr>
+                            <td>shadcn/ui components</td>
+                            <td>Accessible, unstyled primitives (Dialog, Popover, DropdownMenu, Tooltip)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>State Management</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technology</th>
+                            <th>Role / Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Zustand</td>
+                            <td>Lightweight global state for: auth session, sidebar collapsed state, notifications</td>
+                        </tr>
+                        <tr>
+                            <td>React Context</td>
+                            <td>Role context — UserRoleContext provided at layout root</td>
+                        </tr>
+                        <tr>
+                            <td>TanStack Query</td>
+                            <td>Server state for notifications count, user profile fetch</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Auth</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technology</th>
+                            <th>Role / Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>NextAuth.js / Auth.js</td>
+                            <td>Session handling, JWT, provider abstraction (SSO / OAuth)</td>
+                        </tr>
+                        <tr>
+                            <td>Role claims in JWT</td>
+                            <td>User role stored in token; accessed via useSession() hook</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Icons & Assets</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technology</th>
+                            <th>Role / Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Lucide React</td>
+                            <td>Open-source icon set — consistent stroke weight and style</td>
+                        </tr>
+                        <tr>
+                            <td>next/image</td>
+                            <td>Optimized image component for avatar and brand mark</td>
+                        </tr>
+                        <tr>
+                            <td>Geist font (Vercel)</td>
+                            <td>Clean, modern typeface for dashboard UI — available via next/font</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Testing & Quality</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technology</th>
+                            <th>Role / Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Playwright</td>
+                            <td>E2E tests for nav routing and account menu interactions</td>
+                        </tr>
+                        <tr>
+                            <td>Jest + Testing Library</td>
+                            <td>Unit tests for component states</td>
+                        </tr>
+                        <tr>
+                            <td>axe-core</td>
+                            <td>Automated accessibility checks in CI</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Analytics</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technology</th>
+                            <th>Role / Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PostHog JS SDK</td>
+                            <td>Initialized at app root; role_selected event fired after role confirmation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Note on CSS:</strong> All design tokens must be defined as CSS custom properties in a
+                    globals.css file before any component styling begins. Tailwind config extends these tokens. No
+                    hardcoded hex values in component files — always reference vars.</p>
+
+                <h2 id="layout">3. Page Layout Architecture</h2>
+                <p><strong>Layout zones, grid structure, and responsive behavior</strong></p>
+
+                <h3 id="layout-grid">3.1 Layout Grid & Zone Map</h3>
+                <p>The authenticated shell is divided into four persistent layout zones labeled A–D. These zones are
+                    defined at the root layout level (Next.js app/layout.tsx) and remain constant across all
+                    authenticated pages. Only Zone C (main content) changes per route.</p>
+
+                <ul>
+                    <li><strong>ZONE A — TOP NAVIGATION BAR</strong></li>
+                    <li><strong>ZONE B — LEFT SIDEBAR NAV</strong></li>
+                    <li><strong>ZONE C — MAIN CONTENT</strong>: Welcome Header · Quick Action Grid · Recent Activity ·
+                        Announcements</li>
+                    <li><strong>ZONE D — CONTEXT PANEL (AdvisorWidget)</strong></li>
+                </ul>
+
+                <p>The layout uses CSS Grid at the root level with named template areas. Zone B and D are
+                    position:sticky so they remain fixed during content scroll.</p>
+
+                <pre><code>/* globals.css — root authenticated layout */
+.app-shell {
+  display: grid;
+  grid-template-rows: var(--topbar-height) 1fr;
+  grid-template-columns: var(--sidebar-width) 1fr var(--rightpanel-width);
+  grid-template-areas:
+    "topbar topbar topbar"
+    "sidebar main rightpanel";
+  min-height: 100vh;
+}
+
+/* CSS token defaults */
+--topbar-height: 56px;
+--sidebar-width: 240px;
+--sidebar-collapsed-width: 64px;
+--rightpanel-width: 280px;
+--content-max-width: 1200px;
+</code></pre>
+
+                <h3 id="layout-breakpoints">3.2 Responsive Breakpoints</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Breakpoint</th>
+                            <th>Mode</th>
+                            <th>Behavior</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1440px+</td>
+                            <td>Full</td>
+                            <td>All 4 zones visible. Sidebar expanded (240px). Right panel visible.</td>
+                        </tr>
+                        <tr>
+                            <td>1280px</td>
+                            <td>Standard desktop</td>
+                            <td>All 4 zones. Sidebar expanded. Right panel collapsed to icon-only.</td>
+                        </tr>
+                        <tr>
+                            <td>1024px</td>
+                            <td>Laptop</td>
+                            <td>3 zones. Sidebar collapsed to icons (64px). Right panel hidden.</td>
+                        </tr>
+                        <tr>
+                            <td>768px</td>
+                            <td>Tablet</td>
+                            <td>2 zones. Sidebar hidden; hamburger menu opens as overlay drawer.</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                < 768px</td>
+                            <td>Mobile (future)</td>
+                            <td>Out of scope for MVP. Shell must not break — graceful degradation only.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 id="zone-a">4. Zone A — Top Navigation Bar</h2>
+                <p><strong>56px persistent header · logo · search · notifications · account</strong></p>
+                <p>The top navigation bar is 56px tall, spans the full viewport width, and sits at z-index 100 above all
+                    other content. It uses the app's darkest background (--color-surface-dark) with a subtle 1px bottom
+                    border. All child components described in this section live within a flex row with justify-between.
+                </p>
+
+                <h3 id="zone-a-inventory">4.1 Component Inventory</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Component</th>
+                            <th>Behavior / Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Left group</td>
+                            <td>Logo mark + wordmark</td>
+                            <td>Navigates to / (dashboard home) on click</td>
+                        </tr>
+                        <tr>
+                            <td>Left group</td>
+                            <td>Role breadcrumb badge</td>
+                            <td>Read-only pill showing current role (e.g. 'Lecturer')</td>
+                        </tr>
+                        <tr>
+                            <td>Center</td>
+                            <td>Global search bar</td>
+                            <td>Placeholder text; no search logic in MVP — focused state triggers modal shell</td>
+                        </tr>
+                        <tr>
+                            <td>Right group</td>
+                            <td>Notification bell icon</td>
+                            <td>Lucide Bell icon; red dot badge with count (static in MVP)</td>
+                        </tr>
+                        <tr>
+                            <td>Right group</td>
+                            <td>Help icon</td>
+                            <td>Lucide HelpCircle — links to /help page</td>
+                        </tr>
+                        <tr>
+                            <td>Right group</td>
+                            <td>User avatar + chevron</td>
+                            <td>Circular avatar (initials fallback); clicks open account dropdown</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="zone-a-logo">4.2 Logo & Brand Mark</h3>
+                <ul>
+                    <li>Asset: SVG logotype — horizontal lockup (icon + wordmark). White on dark.</li>
+                    <li>Width: 130px fixed. Height: auto (constrained to 32px max).</li>
+                    <li>Spacing: 16px left padding from shell edge.</li>
+                    <li>On click: router.push('/') — navigates to dashboard home.</li>
+                    <li>Adjacent: Role breadcrumb badge — 8px gap, 6px horizontal padding, rounded-full pill in
+                        --color-accent-muted background.</li>
+                </ul>
+
+                <h3 id="zone-a-search">4.3 Global Search Bar</h3>
+                <p>In MVP the search bar is a non-functional UI placeholder that establishes the visual pattern for
+                    future search capability. It must look complete and intentional — not a disabled or grayed-out
+                    element.</p>
+                <ul>
+                    <li>Width: min(480px, 40vw). Centered horizontally in the top bar.</li>
+                    <li>Height: 36px. Border-radius: 8px. Background: --color-surface-elevated (slightly lighter than
+                        topbar).</li>
+                    <li>Left icon: Lucide Search, 16px, --color-text-muted.</li>
+                    <li>Placeholder: 'Search tools, tasks, prompts…' in --color-text-muted.</li>
+                    <li>Keyboard shortcut hint: '⌘K' displayed as a small badge on the right side.</li>
+                    <li>Click/focus: opens a CommandPalette modal (empty shell, no results in MVP).</li>
+                    <li>PostHog: fire search_bar_focused event on focus.</li>
+                </ul>
+
+                <h3 id="zone-a-bell">4.4 Notification Bell</h3>
+                <ul>
+                    <li>Icon: Lucide Bell, 20px stroke, --color-text-secondary.</li>
+                    <li>Badge: Red dot (8px circle) in top-right corner. Shows count '3' as static placeholder in MVP.
+                    </li>
+                    <li>Click: opens a Popover panel (240px wide) with placeholder 'No notifications yet' state.</li>
+                    <li>Popover contains: header 'Notifications', empty state illustration, 'Mark all read' button
+                        (disabled).</li>
+                    <li>PostHog: fire notification_bell_clicked on open.</li>
+                </ul>
+
+                <h3 id="zone-a-account">4.5 User Account Menu</h3>
+                <p>The account menu is the user's primary identity surface and settings gateway. It must be clearly
+                    recognizable and immediately accessible from any page.</p>
+                <p><strong>Trigger (closed state):</strong></p>
+                <ul>
+                    <li>Avatar: 32px circular image. Fallback: initials in a colored circle (color derived from user
+                        name hash).</li>
+                    <li>Name: First name only, displayed inline. Hidden at &lt; 1100px viewport width.</li>
+                    <li>Chevron: Lucide ChevronDown, 14px. Rotates 180° on open (CSS transition 150ms).</li>
+                </ul>
+                <p><strong>Dropdown (open state) — DropdownMenu component:</strong></p>
+                <ul>
+                    <li>User block: Non-clickable. Avatar (40px) + full name + email + role badge.</li>
+                    <li>— 1px separator line.</li>
+                    <li>My Profile: → /profile · Lucide UserCircle icon</li>
+                    <li>My Workspace: → /workspace · Lucide LayoutDashboard icon</li>
+                    <li>Settings: → /settings · Lucide Settings icon</li>
+                    <li>— 1px separator line.</li>
+                    <li>AI Certifications: → /certifications · Lucide Award icon · Badge showing level</li>
+                    <li>— 1px separator line.</li>
+                    <li>Sign Out: Calls signOut(). Lucide LogOut icon. Destructive text color.</li>
+                </ul>
+                <p>Dropdown width: 240px. Offset: 8px below trigger. Border: 1px --color-border. Shadow:
+                    var(--shadow-lg). Border-radius: 10px. Animation: fade + slide-down 120ms ease.</p>
+
+
+                <h2 id="zone-b">5. Zone B — Left Sidebar Navigation</h2>
+                <p><strong>240px · role-aware · collapsible · sticky</strong></p>
+                <p>The sidebar is the platform's primary navigation surface. It is always visible on desktop and
+                    collapses to icon-only mode at 1024px. On tablet it becomes an overlay drawer. The sidebar
+                    background uses --color-sidebar (near-black navy) to visually separate it from the main content area
+                    and reinforce the platform's professional identity.</p>
+
+                <h3 id="zone-b-role">5.1 Role Indicator</h3>
+                <p>Immediately below the top bar boundary, the sidebar displays a role indicator block. This is the
+                    user's selected role — it is not a navigation item.</p>
+                <ul>
+                    <li>Height: 48px. Full sidebar width. Background: slightly lighter than sidebar
+                        (--color-sidebar-hover).</li>
+                    <li>Content: Small colored dot (role color) + role name text + 'Change role' link (12px, muted).
+                    </li>
+                    <li>Role colors: Lecturer → blue, Marketing → teal, Admin → orange, Legal → red, HR → purple,
+                        Support → green.</li>
+                    <li>Hover on 'Change role': navigates to /role-select to re-enter role selection flow.</li>
+                    <li>Collapsed state: shows only colored dot, no text.</li>
+                </ul>
+
+                <h3 id="zone-b-navitems">5.2 Navigation Items</h3>
+                <p>Navigation is grouped into two sections separated by a divider: primary navigation (core platform
+                    areas) and secondary navigation (settings, help). Each item follows the same anatomy.</p>
+                <p><strong>Item Anatomy:</strong></p>
+                <ul>
+                    <li>Height: 40px. Full sidebar width. Border-radius: 8px (inset 4px from edges).</li>
+                    <li>Layout: 16px left padding → icon (20px) → 10px gap → label text → optional right badge.</li>
+                    <li>Active state: --color-accent background, white text and icon.</li>
+                    <li>Hover state: --color-sidebar-hover background (transition: 100ms).</li>
+                    <li>Focus state: 2px --color-accent outline (keyboard navigation).</li>
+                </ul>
+
+                <p><strong>Primary Navigation Items:</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                            <th>Lucide Icon</th>
+                            <th>Route</th>
+                            <th>Visibility Rule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Home / Dashboard</td>
+                            <td>LayoutDashboard</td>
+                            <td>/</td>
+                            <td>Always visible</td>
+                        </tr>
+                        <tr>
+                            <td>Tasks List</td>
+                            <td>Todo</td>
+                            <td>/tasks</td>
+                            <td>Always visible</td>
+                        </tr>
+                        <tr>
+                            <td>Tool Directory</td>
+                            <td>Wrench</td>
+                            <td>/tools</td>
+                            <td>Always visible</td>
+                        </tr>
+                        <tr>
+                            <td>Prompt Library</td>
+                            <td>BookOpen</td>
+                            <td>/prompts</td>
+                            <td>Always visible</td>
+                        </tr>
+                        <tr>
+                            <td>Knowledge Base</td>
+                            <td>Database</td>
+                            <td>/knowledge</td>
+                            <td>Always visible</td>
+                        </tr>
+                        <tr>
+                            <td>AI Advisor</td>
+                            <td>Sparkles</td>
+                            <td>/advisor</td>
+                            <td>Always visible; subtle pulse animation</td>
+                        </tr>
+                        <tr>
+                            <td>Team Space</td>
+                            <td>Users</td>
+                            <td>/team</td>
+                            <td>Only shown if user belongs to a team</td>
+                        </tr>
+                        <tr>
+                            <td>My Workspace</td>
+                            <td>FolderOpen</td>
+                            <td>/workspace</td>
+                            <td>Always visible</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Secondary Navigation Items (below divider):</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                            <th>Lucide Icon</th>
+                            <th>Route</th>
+                            <th>Visibility Rule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Analytics</td>
+                            <td>BarChart2</td>
+                            <td>/analytics</td>
+                            <td>Admin role only</td>
+                        </tr>
+                        <tr>
+                            <td>Settings</td>
+                            <td>Settings</td>
+                            <td>/settings</td>
+                            <td>Always visible</td>
+                        </tr>
+                        <tr>
+                            <td>Help & Docs</td>
+                            <td>HelpCircle</td>
+                            <td>/help</td>
+                            <td>Always visible</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="zone-b-states">5.3 Sidebar States</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Width</th>
+                            <th>Behavior</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Expanded</td>
+                            <td>240px</td>
+                            <td>Icon + label text visible. Role indicator shows full name. Default on ≥ 1280px.</td>
+                        </tr>
+                        <tr>
+                            <td>Collapsed</td>
+                            <td>64px</td>
+                            <td>Icon only. Label hidden. Hovering an item shows Tooltip. Role indicator shows dot.
+                                Triggered manually or at 1024px.</td>
+                        </tr>
+                        <tr>
+                            <td>Mobile Drawer</td>
+                            <td>100vw overlay</td>
+                            <td>Slides in from left on hamburger tap. Semi-transparent backdrop behind. Close on click
+                                or Esc.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Collapse toggle:</strong></p>
+                <ul>
+                    <li>A small collapse button (Lucide PanelLeftClose / PanelLeftOpen icon) is pinned to the right edge
+                        of the sidebar at vertical center.</li>
+                    <li>Click toggles sidebarCollapsed state in Zustand store.</li>
+                    <li>State is persisted to localStorage key: iu-studio.sidebar.collapsed</li>
+                    <li>CSS transition: width 200ms cubic-bezier(0.4, 0, 0.2, 1). Labels fade: opacity 0, pointer-events
+                        none when collapsed.</li>
+                </ul>
+
+                <h3 id="zone-b-footer">5.4 Sidebar Footer</h3>
+                <ul>
+                    <li>Pinned to bottom of sidebar. Separator line above.</li>
+                    <li>Left: Platform version string ('v1.0') in --color-text-muted at 11px.</li>
+                    <li>Right: Feedback button — small pill 'Give feedback' or icon-only (Lucide MessageSquare) when
+                        collapsed.</li>
+                    <li>Feedback click: opens the Layer 10 feedback modal (empty shell in MVP).</li>
+                </ul>
+
+                <h2 id="zone-c">6. Zone C — Main Content Area</h2>
+                <p><strong>Dashboard home · welcome · quick actions · recent · announcements</strong></p>
+                <p>Zone C renders the authenticated dashboard home page — the screen a user sees immediately after
+                    login. It is the most important screen in the MVP for establishing platform value and directing user
+                    intent. All sub-components in this zone are scaffolds: they establish layout and visual structure
+                    but contain placeholder or static data.</p>
+
+                <h3 id="zone-c-welcome">6.1 Welcome Header</h3>
+                <ul>
+                    <li>Full-width top block within Zone C. Background: --color-surface (white/off-white).</li>
+                    <li>Height: auto (~80px). Padding: 24px top and bottom, 32px left.</li>
+                    <li>Left: Greeting text 'Good morning, [First Name].' (H1, 22px, --color-text-primary).</li>
+                    <li>Sub-text: 'You're signed in as [Role].' with role badge inline. 14px --color-text-secondary.
+                    </li>
+                    <li>Right (optional): Date + quick stats strip: '3 saved prompts · 2 team updates' in muted text.
+                    </li>
+                    <li>Bottom border: 1px --color-border-light.</li>
+                    <li>Greeting changes by time of day: 'Good morning' / 'Good afternoon' / 'Good evening'.</li>
+                </ul>
+
+                <h3 id="zone-c-quickactions">6.2 Quick Actions Grid</h3>
+                <p>The quick actions grid is the primary entry point for task-based navigation from the dashboard. It
+                    surfaces the 6 most relevant tasks for the user's current role. In MVP these are static —
+                    role-to-tasks mapping is hardcoded in a config object.</p>
+                <ul>
+                    <li>Section label: 'Quick Actions' in 11px uppercase tracking-widest --color-text-muted. 24px top
+                        margin.</li>
+                    <li>Grid: 3 columns × 2 rows at 1440px. 2 columns at 1024px. Gap: 16px.</li>
+                    <li>Card size: auto height (~100px). Full width within column. Border-radius: 12px.</li>
+                    <li>Card anatomy: Icon (28px, colored per category) + Task label (14px bold) + short descriptor
+                        (12px muted, 1 line max).</li>
+                    <li>Card background: white. Border: 1px --color-border. Box shadow: var(--shadow-sm).</li>
+                    <li>Hover: shadow lifts to var(--shadow-md), border-color shifts to --color-accent. Slight
+                        translateY(-2px). Transition: 150ms.</li>
+                    <li>Click: navigates to /tasks/[task-type] — routes are defined but pages show 'Coming soon'
+                        scaffold.</li>
+                    <li>PostHog: fire task_card_clicked with task_type property on click.</li>
+                </ul>
+
+                <p><strong>Role → Task mapping (MVP config):</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Default Quick Action Tasks (in order)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Lecturer</td>
+                            <td>Create quiz, Build presentation, Summarize document, Draft email, Create video script,
+                                Extract insights</td>
+                        </tr>
+                        <tr>
+                            <td>Marketing</td>
+                            <td>Create marketing copy, Build presentation, Draft email, Create video script, Create
+                                diagram/image, Summarize document</td>
+                        </tr>
+                        <tr>
+                            <td>Admin</td>
+                            <td>Draft email, Summarize document, Generate policy draft, Extract insights, Create
+                                presentation, Build report</td>
+                        </tr>
+                        <tr>
+                            <td>HR</td>
+                            <td>Draft email, Generate policy draft, Summarize document, Extract insights, Create
+                                presentation, Build report</td>
+                        </tr>
+                        <tr>
+                            <td>Legal</td>
+                            <td>Generate policy draft, Summarize document, Extract insights, Draft email, Create report,
+                                Build presentation</td>
+                        </tr>
+                        <tr>
+                            <td>Support</td>
+                            <td>Draft email, Summarize document, Extract insights, Generate response template, Create
+                                FAQ, Build report</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="zone-c-recent">6.3 Recent Activity Strip</h3>
+                <p>A horizontal scrollable strip of recent items. In MVP this renders static placeholder cards showing
+                    the pattern — real data is wired in Phase 2.</p>
+                <ul>
+                    <li>Section label: 'Recently Used' with 'View all →' link aligned right.</li>
+                    <li>Layout: horizontal flex row, gap 12px, overflow-x: auto, scrollbar hidden.</li>
+                    <li>Card size: 180px × 80px. Border-radius: 8px. Border: 1px --color-border.</li>
+                    <li>Card anatomy: Type badge (e.g. 'Prompt') + item name (truncated 1 line) + timestamp.</li>
+                    <li>3–5 static placeholder cards in MVP. Shimmer skeleton loader shown on initial load.</li>
+                    <li>Empty state: 'Your recent activity will appear here' with Lucide Clock icon.</li>
+                </ul>
+
+                <h3 id="zone-c-announcements">6.4 Announcements / Team Updates</h3>
+                <p>A notice board section for platform announcements and team updates. Static in MVP.</p>
+                <ul>
+                    <li>Section label: 'Announcements' with 'Mark all read' button.</li>
+                    <li>Layout: vertical stack of notice cards. Max 3 visible, 'Show more' expander below.</li>
+                    <li>Card anatomy: Colored left border (category color) + icon + title + short description +
+                        timestamp.</li>
+                    <li>Categories: Platform Update (blue), Compliance Notice (orange), Team Update (teal), New Feature
+                        (green).</li>
+                    <li>In MVP: 2–3 hardcoded placeholder notices showing platform launch messaging.</li>
+                    <li>Dismiss: X button on each card. State stored in localStorage for MVP.</li>
+                </ul>
+
+                <h2 id="zone-d">7. Zone D — Right Context Panel</h2>
+                <p><strong>280px · AI Advisor entry · contextual tips · collapsible</strong></p>
+                <p>The right context panel is 280px wide and collapses at 1280px. In MVP it serves as a persistent entry
+                    point to the AI Advisor and surfaces a single contextual tip card. It establishes the pattern for
+                    future contextual intelligence features without implementing full functionality.</p>
+
+                <p><strong>AI Advisor Entry Card</strong></p>
+                <ul>
+                    <li>Full-width card with teal gradient background.</li>
+                    <li>Icon: Lucide Sparkles (animated subtle pulse).</li>
+                    <li>Heading: 'Not sure where to start?' (14px bold, white).</li>
+                    <li>Sub-text: 'Tell me your goal and I'll guide you.' (12px, white 80% opacity).</li>
+                    <li>Button: 'Open Advisor' — white background, teal text, full width.</li>
+                    <li>Click: navigates to /advisor — shows empty Advisor shell page.</li>
+                </ul>
+
+                <p><strong>Quick Tip Card</strong></p>
+                <ul>
+                    <li>White card, border: 1px --color-border.</li>
+                    <li>Header: 'Platform Tip' label + Lucide Lightbulb icon (yellow).</li>
+                    <li>Body: Rotating tip text from a static array of 8 platform tips.</li>
+                    <li>Tip changes daily — key derived from date, static array, modulo.</li>
+                    <li>'View more tips →' link at bottom.</li>
+                </ul>
+
+                <p><strong>Collapse Toggle</strong></p>
+                <ul>
+                    <li>Vertical collapse button on the left edge of the panel.</li>
+                    <li>Lucide PanelRightClose / PanelRightOpen icon.</li>
+                    <li>Collapses to 0px. Content fades out. Transition: 200ms.</li>
+                    <li>State persisted to localStorage: iu-studio.rightpanel.collapsed.</li>
+                </ul>
+
+                <h2 id="design-tokens">8. Design Tokens</h2>
+                <p><strong>All CSS custom properties — defined once, used everywhere</strong></p>
+                <p>All design values are defined as CSS custom properties in globals.css. No component should reference
+                    hex values or hardcoded px values that are defined in this token system. Tailwind is configured to
+                    reference these vars in tailwind.config.ts.</p>
+
+                <h3 id="tokens-color">8.1 Color System</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Value</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>--color-bg-base</td>
+                            <td><code>#F2F4F7</code></td>
+                            <td>Page background — content areas</td>
+                        </tr>
+                        <tr>
+                            <td>--color-surface</td>
+                            <td><code>#FFFFFF</code></td>
+                            <td>Cards, panels, main content bg</td>
+                        </tr>
+                        <tr>
+                            <td>--color-surface-elevated</td>
+                            <td><code>#1E2A3A</code></td>
+                            <td>Topbar, elevated surfaces in dark mode</td>
+                        </tr>
+                        <tr>
+                            <td>--color-sidebar</td>
+                            <td><code>#0A1628</code></td>
+                            <td>Sidebar background</td>
+                        </tr>
+                        <tr>
+                            <td>--color-sidebar-hover</td>
+                            <td><code>#162236</code></td>
+                            <td>Sidebar item hover / role indicator bg</td>
+                        </tr>
+                        <tr>
+                            <td>--color-border</td>
+                            <td><code>#E4E7EB</code></td>
+                            <td>Default borders</td>
+                        </tr>
+                        <tr>
+                            <td>--color-border-light</td>
+                            <td><code>#F0F2F5</code></td>
+                            <td>Subtle separators</td>
+                        </tr>
+                        <tr>
+                            <td>--color-accent</td>
+                            <td><code>#2E86C1</code></td>
+                            <td>Primary accent — active nav, buttons, links</td>
+                        </tr>
+                        <tr>
+                            <td>--color-accent-muted</td>
+                            <td><code>#1A4080</code></td>
+                            <td>Muted accent — role badges, secondary elements</td>
+                        </tr>
+                        <tr>
+                            <td>--color-teal</td>
+                            <td><code>#17A589</code></td>
+                            <td>Advisor, AI features</td>
+                        </tr>
+                        <tr>
+                            <td>--color-success</td>
+                            <td><code>#1E8449</code></td>
+                            <td>Success states, positive badges</td>
+                        </tr>
+                        <tr>
+                            <td>--color-warning</td>
+                            <td><code>#E67E22</code></td>
+                            <td>Warning states, compliance alerts</td>
+                        </tr>
+                        <tr>
+                            <td>--color-danger</td>
+                            <td><code>#C0392B</code></td>
+                            <td>Error states, destructive actions</td>
+                        </tr>
+                        <tr>
+                            <td>--color-text-primary</td>
+                            <td><code>#0D1F3C</code></td>
+                            <td>Main body text</td>
+                        </tr>
+                        <tr>
+                            <td>--color-text-secondary</td>
+                            <td><code>#566573</code></td>
+                            <td>Supporting text</td>
+                        </tr>
+                        <tr>
+                            <td>--color-text-muted</td>
+                            <td><code>#95A5A6</code></td>
+                            <td>Placeholders, timestamps, labels</td>
+                        </tr>
+                        <tr>
+                            <td>--color-text-inverse</td>
+                            <td><code>#FFFFFF</code></td>
+                            <td>Text on dark surfaces</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="tokens-typo">8.2 Typography Scale</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Value</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>--font-sans</td>
+                            <td>Geist, system-ui, sans-serif</td>
+                            <td>All UI text</td>
+                        </tr>
+                        <tr>
+                            <td>--font-mono</td>
+                            <td>Geist Mono, Courier New, mono</td>
+                            <td>Code snippets, token names</td>
+                        </tr>
+                        <tr>
+                            <td>--text-xs</td>
+                            <td>11px / 1.4</td>
+                            <td>Timestamps, version strings, secondary labels</td>
+                        </tr>
+                        <tr>
+                            <td>--text-sm</td>
+                            <td>13px / 1.45</td>
+                            <td>Navigation labels, metadata, card sub-text</td>
+                        </tr>
+                        <tr>
+                            <td>--text-base</td>
+                            <td>15px / 1.55</td>
+                            <td>Body text, paragraph content</td>
+                        </tr>
+                        <tr>
+                            <td>--text-lg</td>
+                            <td>18px / 1.4</td>
+                            <td>Card titles, section headings</td>
+                        </tr>
+                        <tr>
+                            <td>--text-xl</td>
+                            <td>22px / 1.3</td>
+                            <td>Page H1 — welcome greeting</td>
+                        </tr>
+                        <tr>
+                            <td>--text-2xl</td>
+                            <td>28px / 1.25</td>
+                            <td>Display headings — reserved for cover screens</td>
+                        </tr>
+                        <tr>
+                            <td>--font-weight-normal</td>
+                            <td>400</td>
+                            <td>Body text</td>
+                        </tr>
+                        <tr>
+                            <td>--font-weight-medium</td>
+                            <td>500</td>
+                            <td>Labels, navigation items</td>
+                        </tr>
+                        <tr>
+                            <td>--font-weight-bold</td>
+                            <td>700</td>
+                            <td>Headings, badges, button text</td>
+                        </tr>
+                        <tr>
+                            <td>--letter-spacing-wide</td>
+                            <td>0.05em</td>
+                            <td>Uppercase label text (section headers)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="tokens-space">8.3 Spacing & Elevation</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Value</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>--space-1</td>
+                            <td>4px</td>
+                            <td>Micro gaps — icon to label</td>
+                        </tr>
+                        <tr>
+                            <td>--space-2</td>
+                            <td>8px</td>
+                            <td>Tight spacing — badge padding</td>
+                        </tr>
+                        <tr>
+                            <td>--space-3</td>
+                            <td>12px</td>
+                            <td>Component internal padding</td>
+                        </tr>
+                        <tr>
+                            <td>--space-4</td>
+                            <td>16px</td>
+                            <td>Standard padding — card body, nav items</td>
+                        </tr>
+                        <tr>
+                            <td>--space-5</td>
+                            <td>20px</td>
+                            <td>Comfortable spacing</td>
+                        </tr>
+                        <tr>
+                            <td>--space-6</td>
+                            <td>24px</td>
+                            <td>Section padding, header padding</td>
+                        </tr>
+                        <tr>
+                            <td>--space-8</td>
+                            <td>32px</td>
+                            <td>Large section gaps</td>
+                        </tr>
+                        <tr>
+                            <td>--space-12</td>
+                            <td>48px</td>
+                            <td>Page-level vertical rhythm</td>
+                        </tr>
+                        <tr>
+                            <td>--radius-sm</td>
+                            <td>4px</td>
+                            <td>Badges, pills, small tags</td>
+                        </tr>
+                        <tr>
+                            <td>--radius-md</td>
+                            <td>8px</td>
+                            <td>Buttons, input fields, nav items</td>
+                        </tr>
+                        <tr>
+                            <td>--radius-lg</td>
+                            <td>12px</td>
+                            <td>Cards, panels</td>
+                        </tr>
+                        <tr>
+                            <td>--radius-xl</td>
+                            <td>16px</td>
+                            <td>Modal containers, large panels</td>
+                        </tr>
+                        <tr>
+                            <td>--shadow-sm</td>
+                            <td>0 1px 3px rgba(0,0,0,0.08)...</td>
+                            <td>Default card shadow</td>
+                        </tr>
+                        <tr>
+                            <td>--shadow-md</td>
+                            <td>0 4px 12px rgba(0,0,0,0.10)...</td>
+                            <td>Hover elevated card</td>
+                        </tr>
+                        <tr>
+                            <td>--shadow-lg</td>
+                            <td>0 8px 24px rgba(0,0,0,0.12)...</td>
+                            <td>Dropdown menus, modals</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 id="component-states">9. Component States</h2>
+                <p><strong>All interactive states that must be implemented in MVP</strong></p>
+                <p>Every interactive element in the shell must implement all of the following states. Incomplete state
+                    coverage is a bug, not a backlog item — states should be built alongside the component, not added
+                    later.</p>
+
+                <ul>
+                    <li><strong>Navigation Item</strong>: default, hover, active (current page), focus (keyboard),
+                        disabled (no access)</li>
+                    <li><strong>Quick Action Card</strong>: default, hover (shadow lift), active/pressed, focus
+                        (keyboard), loading (skeleton)</li>
+                    <li><strong>Account Menu</strong>: trigger: default, hover, focus | dropdown: open, closing | menu
+                        item: hover, focus, active</li>
+                    <li><strong>Search Bar</strong>: default (placeholder visible), focused (ring highlight), ⌘K hint
+                        visible always</li>
+                    <li><strong>Notification Bell</strong>: default (badge shown), hover, popover: open, empty state
+                    </li>
+                    <li><strong>Sidebar Item</strong>: default, hover, active, focus, tooltip (collapsed mode only)</li>
+                    <li><strong>Collapse Toggle</strong>: expanded icon state, collapsed icon state, hover, focus</li>
+                    <li><strong>Feedback Button</strong>: default, hover, modal open state (empty shell)</li>
+                    <li><strong>Advisor Entry Card</strong>: default, button hover, button active, button focus</li>
+                </ul>
+
+                <p><strong>Loading states:</strong> Every data-driven section (recent activity, notifications count,
+                    user name) must show a Skeleton shimmer loader while data is fetching. Use shadcn/ui Skeleton
+                    component with var(--color-border-light) base and a shimmer animation. Never show empty divs during
+                    loading.</p>
+
+                <h2 id="a11y">10. Accessibility Requirements</h2>
+                <p><strong>WCAG 2.1 AA — non-negotiable for a university platform</strong></p>
+                <p>As an institutional platform serving faculty, staff, and students, WCAG 2.1 AA compliance is a legal
+                    and ethical requirement — not an enhancement. All MVP shell components must meet or exceed these
+                    requirements before release.</p>
+
+                <h3>Color Contrast</h3>
+                <ul>
+                    <li>All text on light bg: minimum 4.5:1 contrast ratio (WCAG AA).</li>
+                    <li>Large text (18px+ or 14px bold): minimum 3:1 ratio.</li>
+                    <li>Sidebar text on dark bg: all items must meet 4.5:1 — verify --color-sidebar vs text.</li>
+                    <li>Use Figma Contrast plugin or webaim.org/resources/contrastchecker to verify all combos.</li>
+                </ul>
+
+                <h3>Keyboard Navigation</h3>
+                <ul>
+                    <li>Full tab order through all interactive elements — no keyboard traps.</li>
+                    <li>Sidebar navigation fully operable via Tab + Enter.</li>
+                    <li>Account menu: open via Enter, navigate items via Arrow keys, close via Escape.</li>
+                    <li>Skip-to-main-content link: first focusable element on page (visually hidden, shows on focus).
+                    </li>
+                    <li>Quick action cards: navigable via Tab, activated via Enter or Space.</li>
+                </ul>
+
+                <h3>ARIA Landmarks & Roles</h3>
+                <ul>
+                    <li><code>&lt;header&gt;</code> for Zone A (top bar).</li>
+                    <li><code>&lt;nav&gt;</code> for Zone B sidebar.</li>
+                    <li><code>&lt;main&gt;</code> for Zone C content area.</li>
+                    <li><code>&lt;aside&gt;</code> for Zone D right panel.</li>
+                    <li><code>aria-current='page'</code> on active sidebar nav item.</li>
+                    <li><code>aria-expanded</code> on account menu trigger. <code>aria-haspopup='menu'</code>.</li>
+                    <li><code>role='menu'</code> and <code>role='menuitem'</code> on account dropdown items.</li>
+                    <li>Notification bell: <code>aria-label='Notifications, 3 unread'</code>.</li>
+                </ul>
+
+                <h3>Focus Management</h3>
+                <ul>
+                    <li>Opening account menu: first menu item receives focus automatically.</li>
+                    <li>Closing menu (Escape): focus returns to trigger button.</li>
+                    <li>Opening mobile sidebar drawer: first nav item receives focus.</li>
+                    <li>Closing drawer: focus returns to hamburger button.</li>
+                    <li>Search bar modal open: focus moves to search input.</li>
+                </ul>
+
+                <h3>Reduced Motion</h3>
+                <ul>
+                    <li>All transitions and animations must respect prefers-reduced-motion.</li>
+                    <li>Wrap animation CSS in <code>@media (prefers-reduced-motion: no-preference) {}</code>.</li>
+                    <li>Advisor pulse animation: disabled in reduced motion mode.</li>
+                    <li>Sidebar collapse transition: instant in reduced motion mode.</li>
+                </ul>
+
+                <h3>Screen Reader</h3>
+                <ul>
+                    <li>Test with VoiceOver (macOS) and NVDA (Windows) as part of QA.</li>
+                    <li>Avatar initials fallback: <code>aria-label='User avatar for [Full Name]'</code>.</li>
+                    <li>Role badge in sidebar: <code>aria-label='Current role: [Role Name]'</code>.</li>
+                    <li>Skeleton loaders: <code>aria-busy='true'</code> on parent containers while loading.</li>
+                </ul>
+
+                <h2 id="structure">11. File & Folder Structure</h2>
+                <p><strong>Next.js App Router — component and layout organization</strong></p>
+                <p>The following file structure implements the shell using Next.js 14 App Router conventions. All shared
+                    layout components live in /components/shell/. The root authenticated layout in
+                    app/(authenticated)/layout.tsx renders all four zones.</p>
+
+                <pre><code>iu-ai-studio/
+├── app/
+│   ├── (authenticated)/
+│   │   ├── layout.tsx         ¬ Root shell: renders AppShell
+│   │   ├── page.tsx           ¬ Dashboard home (Zone C content)
+│   │   ├── tasks/
+│   │   │   └── [task-type]/page.tsx ¬ Task pages (stub in MVP)
+│   │   ├── tools/page.tsx
+│   │   ├── prompts/page.tsx
+│   │   ├── knowledge/page.tsx
+│   │   ├── advisor/page.tsx
+│   │   ├── team/page.tsx
+│   │   ├── workspace/page.tsx
+│   │   ├── settings/page.tsx
+│   │   ├── help/page.tsx
+│   │   └── profile/page.tsx
+│   ├── (auth)/
+│   │   ├── login/page.tsx
+│   │   └── role-select/page.tsx ¬ Role selection after first login
+│   ├── layout.tsx             ¬ Root layout (fonts, providers)
+│   └── globals.css            ¬ ALL CSS tokens defined here
+├── components/
+│   ├── shell/
+│   │   ├── AppShell.tsx       ¬ Grid layout wrapper
+│   │   ├── TopBar/
+│   │   │   ├── TopBar.tsx
+│   │   │   ├── Logo.tsx
+│   │   │   ├── SearchBar.tsx
+│   │   │   ├── NotificationBell.tsx
+│   │   │   └── AccountMenu.tsx
+│   │   ├── Sidebar/
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── RoleIndicator.tsx
+│   │   │   ├── NavItem.tsx
+│   │   │   ├── NavGroup.tsx
+│   │   │   ├── SidebarFooter.tsx
+│   │   │   └── CollapseToggle.tsx
+│   │   └── RightPanel/
+│   │       ├── RightPanel.tsx
+│   │       ├── AdvisorEntryCard.tsx
+│   │       └── TipCard.tsx
+│   ├── dashboard/
+│   │   ├── WelcomeHeader.tsx
+│   │   ├── QuickActionsGrid.tsx
+│   │   ├── QuickActionCard.tsx
+│   │   ├── RecentActivityStrip.tsx
+│   │   └── AnnouncementsPanel.tsx
+│   └── ui/                    ¬ shadcn/ui components live here
+├── lib/
+│   ├── config/
+│   │   ├── roleTaskMap.ts     ¬ Role → quick action mapping
+│   │   ├── navItems.ts        ¬ Sidebar navigation config
+│   │   └── platformTips.ts    ¬ Rotating tips array
+│   ├── store/
+│   │   └── uiStore.ts         ¬ Zustand: sidebar, rightpanel collapsed state
+│   └── hooks/
+│       ├── useRole.ts         ¬ Returns current user role from session
+│       └── useGreeting.ts     ¬ Returns time-aware greeting string
+├── types/
+│   └── index.ts               ¬ Role, NavItem, QuickAction, User types
+└── middleware.ts              ¬ Auth protection: redirect to /login if no session
+</code></pre>
+
+                <p><strong>Key Type Definitions</strong></p>
+                <pre><code class="language-typescript">// types/index.ts
+export type Role =
+  | 'lecturer' | 'curriculum_designer' | 'marketing'
+  | 'student_support' | 'admin' | 'legal' | 'hr';
+
+export interface NavItem {
+  label: string;
+  icon: LucideIcon;
+  href: string;
+  visibilityRule?: (role: Role, user: User) => boolean;
+  badge?: string | number;
+}
+
+export interface QuickAction {
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  iconColor: string; // CSS token e.g. 'var(--color-accent)'
+  taskType: string;
+  href: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  teams: string[];
+  certificationLevel: 'none' | 'level1' | 'advanced';
+  avatarUrl?: string;
+}
+</code></pre>
+
+                <p><strong>MVP Definition of done:</strong> The shell renders correctly with a mocked user session, all
+                    navigation routes resolve without 404s, all interactive states are implemented, axe-core reports
+                    zero violations, and PostHog fires <code>role_selected</code> on first dashboard load.</p>
+
+            </section>
+
+            <div class="rule"></div>
+
+            <footer class="article-meta">
+                <span class="tag">#ai-platform</span>
+                <span class="tag">#tech-spec</span>
+                <span class="tag">#frontend-architecture</span>
+            </footer>
+        </article>
+    </main>
+
+    <!-- Footer include -->
+    <div data-include="footer"></div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/loading.js"></script>
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/include-components.js"></script>
+    <script src="../../assets/js/consent.js"></script>
+    <script src="../../assets/js/posthog.js"></script>
+    <script src="../../assets/js/intercom.js"></script>
+
+</body>
+
+</html>

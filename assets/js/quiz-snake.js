@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const containerObj = document.getElementById("canvas-container");
     const resizeObserver = new ResizeObserver(() => {
-        if (gameState === "RUNNING") {
-            togglePause(); // Auto-pause game on container resize
+        if (gameState === "RUNNING" && performance.now() - gameStartTime > 500) {
+            togglePause(); // Auto-pause on genuine user resize, not startup reflow
         }
         resizeCanvas();
         draw();
@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let tickMs = 260; // Default speed
     let lastTime = 0;
     let accumulator = 0;
+    let gameStartTime = 0; // timestamp when game last entered RUNNING — blocks immediate re-pause
 
     // Particle System (Exploding Hearts)
     let domParticles = [];
@@ -210,7 +211,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (gameState === "RUNNING") {
             if (e.code === "Space") {
-                togglePause();
+                // Block pause for 300ms after game starts to absorb the triggering keypress
+                if (performance.now() - gameStartTime > 300) {
+                    togglePause();
+                }
                 return;
             }
             if (e.code === "ArrowUp" || e.code === "KeyW") {
@@ -283,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateHUD();
         overlay.classList.add("hidden");
         gameState = "RUNNING";
+        gameStartTime = performance.now(); // arm the pause guard
 
         remainingQuestions = [...quizData];
         remainingQuestions.sort(() => Math.random() - 0.5);
@@ -338,7 +343,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function startNextLevel() {
+        // Preserve the accumulated snake length — only reset position & direction
+        const savedLength = snake.length + growthQueue;
         initSnake();
+        // Restore the extra tail segments beyond the default 3
+        if (savedLength > 3) {
+            const tail = snake[snake.length - 1];
+            for (let i = 3; i < savedLength; i++) {
+                snake.push({ x: tail.x - i + 2, y: tail.y });
+            }
+        }
+
         level++;
 
         const speedMap = {
@@ -351,6 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateHUD();
         overlay.classList.add("hidden");
         gameState = "RUNNING";
+        gameStartTime = performance.now(); // arm the pause guard for the new level
         spawnNextQuestion();
 
         lastTime = performance.now();

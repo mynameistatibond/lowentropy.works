@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IU AI Studio — Knowledge Base</title>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ── TOKENS ─────────────────────────────────────────────── */
+        :root {
+            --color-bg-base: #ffffff;
+            --color-surface: #fdfdfd;
+            --color-surface-elevated: #fafafa;
+            --color-sidebar: #fafafa;
+            --color-sidebar-hover: rgba(0, 0, 0, 0.04);
+            --color-sidebar-active: rgba(0, 0, 0, 0.08);
+            --color-border: rgba(0, 0, 0, 0.1);
+            --color-border-light: rgba(0, 0, 0, 0.05);
+            --color-accent: #0800ff;
+            --color-accent-muted: #82acff;
+            --color-text-primary: #000000;
+            --color-text-secondary: #333333;
+            --color-text-muted: #888888;
+            --topbar-height: 56px;
+            --sidebar-width: 240px;
+            --folderbar-width: 220px;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .03);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, .06);
+            --font-sans: 'Shippori Mincho B1', serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+            --transition: 200ms ease;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-family: var(--font-sans);
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--color-bg-base);
+            color: var(--color-text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── SHELL ─────────────────────────────────────────────── */
+        .app-shell {
+            display: grid;
+            grid-template-rows: var(--topbar-height) 1fr;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-areas:
+                "topbar topbar"
+                "sidebar main";
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ─────────────────────────────────────────────── */
+        .topbar {
+            grid-area: topbar;
+            background: var(--color-surface-elevated);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px 0 0;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .topbar-left {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px;
+            border-right: 1px solid var(--color-border);
+            height: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-mark {
+            height: 30px;
+            padding: 0 10px;
+            background: var(--color-accent);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            gap: 2px;
+        }
+
+        .logo-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            letter-spacing: -.01em;
+        }
+
+        .topbar-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+
+        .page-breadcrumb a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+        }
+
+        .page-breadcrumb a:hover {
+            color: var(--color-text-primary);
+        }
+
+        .page-breadcrumb .sep {
+            font-size: 12px;
+        }
+
+        .page-breadcrumb .current {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ── SEARCH BAR ── */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, .04);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 7px 12px;
+            min-width: 280px;
+            cursor: text;
+        }
+
+        .search-icon {
+            color: var(--color-text-muted);
+            opacity: .7;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--color-text-primary);
+            font-family: var(--font-sans);
+            font-size: 13.5px;
+            flex: 1;
+        }
+
+        .search-input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .search-kbd {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            background: rgba(0, 0, 0, .05);
+            border: 1px solid var(--color-border);
+            border-radius: 5px;
+            padding: 2px 6px;
+            flex-shrink: 0;
+        }
+
+        /* ── NOTIF BADGE ── */
+        .notif-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 16px;
+            height: 16px;
+            background: #e74c3c;
+            border: 2px solid var(--color-surface-elevated);
+            border-radius: 50%;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── ACCOUNT BUTTON ── */
+        .account-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 8px 5px 6px;
+            border-radius: var(--radius-md);
+            margin-left: 4px;
+            transition: background var(--transition);
+        }
+
+        .account-btn:hover {
+            background: rgba(0, 0, 0, .05);
+        }
+
+        .account-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .chevron-icon {
+            color: var(--color-text-muted);
+            transition: transform var(--transition);
+        }
+
+        /* ── SIDEBAR FOOTER ── */
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 10px 14px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sidebar-version {
+            font-size: 10.5px;
+            color: var(--color-text-muted);
+            font-family: var(--font-mono);
+            opacity: .5;
+        }
+
+        .feedback-pill {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-accent);
+            background: rgba(8, 0, 255, .06);
+            border: 1px solid rgba(8, 0, 255, .15);
+            border-radius: 99px;
+            padding: 3px 10px;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .feedback-pill:hover {
+            background: rgba(8, 0, 255, .12);
+        }
+
+        /* ── ACCOUNT DROPDOWN ── */
+        .account-dropdown {
+            position: absolute;
+            top: calc(var(--topbar-height) + 8px);
+            right: 12px;
+            width: 240px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+            z-index: 200;
+            display: none;
+            animation: dropIn .14s ease;
+        }
+
+        .account-dropdown.open {
+            display: block;
+        }
+
+        @keyframes dropIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .dropdown-user-block {
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .dropdown-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .dropdown-user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .dropdown-user-email {
+            font-size: 11.5px;
+            color: var(--color-text-muted);
+        }
+
+        .dropdown-role-badge {
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(8, 0, 255, .08);
+            color: var(--color-accent);
+            border-radius: 99px;
+            padding: 2px 7px;
+            display: inline-block;
+            margin-top: 3px;
+        }
+
+        .dropdown-sep {
+            height: 1px;
+            background: var(--color-border);
+        }
+
+        .dropdown-item {
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .dropdown-item:hover {
+            background: var(--color-sidebar-hover);
+            color: var(--color-text-primary);
+        }
+
+        .dropdown-item.danger {
+            color: #c0392b;
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(192, 57, 43, .06);
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 0, 0, .05);
+            color: var(--color-text-primary);
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        /* ── SIDEBAR NAV ───────────────────────────────────────── */
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--color-sidebar);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: var(--topbar-height);
+            height: calc(100vh - var(--topbar-height));
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            padding: 8px 10px 4px;
+        }
+
+        /* role indicator */
+        .role-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px 8px;
+        }
+
+        .role-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .role-dot.blue {
+            background: var(--color-accent);
+        }
+
+        .role-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .role-change {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            margin-left: auto;
+            cursor: pointer;
+        }
+
+        .role-change:hover {
+            color: var(--color-text-primary);
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            padding: 0 8px 6px;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 99px;
+            padding: 2px 7px;
+            background: var(--color-text-primary);
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .nav-badge.muted {
+            background: var(--color-border);
+            color: var(--color-text-secondary);
+        }
+
+        .nav-badge.new {
+            background: var(--color-accent);
+            color: #fff;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 10px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background var(--transition);
+            margin-bottom: 2px;
+            position: relative;
+        }
+
+        .nav-item .nav-icon {
+            color: var(--color-text-muted);
+            flex-shrink: 0;
+        }
+
+        .nav-item .nav-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        .nav-item:hover {
+            background: var(--color-sidebar-hover);
+        }
+
+        .nav-item:hover .nav-icon,
+        .nav-item:hover .nav-label {
+            color: var(--color-text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--color-sidebar-active);
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--color-accent);
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            bottom: 6px;
+            width: 3px;
+            background: var(--color-accent);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--color-border-light);
+            margin: 6px 12px;
+        }
+
+        /* ── MAIN CONTENT  ─────────────────────────────────────── */
+        .main {
+            grid-area: main;
+            display: flex;
+            flex-direction: row;
+            min-height: calc(100vh - var(--topbar-height));
+        }
+
+        /* ── FOLDER SIDEBAR ────────────────────────────────────── */
+        .folder-sidebar {
+            width: var(--folderbar-width);
+            border-right: 1px solid var(--color-border);
+            padding: 16px 0;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .folder-group {
+            margin-bottom: 4px;
+        }
+
+        .folder-group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .folder-group-header:hover {
+            color: var(--color-text-primary);
+        }
+
+        .folder-group-header svg {
+            flex-shrink: 0;
+            transition: transform var(--transition);
+        }
+
+        .folder-group.expanded .folder-group-header svg {
+            transform: rotate(90deg);
+        }
+
+        .folder-list {
+            display: none;
+        }
+
+        .folder-group.expanded .folder-list {
+            display: block;
+        }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px 7px 28px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: background var(--transition);
+            border-radius: var(--radius-sm);
+            margin: 1px 6px;
+        }
+
+        .folder-item:hover {
+            background: var(--color-sidebar-hover);
+            color: var(--color-text-primary);
+        }
+
+        .folder-item.active {
+            background: rgba(8, 0, 255, .06);
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        .folder-item .folder-count {
+            margin-left: auto;
+            font-size: 10px;
+            color: var(--color-text-muted);
+            background: var(--color-border);
+            border-radius: 99px;
+            padding: 1px 6px;
+        }
+
+        /* ── DOCS AREA ─────────────────────────────────────────── */
+        .docs-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .docs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface);
+            flex-shrink: 0;
+        }
+
+        .docs-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .docs-subtitle {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        .docs-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background var(--transition), box-shadow var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #0600cc;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--color-sidebar-hover);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-sidebar-active);
+        }
+
+        /* search */
+        .search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface);
+            flex-shrink: 0;
+        }
+
+        .search-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-bg-base);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 6px 12px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: var(--color-text-primary);
+            flex: 1;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            background: var(--color-sidebar-hover);
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .filter-pill:hover {
+            background: var(--color-sidebar-active);
+        }
+
+        .filter-pill.active {
+            background: rgba(8, 0, 255, .07);
+            color: var(--color-accent);
+            border-color: var(--color-accent-muted);
+        }
+
+        /* doc list */
+        .docs-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 20px 0;
+        }
+
+        .doc-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 13px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 6px;
+            background: var(--color-surface);
+            cursor: pointer;
+            position: relative;
+            transition: box-shadow var(--transition), border-color var(--transition), background var(--transition);
+        }
+
+        .doc-card:hover {
+            background: var(--color-surface-elevated);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(8, 0, 255, .18);
+        }
+
+        /* selection checkbox */
+        .doc-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid var(--color-border);
+            background: #fff;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color var(--transition), background var(--transition);
+        }
+
+        .doc-card:hover .doc-check {
+            border-color: var(--color-accent-muted);
+        }
+
+        .doc-card.selected .doc-check {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+
+        .doc-card.selected {
+            border-color: var(--color-accent);
+            background: rgba(8, 0, 255, .025);
+            box-shadow: 0 0 0 2px rgba(8, 0, 255, .07);
+        }
+
+        .doc-icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .doc-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .doc-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .doc-info {
+            font-size: 11.5px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        .doc-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .doc-card:hover .doc-actions {
+            opacity: 1;
+        }
+
+        .doc-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 9px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-base);
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+            transition: background var(--transition), border-color var(--transition), color var(--transition);
+        }
+
+        .doc-action-btn:hover {
+            background: var(--color-accent);
+            color: #fff;
+            border-color: var(--color-accent);
+        }
+
+        /* upload drop zone */
+        .upload-zone {
+            margin: 8px 20px 16px;
+            border: 1.5px dashed var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 18px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: border-color var(--transition), background var(--transition);
+            flex-shrink: 0;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--color-accent-muted);
+            background: rgba(8, 0, 255, .02);
+        }
+
+        .upload-zone-label {
+            font-size: 12.5px;
+            color: var(--color-text-muted);
+        }
+
+        .upload-zone-hint {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            margin-top: 1px;
+        }
+
+        /* section label inside docs list */
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            padding: 6px 2px 8px;
+        }
+
+        /* type badges */
+        .type-badge {
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            border-radius: 4px;
+            padding: 2px 5px;
+            text-transform: uppercase;
+        }
+
+        /* shared badge */
+        .shared-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            color: var(--color-text-muted);
+            background: var(--color-sidebar-hover);
+            border-radius: 99px;
+            padding: 2px 7px;
+        }
+
+        /* owner indicator */
+        .owner-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .owner-dot.me {
+            background: var(--color-accent);
+        }
+
+        .owner-dot.team {
+            background: #888;
+        }
+
+        /* empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 60px 24px;
+            color: var(--color-text-muted);
+            font-size: 13px;
+        }
+
+        .empty-state svg {
+            opacity: .3;
+        }
+
+        /* ── AI TOOLBAR ────────────────────────────────────── */
+        .ai-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px 20px 8px;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface-elevated);
+            flex-shrink: 0;
+        }
+
+        .ai-toolbar-row {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-wrap: nowrap;
+        }
+
+        .ai-toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .ai-toolbar-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            padding: 0 4px 0 2px;
+            white-space: nowrap;
+        }
+
+        .ai-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 9px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+            transition: background var(--transition), color var(--transition), border-color var(--transition);
+        }
+
+        .ai-action-btn:hover {
+            background: rgba(8, 0, 255, .06);
+            color: var(--color-accent);
+            border-color: rgba(8, 0, 255, .15);
+        }
+
+        .ai-action-btn--template {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            background: var(--color-sidebar-hover);
+            border-color: var(--color-border);
+            margin-left: auto;
+        }
+
+        .ai-action-btn--template:hover {
+            background: rgba(8, 0, 255, .07);
+            color: var(--color-accent);
+            border-color: rgba(8, 0, 255, .2);
+        }
+
+        .ai-toolbar-sep {
+            width: 1px;
+            height: 16px;
+            background: var(--color-border);
+            margin: 0 6px;
+            flex-shrink: 0;
+        }
+
+        /* selection bar — appears when docs are selected */
+        .selection-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 20px;
+            background: rgba(8, 0, 255, .04);
+            border-bottom: 1px solid rgba(8, 0, 255, .12);
+            flex-shrink: 0;
+        }
+
+        .selection-bar.visible {
+            display: flex;
+        }
+
+        .selection-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-accent);
+            flex-shrink: 0;
+        }
+
+        .selection-hint {
+            font-size: 11.5px;
+            color: var(--color-text-muted);
+            flex: 1;
+        }
+
+        .selection-clear {
+            font-size: 11.5px;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: var(--font-sans);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            transition: color var(--transition), background var(--transition);
+        }
+
+        .selection-clear:hover {
+            color: var(--color-text-primary);
+            background: var(--color-sidebar-hover);
+        }
+
+        /* toolbar row right spacer */
+        .toolbar-spacer {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+
+    <!-- ══ SHARED NAVBAR ════════════════════════════════════ -->
+    <script src="./_navbar.js"></script>
+
+
+<!-- MAIN CONTENT -->
+        <main class="main"><div class="folder-sidebar">
+                <!-- My Library -->
+                <div class="folder-group expanded" id="mylib-group">
+                    <div class="folder-group-header" onclick="toggleGroup('mylib-group')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                        <span>My Library</span>
+                    </div>
+                    <div class="folder-list" id="mylib-list">
+                        <div class="folder-item active" onclick="selectFolder(this, 'legal')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Legal Docs
+                            <span class="folder-count">4</span>
+                        </div>
+                        <div class="folder-item" onclick="selectFolder(this, 'egypt')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Egypt History
+                            <span class="folder-count">7</span>
+                        </div>
+                        <div class="folder-item" onclick="selectFolder(this, 'research')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Personal Research
+                            <span class="folder-count">3</span>
+                        </div>
+                        <div class="folder-item" onclick="selectFolder(this, 'courses')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Course Materials
+                            <span class="folder-count">12</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Library -->
+                <div class="folder-group expanded" id="teamlib-group">
+                    <div class="folder-group-header" onclick="toggleGroup('teamlib-group')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                        <span>Team Library</span>
+                        <span
+                            style="margin-left:auto;background:rgba(0,0,0,.07);font-size:9px;padding:1px 5px;border-radius:3px;">CS
+                            Dept</span>
+                    </div>
+                    <div class="folder-list" id="teamlib-list">
+                        <div class="folder-item" onclick="selectFolder(this, 'iu-guidelines')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            IU Guidelines
+                            <span class="folder-count">6</span>
+                        </div>
+                        <div class="folder-item" onclick="selectFolder(this, 'hr')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            HR Policies
+                            <span class="folder-count">8</span>
+                        </div>
+                        <div class="folder-item" onclick="selectFolder(this, 'ai-ethics')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            AI Ethics & Policy
+                            <span class="folder-count">5</span>
+                        </div>
+                        <div class="folder-item" onclick="selectFolder(this, 'dept-comms')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Dept. Communications
+                            <span class="folder-count">11</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 8px 12px; margin-top: 12px;">
+                    <button class="btn btn-secondary" style="width:100%;justify-content:center;font-size:12px;"
+                        onclick="alert('New folder UI would open here')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        New folder
+                    </button>
+                </div>
+            </div>
+
+            <!-- DOC LIST -->
+            <div class="docs-area">
+                <div class="docs-header">
+                    <div>
+                        <div class="docs-title" id="folder-title">Legal Docs</div>
+                        <div class="docs-subtitle" id="folder-subtitle">My Library · 4 documents · Private</div>
+                    </div>
+                    <div class="docs-actions">
+                        <button class="btn btn-secondary" onclick="triggerUpload()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="16 16 12 12 8 16" />
+                                <line x1="12" y1="12" x2="12" y2="21" />
+                                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                            </svg>
+                            Upload document
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI ACTION TOOLBAR -->
+                <div class="ai-toolbar" id="ai-toolbar">
+
+                    <!-- Row 1: Comprehend + Assess -->
+                    <div class="ai-toolbar-row">
+                        <div class="ai-toolbar-group">
+                            <span class="ai-toolbar-label">Comprehend</span>
+                            <button class="ai-action-btn" onclick="toolbarAction('Summarise')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="21" y1="6" x2="3" y2="6" />
+                                    <line x1="15" y1="12" x2="3" y2="12" />
+                                    <line x1="17" y1="18" x2="3" y2="18" />
+                                </svg>
+                                Summarise
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Key Concepts')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                </svg>
+                                Key Concepts
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Annotate')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 20h9" />
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                                Annotate
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Translate')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M5 8l6 6" />
+                                    <path d="M4 14l6-6 2-3" />
+                                    <path d="M2 5h12" />
+                                    <path d="M7 2h1" />
+                                    <path d="M22 22l-5-10-5 10" />
+                                    <path d="M14 18h6" />
+                                </svg>
+                                Translate
+                            </button>
+                        </div>
+
+                        <div class="ai-toolbar-sep"></div>
+
+                        <div class="ai-toolbar-group">
+                            <span class="ai-toolbar-label">Assess</span>
+                            <button class="ai-action-btn" onclick="toolbarAction('Create Quiz')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M9 11l3 3L22 4" />
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                                </svg>
+                                Quiz
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Create Exam')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                                Exam
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Flashcards')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                    <line x1="2" y1="10" x2="22" y2="10" />
+                                </svg>
+                                Flashcards
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Rubric')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="8" y1="6" x2="21" y2="6" />
+                                    <line x1="8" y1="12" x2="21" y2="12" />
+                                    <line x1="8" y1="18" x2="21" y2="18" />
+                                    <line x1="3" y1="6" x2="3.01" y2="6" />
+                                    <line x1="3" y1="12" x2="3.01" y2="12" />
+                                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                                </svg>
+                                Rubric
+                            </button>
+                        </div>
+
+                    </div><!-- end Row 1 -->
+
+                    <!-- Row 2: Create + Media + Templates -->
+                    <div class="ai-toolbar-row">
+                        <div class="ai-toolbar-group">
+                            <span class="ai-toolbar-label">Create</span>
+                            <button class="ai-action-btn" onclick="toolbarAction('Lecture Script')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polygon points="23 7 16 12 23 17 23 7" />
+                                    <rect x="1" y="5" width="15" height="14" rx="2" />
+                                </svg>
+                                Lecture Script
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Slide Deck')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                </svg>
+                                Slides
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Reading Guide')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                </svg>
+                                Reading Guide
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Email Draft')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                    <polyline points="22,6 12,13 2,6" />
+                                </svg>
+                                Email
+                            </button>
+                        </div>
+
+                        <div class="ai-toolbar-sep"></div>
+
+                        <div class="ai-toolbar-group">
+                            <span class="ai-toolbar-label">Media</span>
+                            <button class="ai-action-btn" onclick="toolbarAction('Audio Podcast')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polygon points="10 8 16 12 10 16 10 8" />
+                                </svg>
+                                Audio
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Video Script')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                </svg>
+                                Video Script
+                            </button>
+                            <button class="ai-action-btn" onclick="toolbarAction('Infographic Brief')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7" />
+                                    <rect x="14" y="3" width="7" height="7" />
+                                    <rect x="14" y="14" width="7" height="7" />
+                                    <rect x="3" y="14" width="7" height="7" />
+                                </svg>
+                                Infographic
+                            </button>
+                        </div>
+
+                        <div class="ai-toolbar-sep"></div>
+
+                        <div class="ai-toolbar-group">
+                            <button class="ai-action-btn ai-action-btn--template"
+                                onclick="toolbarAction('My Prompt Templates')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                </svg>
+                                My Prompt Templates
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" style="margin-left:2px">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div><!-- end Row 2 -->
+                </div>
+
+                <!-- SELECTION BAR -->
+                <div class="selection-bar" id="selection-bar">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        style="color:var(--color-accent);flex-shrink:0">
+                        <path d="M9 11l3 3L22 4" />
+                    </svg>
+                    <span class="selection-count" id="selection-count">0 selected</span>
+                    <span class="selection-hint">— use the action toolbar above to process these documents</span>
+                    <button class="selection-clear" onclick="clearSelection()">Clear selection</button>
+                </div>
+
+                <div class="search-wrap">
+                    <div class="search-bar">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="color:var(--color-text-muted);flex-shrink:0;">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input type="text" placeholder="Search in this folder…" id="doc-search"
+                            oninput="filterDocs(this.value)">
+                    </div>
+                    <button class="filter-pill active" onclick="toggleFilter(this,'All')">All</button>
+                    <button class="filter-pill" onclick="toggleFilter(this,'PDF')">PDF</button>
+                    <button class="filter-pill" onclick="toggleFilter(this,'DOCX')">DOCX</button>
+                    <button class="filter-pill" onclick="toggleFilter(this,'TXT')">TXT</button>
+                </div>
+
+                <div class="docs-list" id="docs-list">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Upload drop zone -->
+                <div class="upload-zone" onclick="triggerUpload()" id="upload-zone" title="Click or drag files here">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        style="color:var(--color-text-muted)">
+                        <polyline points="16 16 12 12 8 16" />
+                        <line x1="12" y1="12" x2="12" y2="21" />
+                        <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                    </svg>
+                    <span class="upload-zone-label">Drop files here or <u
+                            style="color:var(--color-accent);cursor:pointer">click to browse</u></span>
+                    <span class="upload-zone-hint">PDF, DOCX, TXT, MD — max 50 MB per file</span>
+                </div>
+
+                <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt,.md" style="display:none"
+                    onchange="handleFileUpload(this)">
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // ── DATA ─────────────────────────────────────────────────────
+        const folders = {
+            legal: {
+                title: 'Legal Docs',
+                subtitle: 'My Library · 4 documents · Private',
+                type: 'private',
+                docs: [
+                    { name: 'Employment Contract Template.pdf', type: 'PDF', size: '340 KB', updated: '2 days ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'GDPR Compliance Policy v2.docx', type: 'DOCX', size: '128 KB', updated: '5 days ago', color: '#3498db', textColor: '#2980b9' },
+                    { name: 'IP Assignment Agreement.pdf', type: 'PDF', size: '215 KB', updated: '1 week ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Freelance Services Agreement.txt', type: 'TXT', size: '22 KB', updated: '2 weeks ago', color: '#2ecc71', textColor: '#27ae60' },
+                ]
+            },
+            egypt: {
+                title: 'Egypt History',
+                subtitle: 'My Library · 7 documents · Private',
+                type: 'private',
+                docs: [
+                    { name: 'Ancient Egyptian Religion and Mythology.pdf', type: 'PDF', size: '1.2 MB', updated: '1 day ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'The New Kingdom Period Overview.pdf', type: 'PDF', size: '870 KB', updated: '3 days ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Hieroglyphics — A Practical Guide.docx', type: 'DOCX', size: '560 KB', updated: '4 days ago', color: '#3498db', textColor: '#2980b9' },
+                    { name: 'Pharaoh Succession Timeline.txt', type: 'TXT', size: '18 KB', updated: '1 week ago', color: '#2ecc71', textColor: '#27ae60' },
+                    { name: 'Egyptian Trade Routes — Lecture Notes.pdf', type: 'PDF', size: '440 KB', updated: '2 weeks ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'The Book of the Dead — Excerpts.pdf', type: 'PDF', size: '2.1 MB', updated: '3 weeks ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Archaeology Methods in Egypt.md', type: 'MD', size: '34 KB', updated: '1 month ago', color: '#9b59b6', textColor: '#8e44ad' },
+                ]
+            },
+            research: {
+                title: 'Personal Research',
+                subtitle: 'My Library · 3 documents · Private',
+                type: 'private',
+                docs: [
+                    { name: 'LLM Interpretability Survey 2024.pdf', type: 'PDF', size: '3.4 MB', updated: '6 hours ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Attention Mechanisms — Reading Notes.md', type: 'MD', size: '56 KB', updated: '2 days ago', color: '#9b59b6', textColor: '#8e44ad' },
+                    { name: 'Transformer Architecture Primer.pdf', type: 'PDF', size: '1.1 MB', updated: '5 days ago', color: '#e74c3c', textColor: '#c0392b' },
+                ]
+            },
+            courses: {
+                title: 'Course Materials',
+                subtitle: 'My Library · 12 documents · Private',
+                type: 'private',
+                docs: [
+                    { name: 'CS301 Lecture Slides Week 1–4.pdf', type: 'PDF', size: '5.6 MB', updated: 'Today', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'CS301 Syllabus 2026.docx', type: 'DOCX', size: '78 KB', updated: 'Today', color: '#3498db', textColor: '#2980b9' },
+                    { name: 'CS402 — Recommended Reading List.txt', type: 'TXT', size: '12 KB', updated: '1 day ago', color: '#2ecc71', textColor: '#27ae60' },
+                    { name: 'CS301 Assessment Rubric.pdf', type: 'PDF', size: '220 KB', updated: '2 days ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'CS402 Lecture Notes Week 3.md', type: 'MD', size: '88 KB', updated: '4 days ago', color: '#9b59b6', textColor: '#8e44ad' },
+                ]
+            },
+            'iu-guidelines': {
+                title: 'IU Guidelines',
+                subtitle: 'Team Library · CS Dept · 6 documents · Read-only',
+                type: 'team',
+                docs: [
+                    { name: 'IU Academic Integrity Policy.pdf', type: 'PDF', size: '540 KB', updated: '2 weeks ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Use of AI Tools in Teaching — IU Policy.pdf', type: 'PDF', size: '320 KB', updated: '3 weeks ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Course Assessment Standards 2026.docx', type: 'DOCX', size: '195 KB', updated: '1 month ago', color: '#3498db', textColor: '#2980b9' },
+                    { name: 'Research Ethics Handbook.pdf', type: 'PDF', size: '1.8 MB', updated: '2 months ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Student Privacy Guidelines.pdf', type: 'PDF', size: '280 KB', updated: '2 months ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Reporting Misconduct — Procedure.docx', type: 'DOCX', size: '110 KB', updated: '3 months ago', color: '#3498db', textColor: '#2980b9' },
+                ]
+            },
+            hr: {
+                title: 'HR Policies',
+                subtitle: 'Team Library · CS Dept · 8 documents · Read-only',
+                type: 'team',
+                docs: [
+                    { name: 'Leave Request Policy 2026.pdf', type: 'PDF', size: '210 KB', updated: '1 week ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Remote Work Agreement.docx', type: 'DOCX', size: '145 KB', updated: '2 weeks ago', color: '#3498db', textColor: '#2980b9' },
+                    { name: 'Employee Benefits Overview.pdf', type: 'PDF', size: '890 KB', updated: '1 month ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Performance Review Process.pdf', type: 'PDF', size: '380 KB', updated: '2 months ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Code of Conduct — IU Staff.pdf', type: 'PDF', size: '740 KB', updated: '3 months ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Onboarding Checklist.docx', type: 'DOCX', size: '72 KB', updated: '3 months ago', color: '#3498db', textColor: '#2980b9' },
+                    { name: 'Sabbatical Policy.txt', type: 'TXT', size: '18 KB', updated: '4 months ago', color: '#2ecc71', textColor: '#27ae60' },
+                    { name: 'Health & Safety Regulations.pdf', type: 'PDF', size: '470 KB', updated: '4 months ago', color: '#e74c3c', textColor: '#c0392b' },
+                ]
+            },
+            'ai-ethics': {
+                title: 'AI Ethics & Policy',
+                subtitle: 'Team Library · CS Dept · 5 documents · Read-only',
+                type: 'team',
+                docs: [
+                    { name: 'EU AI Act Summary for Educators.pdf', type: 'PDF', size: '680 KB', updated: '3 days ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Responsible AI Use — Guidelines.pdf', type: 'PDF', size: '410 KB', updated: '1 week ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Bias & Fairness in AI — Reading.pdf', type: 'PDF', size: '1.1 MB', updated: '2 weeks ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'AI in Education — UNESCO Report 2024.pdf', type: 'PDF', size: '2.3 MB', updated: '1 month ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Acceptable Use Policy — IU AI Studio.docx', type: 'DOCX', size: '95 KB', updated: '1 month ago', color: '#3498db', textColor: '#2980b9' },
+                ]
+            },
+            'dept-comms': {
+                title: 'Dept. Communications',
+                subtitle: 'Team Library · CS Dept · 11 documents · Read-only',
+                type: 'team',
+                docs: [
+                    { name: 'Meeting Minutes Feb 2026.docx', type: 'DOCX', size: '55 KB', updated: '5 days ago', color: '#3498db', textColor: '#2980b9' },
+                    { name: 'Faculty Newsletter — Winter 2026.pdf', type: 'PDF', size: '1.6 MB', updated: '2 weeks ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Curriculum Review Decisions 2025.pdf', type: 'PDF', size: '290 KB', updated: '3 weeks ago', color: '#e74c3c', textColor: '#c0392b' },
+                    { name: 'Lecture Room Allocations Semester 2.txt', type: 'TXT', size: '8 KB', updated: '1 month ago', color: '#2ecc71', textColor: '#27ae60' },
+                    { name: 'Budget Planning Notes Q1.docx', type: 'DOCX', size: '130 KB', updated: '1 month ago', color: '#3498db', textColor: '#2980b9' },
+                ]
+            },
+        };
+
+        let currentFolderKey = 'legal';
+        let currentDocs = [];
+
+        function renderDocs(docs) {
+            const list = document.getElementById('docs-list');
+            if (!docs.length) {
+                list.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>No documents found</span></div>';
+                return;
+            }
+            const folder = folders[currentFolderKey];
+            const isTeam = folder.type === 'team';
+            list.innerHTML = docs.map(doc => `
+  <div class="doc-card" onclick="toggleDocSelect(this)">
+    <div class="doc-check">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" class="check-icon" style="display:none"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="doc-icon-wrap" style="background:${doc.color}18;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${doc.color}" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-name">${doc.name}</div>
+      <div class="doc-info">
+        <span class="type-badge" style="background:${doc.color}18;color:${doc.textColor}">${doc.type}</span>
+        &nbsp;${doc.size} · ${doc.updated}
+        ${isTeam ? `&nbsp;<span class="shared-badge"><span class="owner-dot team"></span>Shared</span>` : ''}
+      </div>
+    </div>
+    <div class="doc-actions">
+      <button class="doc-action-btn" onclick="event.stopPropagation();docAction('Summarise','${doc.name}')">Summarise</button>
+      <button class="doc-action-btn" onclick="event.stopPropagation();docAction('Create Quiz','${doc.name}')">Quiz</button>
+      <button class="doc-action-btn" onclick="event.stopPropagation();docAction('Create Test','${doc.name}')">Test</button>
+      ${!isTeam ? `<button class="doc-action-btn" onclick="event.stopPropagation();deleteDoc(this,'${doc.name}')" style="color:#c0392b;border-color:rgba(192,57,43,.3)">×</button>` : ''}
+    </div>
+  </div>
+`).join('');
+        }
+
+        function toggleDocSelect(card) {
+            card.classList.toggle('selected');
+            const isSelected = card.classList.contains('selected');
+            const checkIcon = card.querySelector('.check-icon');
+            if (checkIcon) checkIcon.style.display = isSelected ? 'block' : 'none';
+            updateSelectionBar();
+        }
+
+        function updateSelectionBar() {
+            const selected = document.querySelectorAll('.doc-card.selected');
+            const bar = document.getElementById('selection-bar');
+            const count = document.getElementById('selection-count');
+            const n = selected.length;
+            if (n > 0) {
+                count.textContent = `${n} document${n > 1 ? 's' : ''} selected`;
+                bar.classList.add('visible');
+            } else {
+                bar.classList.remove('visible');
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.doc-card.selected').forEach(card => {
+                card.classList.remove('selected');
+                const icon = card.querySelector('.check-icon');
+                if (icon) icon.style.display = 'none';
+            });
+            updateSelectionBar();
+        }
+
+        function selectFolder(el, key) {
+            document.querySelectorAll('.folder-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            currentFolderKey = key;
+            const f = folders[key];
+            document.getElementById('folder-title').textContent = f.title;
+            document.getElementById('folder-subtitle').textContent = f.subtitle;
+            document.getElementById('doc-search').value = '';
+            const uploadZone = document.getElementById('upload-zone');
+            uploadZone.style.display = f.type === 'team' ? 'none' : 'flex';
+            document.querySelector('.docs-actions').style.display = f.type === 'team' ? 'none' : 'flex';
+            currentDocs = f.docs;
+            // clear any selection from the previous folder
+            document.getElementById('selection-bar').classList.remove('visible');
+            renderDocs(currentDocs);
+        }
+
+        function toggleGroup(id) {
+            document.getElementById(id).classList.toggle('expanded');
+        }
+
+        function filterDocs(q) {
+            const lower = q.toLowerCase();
+            renderDocs(currentDocs.filter(d => d.name.toLowerCase().includes(lower)));
+        }
+
+        function toggleFilter(el, type) {
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            renderDocs(type === 'All' ? currentDocs : currentDocs.filter(d => d.type === type));
+        }
+
+        function docAction(action, name) {
+            alert(`[Prototype] "${action}" will open for:\n${name}\n\n(In the real system this would start the task flow.)`);
+        }
+
+        function toolbarAction(action) {
+            const selected = document.querySelectorAll('.doc-card.selected');
+            if (!selected.length) {
+                alert(`[Prototype] "${action}" — select one or more documents first to apply this action.\n\nIn the real system, selecting docs and clicking this button would launch the "${action}" task flow with those documents pre-loaded as context.`);
+            } else {
+                const names = Array.from(selected).map(c => '· ' + c.querySelector('.doc-name').textContent).join('\n');
+                alert(`[Prototype] "${action}" will run on:\n\n${names}\n\n(In the real system this launches the task flow with selected docs as RAG context.)`);
+            }
+        }
+
+        function deleteDoc(btn, name) {
+            const card = btn.closest('.doc-card');
+            card.style.opacity = '0.4';
+            card.style.pointerEvents = 'none';
+            setTimeout(() => card.remove(), 400);
+        }
+
+        function triggerUpload() {
+            document.getElementById('file-input').click();
+        }
+
+        function handleFileUpload(input) {
+            Array.from(input.files).forEach(file => {
+                const ext = file.name.split('.').pop().toUpperCase();
+                const colors = { PDF: ['#e74c3c', '#c0392b'], DOCX: ['#3498db', '#2980b9'], TXT: ['#2ecc71', '#27ae60'], MD: ['#9b59b6', '#8e44ad'] };
+                const c = colors[ext] || ['#888', '#666'];
+                const newDoc = { name: file.name, type: ext, size: (file.size / 1024 < 1000 ? (file.size / 1024).toFixed(0) + ' KB' : (file.size / 1048576).toFixed(1) + ' MB'), updated: 'Just now', color: c[0], textColor: c[1] };
+                currentDocs = [newDoc, ...currentDocs];
+                folders[currentFolderKey].docs = currentDocs;
+            });
+            renderDocs(currentDocs);
+            input.value = '';
+        }
+
+        // Init
+        selectFolder(document.querySelector('.folder-item.active'), 'legal');
+    </script>
+</body>
+
+</html>

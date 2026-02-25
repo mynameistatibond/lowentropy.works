@@ -1,0 +1,780 @@
+<!-- ═══════════════════════════════════════════════════════════
+     AI STUDIO — SHARED NAVBAR  (single source of truth)
+     Loaded by all prototype pages via _navbar.js
+     Edit THIS file to change the navbar on every page at once.
+════════════════════════════════════════════════════════════ -->
+
+<!-- ── CANONICAL NAVBAR CSS (injected with the HTML so it's always identical) ── -->
+<style id="navbar-styles">
+    /* ── CSS TOKENS (navbar-scoped overrides to ensure consistency) ── */
+    :root {
+        --nb-accent: #0800ff;
+        --nb-accent-hover: rgba(8, 0, 255, .08);
+        --nb-sidebar-bg: #fafafa;
+        --nb-sidebar-hover: rgba(0, 0, 0, .04);
+        --nb-sidebar-active: rgba(0, 0, 0, .08);
+        --nb-border: rgba(0, 0, 0, .10);
+        --nb-border-light: rgba(0, 0, 0, .05);
+        --nb-text-primary: #000000;
+        --nb-text-secondary: #333333;
+        --nb-text-muted: #888888;
+        --nb-topbar-h: 56px;
+        --nb-sidebar-w: 240px;
+        --nb-radius: 8px;
+        --nb-radius-lg: 12px;
+        --nb-transition: 200ms ease;
+    }
+
+    /* ── TOPBAR ─────────────────────────────────────────────── */
+    .topbar {
+        grid-area: topbar;
+        background: #fafafa;
+        border-bottom: 1px solid var(--nb-border);
+        display: flex;
+        align-items: center;
+        padding: 0 16px 0 0;
+        gap: 12px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
+        height: var(--nb-topbar-h);
+    }
+
+    .topbar-left {
+        width: var(--nb-sidebar-w);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px;
+        border-right: 1px solid var(--nb-border);
+        height: 100%;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .logo-mark {
+        height: 30px;
+        padding: 0 10px;
+        background: var(--nb-accent);
+        border-radius: var(--nb-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .logo-text {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--nb-text-primary);
+        letter-spacing: -.01em;
+    }
+
+    .topbar-center {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        padding: 0 24px;
+    }
+
+    .search-bar {
+        width: min(440px, 100%);
+        height: 36px;
+        background: rgba(0, 0, 0, .03);
+        border: 1px solid var(--nb-border);
+        border-radius: var(--nb-radius);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 12px;
+        cursor: text;
+        transition: border-color var(--nb-transition), background var(--nb-transition);
+    }
+
+    .search-bar:hover {
+        background: rgba(0, 0, 0, .05);
+        border-color: rgba(0, 0, 0, .15);
+    }
+
+    .search-bar:focus-within {
+        background: #fff;
+        border-color: var(--nb-accent);
+        box-shadow: 0 0 0 3px rgba(8, 0, 255, .1);
+    }
+
+    .search-icon {
+        color: var(--nb-text-muted);
+        opacity: .6;
+        flex-shrink: 0;
+    }
+
+    .search-input {
+        background: none;
+        border: none;
+        outline: none;
+        color: var(--nb-text-secondary);
+        font-size: 13.5px;
+        flex: 1;
+        font-family: inherit;
+    }
+
+    .search-input::placeholder {
+        color: var(--nb-text-muted);
+    }
+
+    .search-kbd {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 11px;
+        color: var(--nb-text-muted);
+        background: rgba(0, 0, 0, .04);
+        border: 1px solid var(--nb-border);
+        border-radius: 5px;
+        padding: 2px 6px;
+        flex-shrink: 0;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--nb-radius);
+        color: var(--nb-text-secondary);
+        position: relative;
+        transition: background var(--nb-transition), color var(--nb-transition);
+    }
+
+    .icon-btn:hover {
+        background: rgba(0, 0, 0, .05);
+        color: var(--nb-text-primary);
+    }
+
+    .notif-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 16px;
+        height: 16px;
+        background: #0800ff;
+        border: 2px solid #fafafa;
+        border-radius: 50%;
+        font-size: 9px;
+        font-weight: 700;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .account-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px 8px 5px 6px;
+        border-radius: var(--nb-radius);
+        margin-left: 4px;
+        transition: background var(--nb-transition);
+    }
+
+    .account-btn:hover {
+        background: rgba(0, 0, 0, .05);
+    }
+
+    .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--nb-text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .account-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--nb-text-primary);
+    }
+
+    .chevron-icon {
+        color: var(--nb-text-muted);
+        transition: transform var(--nb-transition);
+    }
+
+    /* ── ACCOUNT DROPDOWN ─────────────────────────────────── */
+    .account-dropdown {
+        position: fixed;
+        top: calc(var(--nb-topbar-h) + 8px);
+        right: 12px;
+        width: 240px;
+        background: #fff;
+        border: 1px solid var(--nb-border);
+        border-radius: var(--nb-radius-lg);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, .10);
+        z-index: 9999;
+        display: none;
+    }
+
+    .account-dropdown.open {
+        display: block;
+        animation: nb-dropIn .14s ease;
+    }
+
+    @keyframes nb-dropIn {
+        from {
+            opacity: 0;
+            transform: translateY(-6px) scale(.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    .dropdown-user-block {
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid var(--nb-border-light);
+    }
+
+    .dropdown-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--nb-text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .dropdown-user-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--nb-text-primary);
+    }
+
+    .dropdown-user-email {
+        font-size: 11.5px;
+        color: var(--nb-text-muted);
+    }
+
+    .dropdown-role-badge {
+        font-size: 10px;
+        font-weight: 600;
+        background: rgba(8, 0, 255, .08);
+        color: var(--nb-accent);
+        border-radius: 99px;
+        padding: 2px 7px;
+        display: inline-block;
+        margin-top: 3px;
+    }
+
+    .dropdown-sep {
+        height: 1px;
+        background: var(--nb-border-light);
+        margin: 2px 0;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 14px;
+        font-size: 13px;
+        color: var(--nb-text-secondary);
+        cursor: pointer;
+        transition: background var(--nb-transition);
+    }
+
+    .dropdown-item:hover {
+        background: #f5f5f7;
+        color: var(--nb-text-primary);
+    }
+
+    .dropdown-item svg {
+        opacity: .6;
+        flex-shrink: 0;
+    }
+
+    .dropdown-item.danger {
+        color: #cc0000;
+    }
+
+    .dropdown-item.danger svg {
+        opacity: .8;
+    }
+
+    /* ── SIDEBAR ──────────────────────────────────────────── */
+    .sidebar {
+        grid-area: sidebar;
+        background: var(--nb-sidebar-bg);
+        border-right: 1px solid var(--nb-border);
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: var(--nb-topbar-h);
+        height: calc(100vh - var(--nb-topbar-h));
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .role-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: var(--nb-sidebar-hover);
+        border-bottom: 1px solid var(--nb-border-light);
+        cursor: pointer;
+        transition: background var(--nb-transition);
+    }
+
+    .role-indicator:hover {
+        background: var(--nb-sidebar-active);
+    }
+
+    .role-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .role-dot.blue {
+        background: var(--nb-accent);
+        box-shadow: 0 0 6px rgba(8, 0, 255, .4);
+    }
+
+    .role-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--nb-text-primary);
+    }
+
+    .role-change {
+        font-size: 10.5px;
+        color: var(--nb-text-muted);
+        margin-left: auto;
+        opacity: .7;
+    }
+
+    .role-change:hover {
+        opacity: 1;
+    }
+
+    .nav-section {
+        padding: 8px 10px 4px;
+    }
+
+    .nav-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--nb-text-muted);
+        padding: 0 8px 6px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 10px;
+        height: 38px;
+        border-radius: var(--nb-radius);
+        text-decoration: none;
+        cursor: pointer;
+        transition: background var(--nb-transition), color var(--nb-transition);
+        margin-bottom: 2px;
+        position: relative;
+    }
+
+    .nav-item .nav-icon {
+        color: var(--nb-text-muted);
+        flex-shrink: 0;
+        transition: color var(--nb-transition);
+    }
+
+    .nav-item .nav-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--nb-text-secondary);
+        transition: color var(--nb-transition);
+    }
+
+    .nav-item:hover {
+        background: var(--nb-sidebar-hover);
+    }
+
+    .nav-item:hover .nav-icon {
+        color: var(--nb-accent);
+    }
+
+    .nav-item:hover .nav-label {
+        color: var(--nb-text-primary);
+    }
+
+    .nav-item.active {
+        background: var(--nb-sidebar-active);
+    }
+
+    .nav-item.active .nav-icon {
+        color: var(--nb-accent);
+    }
+
+    .nav-item.active .nav-label {
+        color: var(--nb-text-primary);
+        font-weight: 600;
+    }
+
+    .nav-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        background: var(--nb-accent);
+        border-radius: 0 3px 3px 0;
+    }
+
+    .nav-badge {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 700;
+        border-radius: 99px;
+        padding: 2px 7px;
+        background: var(--nb-text-primary);
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .nav-badge.nav-badge--muted {
+        background: rgba(0, 0, 0, .08);
+        color: var(--nb-text-secondary);
+    }
+
+    .nav-badge.nav-badge--teal {
+        background: var(--nb-accent);
+        color: #fff;
+    }
+
+    .nav-divider {
+        height: 1px;
+        background: var(--nb-border);
+        margin: 8px 10px;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        padding: 10px 14px;
+        border-top: 1px solid var(--nb-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+    .sidebar-version {
+        font-size: 10.5px;
+        color: var(--nb-text-muted);
+        font-family: ui-monospace, monospace;
+        opacity: .5;
+    }
+
+    .feedback-pill {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--nb-accent);
+        background: rgba(8, 0, 255, .06);
+        border: 1px solid rgba(8, 0, 255, .15);
+        border-radius: 99px;
+        padding: 3px 10px;
+        cursor: pointer;
+        transition: background var(--nb-transition);
+    }
+
+    .feedback-pill:hover {
+        background: rgba(8, 0, 255, .12);
+    }
+</style>
+
+<!-- ── TOPBAR ─────────────────────────────────────────────── -->
+<header class="topbar" role="banner">
+
+    <div class="topbar-left">
+        <div class="logo" aria-label="AI Studio home" data-nav-home>
+            <div class="logo-mark">AI</div>
+            <span class="logo-text">Studio</span>
+        </div>
+    </div>
+
+    <div class="topbar-center">
+        <div class="search-bar" role="search">
+            <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-input" placeholder="Search tools, tasks, prompts…" aria-label="Search platform"
+                readonly>
+            <kbd class="search-kbd">⌘K</kbd>
+        </div>
+    </div>
+
+    <div class="topbar-right">
+        <button class="icon-btn" aria-label="Help" title="Help &amp; Documentation">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        </button>
+        <button class="icon-btn" aria-label="Notifications, 3 unread" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span class="notif-badge" aria-hidden="true">3</span>
+        </button>
+        <button class="account-btn" id="account-trigger"
+            onclick="document.getElementById('account-dropdown').classList.toggle('open');this.setAttribute('aria-expanded',document.getElementById('account-dropdown').classList.contains('open'))"
+            aria-haspopup="menu" aria-expanded="false">
+            <div class="avatar" aria-hidden="true">SM</div>
+            <span class="account-name">Sarah</span>
+            <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Account Dropdown -->
+    <div class="account-dropdown" id="account-dropdown" role="menu" aria-label="Account menu">
+        <div class="dropdown-user-block">
+            <div class="dropdown-avatar">SM</div>
+            <div>
+                <div class="dropdown-user-name">Sarah Mitchell</div>
+                <div class="dropdown-user-email">s.mitchell@iu.edu</div>
+                <span class="dropdown-role-badge">Lecturer</span>
+            </div>
+        </div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>My Profile
+        </div>
+        <div class="dropdown-item" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+            </svg>My Workspace
+        </div>
+        <div class="dropdown-item" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07" />
+            </svg>Settings
+        </div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+            </svg>AI Certifications
+            <span
+                style="margin-left:auto;font-size:10px;background:rgba(8,0,255,.08);color:#0800ff;border-radius:99px;padding:2px 7px;font-weight:700;">Level
+                1</span>
+        </div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item danger" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>Sign Out
+        </div>
+    </div>
+
+</header>
+
+<!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+<nav class="sidebar" aria-label="Main navigation">
+
+    <div class="role-indicator" title="Change role">
+        <div class="role-dot blue"></div>
+        <span class="role-name">Lecturer</span>
+        <span class="role-change">Change →</span>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-section-label">Platform</div>
+
+        <a class="nav-item" href="./AI Studio MVP Prototype.html" data-navkey="home">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            <span class="nav-label">Home</span>
+        </a>
+
+        <a class="nav-item" href="#" data-navkey="tasks">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+            <span class="nav-label">Tasks</span>
+        </a>
+
+        <a class="nav-item" href="#" data-navkey="tools">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path
+                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+            </svg>
+            <span class="nav-label">Tool Directory</span>
+            <span class="nav-badge nav-badge--muted">24</span>
+        </a>
+
+        <a class="nav-item" href="#" data-navkey="prompts">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+            <span class="nav-label">Prompt Library</span>
+        </a>
+
+        <a class="nav-item" href="./AI Studio KB Prototype.html" data-navkey="kb">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+            </svg>
+            <span class="nav-label">Knowledge Base</span>
+        </a>
+
+        <a class="nav-item" href="./AI Studio Advisor.html" data-navkey="advisor">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            <span class="nav-label">AI Advisor</span>
+            <span class="nav-badge nav-badge--teal">New</span>
+        </a>
+    </div>
+
+    <div class="nav-divider" role="separator"></div>
+
+    <div class="nav-section">
+        <div class="nav-section-label">Workspace</div>
+
+        <a class="nav-item" href="#" data-navkey="team">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span class="nav-label">Team Space</span>
+            <span class="nav-badge nav-badge--muted">2</span>
+        </a>
+
+        <a class="nav-item" href="#" data-navkey="workspace">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+            </svg>
+            <span class="nav-label">My Workspace</span>
+        </a>
+    </div>
+
+    <div class="nav-divider" role="separator"></div>
+
+    <div class="nav-section">
+        <a class="nav-item" href="#" data-navkey="analytics">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span class="nav-label">Analytics</span>
+        </a>
+        <a class="nav-item" href="#" data-navkey="settings">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07" />
+            </svg>
+            <span class="nav-label">Settings</span>
+        </a>
+        <a class="nav-item" href="#" data-navkey="help">
+            <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span class="nav-label">Help &amp; Docs</span>
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <span class="sidebar-version">v1.0.0</span>
+        <button class="feedback-pill">Give feedback</button>
+    </div>
+
+</nav>

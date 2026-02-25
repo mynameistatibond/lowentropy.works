@@ -1,0 +1,161 @@
+body.game-page {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    /* Using svh for better mobile viewport support */
+    margin: 0;
+}
+
+body.game-page>div[data-include="header"],
+body.game-page>div[data-include="footer"] {
+    flex-shrink: 0;
+}
+
+.play-me-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+    width: 100%;
+    flex: 1 1 0;
+    min-height: 0;
+    box-sizing: border-box;
+    font-family: 'Shippori Mincho B1', serif;
+    overflow: hidden;
+}
+
+#game-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-shrink: 0;
+    padding: 1rem 2rem;
+    /* 2rem side padding strictly matches the site header alignment */
+    background: transparent;
+    z-index: 20;
+    margin-bottom: 2rem;
+    /* Clear space so it doesn't touch the grid */
+}
+
+#hud-question {
+    text-align: center;
+    flex-grow: 1;
+    padding: 0 var(--sp-md);
+    font-size: 1.15rem;
+}
+
+#hud-lives {
+    color: var(--clr-plot-vermilion);
+}
+
+#canvas-container {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    background-color: var(--clr-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-canvas {
+    display: block;
+    position: absolute;
+    /* We don't stretch the CSS width/height fully, because it causes blur.
+       We will size the canvas element properties via JS and center it perfectly */
+}
+
+#game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--clr-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 10;
+}
+
+#game-overlay.hidden {
+    display: none;
+}
+
+#overlay-title {
+    font-size: 3rem;
+    margin-bottom: var(--sp-xs);
+    font-weight: 700;
+}
+
+#overlay-subtitle {
+    font-size: 1.2rem;
+    color: var(--clr-text-muted);
+}
+
+#game-controls-hint {
+    display: flex;
+    justify-content: center;
+    color: var(--clr-border);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    background: var(--clr-bg);
+    padding: var(--sp-xs);
+    width: 100%;
+    z-index: 20;
+    border-top: 1px dashed var(--clr-border);
+}
+
+@keyframes scorePop {
+    0% {
+        transform: scale(1);
+    }
+
+    15% {
+        transform: scale(3.5);
+        color: var(--clr-plot-purple);
+        font-weight: 900;
+    }
+
+    30% {
+        transform: scale(1.5);
+        color: var(--clr-plot-purple);
+        font-weight: 900;
+    }
+
+    45% {
+        transform: scale(2.8);
+        color: var(--clr-plot-purple);
+        font-weight: 700;
+    }
+
+    60% {
+        transform: scale(1.5);
+        color: var(--clr-plot-purple);
+        font-weight: 700;
+    }
+
+    75% {
+        transform: scale(2.0);
+        color: var(--clr-plot-purple);
+        font-weight: 700;
+    }
+
+    100% {
+        transform: scale(1);
+        font-weight: inherit;
+    }
+}
+
+.score-pop {
+    animation: scorePop 1.2s ease-in-out forwards;
+    display: inline-block !important;
+    transform-origin: center right;
+    /* Required for transform */
+}

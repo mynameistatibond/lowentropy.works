@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Snake — Low Entropy</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/theme.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/loading.css">
+    <link rel="stylesheet" href="../../assets/css/components/header.css">
+    <link rel="stylesheet" href="../../assets/css/components/footer.css">
+    <link rel="stylesheet" href="../../assets/css/consent.css">
+    <link rel="stylesheet" href="../../assets/css/pages-play-me.css?v=2">
+
+
+
+
+
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../../assets/favicons/regular_128.png" />
+</head>
+
+<body class="loading game-page">
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-symbol">ŁѺ𝔚 Σ𐌍ŦȐΘℙΨ</div>
+    </div>
+
+
+    <!-- Header -->
+    <div data-include="header"></div>
+
+
+    <main class="project play-me-container">
+        <div id="game-hud">
+            <div id="hud-lives">Lives: <span id="lives-count">♥♥♥♥♥</span></div>
+            <div id="hud-question">Loading question...</div>
+            <div id="score-count">Level 1 | Score: 0</div>
+        </div>
+        <div id="canvas-container">
+            <canvas id="game-canvas"></canvas>
+            <div id="game-overlay">
+                <h2 id="overlay-title">Quiz Snake</h2>
+                <p id="overlay-subtitle">Loading Questions...</p>
+            </div>
+        </div>
+        <div id="game-controls-hint">
+            CONTROLS: move — arrows / WASD || pause — SPACE
+        </div>
+    </main>
+
+
+    <!-- Footer -->
+
+    <div data-include="footer"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="../../assets/js/loading.js"></script>
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/include-components.js"></script>
+    <script src="../../assets/js/consent.js"></script>
+    <script src="../../assets/js/posthog.js"></script>
+    <script src="../../assets/js/intercom.js"></script>
+    <!-- Quiz/Snake Logic -->
+    <script src="../../assets/js/quiz-snake.js?v=5"></script>
+
+
+</body>
+
+</html>

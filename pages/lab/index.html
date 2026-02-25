@@ -17,10 +17,10 @@
     <link rel="stylesheet" href="../../assets/css/components/header.css">
     <link rel="stylesheet" href="../../assets/css/components/footer.css">
     <link rel="stylesheet" href="../../assets/css/consent.css">
-    <link rel="stylesheet" href="../../assets/css/pages-lab.css?v=100">
+    <link rel="stylesheet" href="../../assets/css/pages-lab.css?v=101">
     <link rel="stylesheet" href="../../assets/css/pages-lab-materials.css?v=40">
     <!-- Annotation Hover System -->
-    <link rel="stylesheet" href="../../assets/css/annotation-hover.css?v=1">
+    <link rel="stylesheet" href="../../assets/css/annotation-hover.css?v=3">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -191,19 +191,58 @@
                 <div class="rack-ears"></div>
             </div>
 
-            <!-- 6. Small Off (Bridging Main/Med) -->
+            <!-- 6. Small Active (Bridging Main/Med) -->
             <!-- Shifted RIGHT to clear main screen -->
-            <div class="monitor-casing size-sm-md state-off style-bakelite v-hold-drift"
-                style="--x: 951px; --y: 326px; --z: 22; --r: -14deg;">
-                <div class="screen"></div>
-                <div class="monitor-controls">
-                    <div class="power-led off"></div>
-                    <div class="knob"></div>
-                    <div class="knob small"></div>
-                    <div class="knob small"></div>
-                    <div class="switch-toggle" style="transform: scale(0.8);"></div>
+            <a href="/pages/play-me/" class="monitor-link" style="--x: 951px; --y: 326px; --z: 22; --r: -14deg;">
+                <div class="monitor-casing size-sm-md state-nokia-snake style-bakelite">
+                    <div class="ambient-glow"></div>
+
+                    <!-- ANNOTATION HOVER SYSTEM (Overlay) -->
+                    <div class="nokia-screen-hotspot fraud-screen-hotspot"></div>
+                    <svg class="annotation-overlay" style="overflow: visible;">
+                        <defs>
+                            <!-- Gradient for Soft Stop. The line ends at x: 360, y: -80 -->
+                            <linearGradient id="line-fade-nokia" gradientUnits="userSpaceOnUse" x1="310" y1="-55"
+                                x2="360" y2="-80">
+                                <stop offset="0" stop-color="white" />
+                                <stop offset="1" stop-color="black" />
+                            </linearGradient>
+
+                            <!-- Mask that handles the "Draw" animation -->
+                            <mask id="draw-mask-nokia">
+                                <path class="nokia-anno-curve anno-mask-path nokia-anno-mask-path" d="" fill="none"
+                                    stroke="url(#line-fade-nokia)" stroke-width="6" stroke-linecap="round" />
+                            </mask>
+                        </defs>
+
+                        <!-- Visible Line: Static Dotted, Revealed by Mask -->
+                        <path class="nokia-anno-curve dotted-display-line nokia-dotted-display-line" d="" fill="none"
+                            stroke-width="2.5" stroke-dasharray="0 5" stroke-linecap="round"
+                            mask="url(#draw-mask-nokia)" />
+                    </svg>
+
+                    <!-- Declassified Text Annotation for Nokia -->
+                    <div class="nokia-annotation-text-block annotation-text-block hidden">
+                        <div class="nokia-anno-content">
+                            <div class="anno-header">SNAKE: AI ACT EDITION</div>
+                            <div class="anno-status">STATUS: OPERATIONAL</div>
+                            <div class="anno-body">
+                                <div>Interactive learning application for EU AI Act literacy.</div>
+                                <div>Gamified decision training through binary regulatory choices.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="screen"><canvas id="nokia-snake-canvas"></canvas></div>
+                    <div class="monitor-controls">
+                        <div class="power-led on"></div>
+                        <div class="knob"></div>
+                        <div class="knob small"></div>
+                        <div class="knob small"></div>
+                        <div class="switch-toggle" style="transform: scale(0.8);"></div>
+                    </div>
                 </div>
-            </div>
+            </a>
 
 
             <!-- ROW 3: PEAK LAYER -->
@@ -267,7 +306,8 @@
     <script src="../../assets/js/consent.js"></script>
     <script src="../../assets/js/posthog.js"></script>
     <script src="../../assets/js/intercom.js"></script>
-    <script src="../../assets/js/annotation-hover.js?v=1"></script>
+    <script src="../../assets/js/annotation-hover.js?v=5"></script>
+    <script src="../../assets/js/lab-nokia-snake.js"></script>
 
     <!-- Responsive Scaling Script -->
     <script>

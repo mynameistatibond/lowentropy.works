@@ -1,0 +1,802 @@
+[
+  {
+    "prompt": "On which date was the AI Act published in the Official Journal of the EU?",
+    "options": [
+      "1 August 2024",
+      "12 July 2024"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "When did the AI Act enter into force?",
+    "options": [
+      "1 August 2024",
+      "12 July 2024"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "How is the AI Act described in its legislative context?",
+    "options": [
+      "A sector-specific directive for public authorities",
+      "The first binding worldwide horizontal regulation on AI"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "What regulatory logic does the AI Act primarily follow?",
+    "options": [
+      "Capability-based classification",
+      "Risk-based approach"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "AI systems presenting \u201cunacceptable risk\u201d are:",
+    "options": [
+      "Prohibited",
+      "Allowed under transparency rules"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "High-risk AI systems under the Act are:",
+    "options": [
+      "Automatically banned",
+      "Allowed subject to strict requirements"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Minimal-risk AI systems under the AI Act:",
+    "options": [
+      "Must undergo conformity assessment",
+      "Have no additional obligations beyond existing law"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The AI Act definition of an AI system aligns with:",
+    "options": [
+      "The OECD revised definition",
+      "WTO digital governance standards"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Under the AI Act, an AI system must:",
+    "options": [
+      "Always use neural networks",
+      "Infer outputs (e.g. predictions, decisions) from inputs"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The AI Act does not apply to AI systems used solely for:",
+    "options": [
+      "Military, defence or national security purposes",
+      "Commercial analytics"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "AI systems developed and used exclusively for scientific research are:",
+    "options": [
+      "Automatically high-risk",
+      "Excluded from the scope"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Real-time remote biometric identification in public spaces for law enforcement is:",
+    "options": [
+      "Fully permitted",
+      "Prohibited, with limited exceptions"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "AI systems using subliminal techniques causing significant harm are:",
+    "options": [
+      "Prohibited",
+      "Classified as minimal-risk"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Untargeted scraping of facial images to build recognition databases is:",
+    "options": [
+      "Minimal-risk",
+      "Prohibited"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Emotion recognition in workplaces is generally:",
+    "options": [
+      "Prohibited (except medical/safety reasons)",
+      "Always permitted"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "High-risk classification primarily depends on:",
+    "options": [
+      "Model parameter count",
+      "Intended purpose"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Profiling of natural persons automatically results in high-risk classification:",
+    "options": [
+      "Yes",
+      "No"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Before placing a high-risk AI system on the market, the provider must:",
+    "options": [
+      "Conduct a conformity assessment",
+      "Only publish a transparency notice"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Compliance with harmonised EU standards gives:",
+    "options": [
+      "Presumption of conformity",
+      "Automatic exemption from all obligations"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "High-risk providers must implement:",
+    "options": [
+      "No post-market duties",
+      "Post-market monitoring"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "AI systems interacting directly with humans must:",
+    "options": [
+      "Inform users they are interacting with AI",
+      "Undergo CE certification"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "AI-generated deepfake content must:",
+    "options": [
+      "Be banned",
+      "Be disclosed as artificially generated"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "General-Purpose AI (GPAI) providers must provide downstream integrators with:",
+    "options": [
+      "Technical documentation",
+      "Only marketing material"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "GPAI providers must adopt a policy to respect:",
+    "options": [
+      "EU copyright law",
+      "WTO trade compliance rules"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "GPAI providers must publish:",
+    "options": [
+      "The entire raw dataset",
+      "A sufficiently detailed summary of training content"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The systemic-risk threshold for GPAI is presumed at:",
+    "options": [
+      "10^20 FLOPs",
+      "10^25 FLOPs"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "A GPAI exceeding 10^25 FLOPs is presumed to:",
+    "options": [
+      "Pose systemic risk",
+      "Be minimal-risk"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Systemic-risk GPAI providers must:",
+    "options": [
+      "Conduct continuous risk assessment and mitigation",
+      "Submit a one-time declaration"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Each Member State must establish at least:",
+    "options": [
+      "One regulatory sandbox",
+      "Three sandboxes per region"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Real-world testing outside a sandbox requires:",
+    "options": [
+      "Safeguards and defined conditions",
+      "No regulatory notification"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "High-risk AI testing in real-world conditions requires:",
+    "options": [
+      "Specific informed consent",
+      "No consent"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Member States must designate at least one:",
+    "options": [
+      "Market surveillance authority",
+      "Private AI auditor"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Maximum fines for prohibited practices may reach:",
+    "options": [
+      "\u20ac5 million",
+      "\u20ac35 million or 7% of global annual turnover"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Prohibited systems must be phased out within:",
+    "options": [
+      "6 months",
+      "24 months"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "GPAI provisions apply:",
+    "options": [
+      "12 months after entry into force",
+      "Immediately upon publication"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "High-risk AI system provisions apply:",
+    "options": [
+      "24 months after entry into force",
+      "6 months after entry into force"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "For AI integrated into products under existing sectoral law, obligations apply after:",
+    "options": [
+      "12 months",
+      "36 months"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The AI Office was created to:",
+    "options": [
+      "Replace national regulators",
+      "Support implementation and GPAI oversight"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The AI Board consists of:",
+    "options": [
+      "Member State representatives and the Commission",
+      "Tech companies and NGOs"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "The Commission may adopt:",
+    "options": [
+      "Criminal sanctions directly",
+      "Implementing and delegated acts"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The legal basis of the AI Act includes:",
+    "options": [
+      "Articles 114 and 16 TFEU",
+      "Article 50 TEU"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "High-risk areas include AI used in:",
+    "options": [
+      "Weather prediction apps",
+      "Law enforcement, employment, education"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The \u201cfilter provision\u201d means a system is not high-risk if:",
+    "options": [
+      "It does not pose significant risk to health, safety or fundamental rights",
+      "It uses ML techniques"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Transparency rules apply to synthetic content:",
+    "options": [
+      "No",
+      "Yes"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Open-source GPAI models are:",
+    "options": [
+      "Fully exempt from the Act",
+      "Exempt from some documentation duties, not all"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The Act applies to non-EU providers if:",
+    "options": [
+      "Their AI output is used in the EU",
+      "They sell hardware in the EU"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Social scoring causing detrimental treatment is:",
+    "options": [
+      "Prohibited",
+      "High-risk only"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "AI assessing criminal risk based solely on profiling is:",
+    "options": [
+      "Mandatory",
+      "Prohibited"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Systemic-risk GPAI providers must report:",
+    "options": [
+      "Minor UI issues",
+      "Serious incidents such as fundamental rights violations"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Regulatory sandboxes allow testing:",
+    "options": [
+      "Indefinitely",
+      "For a limited pre-market period"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The AI Act applies to:",
+    "options": [
+      "Only public authorities",
+      "Both public authorities and private organisations"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The AI Act applies to providers established outside the EU when:",
+    "options": [
+      "Their AI system\u2019s output is used in the EU",
+      "They open a subsidiary in the EU"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "The AI Act primarily regulates AI systems when they are:",
+    "options": [
+      "In early laboratory development",
+      "Placed on the market or put into service"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The Commission may update certain high-risk categories through:",
+    "options": [
+      "Delegated acts",
+      "National executive decrees"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "A high-risk AI system may also be:",
+    "options": [
+      "A safety component of a product covered by EU sectoral legislation",
+      "Only standalone AI software"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "The EU database for high-risk AI systems is managed by:",
+    "options": [
+      "The European Central Bank",
+      "The European Commission"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Under the filter provision, an AI system may avoid high-risk classification if it:",
+    "options": [
+      "Performs a narrow procedural task without significant impact",
+      "Is trained on large datasets"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "An AI system assisting a human decision without replacing it:",
+    "options": [
+      "Is automatically high-risk",
+      "May avoid high-risk status under defined conditions"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "An AI system detecting patterns but not making binding decisions:",
+    "options": [
+      "May fall outside high-risk classification depending on context",
+      "Is automatically prohibited"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "AI performing preparatory tasks for Annex III areas:",
+    "options": [
+      "Is always prohibited",
+      "May avoid high-risk status if no significant risk arises"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "AI systems interacting directly with individuals must:",
+    "options": [
+      "Inform users they are interacting with AI",
+      "Publish their source code"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Deepfake disclosure obligations do not apply where content is used:",
+    "options": [
+      "For preventing criminal offences",
+      "For entertainment"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "A GPAI provider established outside the EU must:",
+    "options": [
+      "Appoint an authorised representative in the EU",
+      "Register a trademark in each Member State"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Open-source GPAI models remain subject to obligations when:",
+    "options": [
+      "Integrated into prohibited or high-risk systems",
+      "Shared for academic research only"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Systemic-risk GPAI providers must implement:",
+    "options": [
+      "Risk management and cybersecurity measures",
+      "Full public release of weights"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "The FLOP threshold for systemic-risk GPAI may be:",
+    "options": [
+      "Permanently fixed in the Regulation",
+      "Adjusted by the Commission over time"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "The Commission may designate a GPAI as systemic-risk even:",
+    "options": [
+      "Below 10^25 FLOPs after assessment",
+      "Only above 10^30 FLOPs"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Serious incidents include:",
+    "options": [
+      "Minor cosmetic interface bugs",
+      "Events leading to serious harm or fundamental rights violations"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Codes of practice for GPAI may be endorsed via:",
+    "options": [
+      "Implementing acts by the Commission",
+      "National parliamentary votes"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "If a provider does not follow an approved code of practice, it must:",
+    "options": [
+      "Cease operations immediately",
+      "Demonstrate compliance by other means"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "National regulatory sandboxes must operate under:",
+    "options": [
+      "Supervisory authority oversight",
+      "Full industry self-regulation"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Real-world testing outside sandboxes requires:",
+    "options": [
+      "Submission of a testing plan to the market surveillance authority",
+      "Public referendum"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Market surveillance authorities oversee compliance of:",
+    "options": [
+      "Minimal-risk systems only",
+      "High-risk AI systems"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "External reporting channels under the Directive must be:",
+    "options": [
+      "Independent and autonomous",
+      "Managed solely by private contractors"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "External reporting mechanisms must ensure:",
+    "options": [
+      "Public disclosure of all reports",
+      "Confidentiality and integrity of information"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Authorities must acknowledge receipt of reports within:",
+    "options": [
+      "7 days",
+      "30 days"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Feedback to reporting persons must generally be provided within:",
+    "options": [
+      "3 months (extendable in justified cases)",
+      "12 months"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Authorities may close repetitive reports if:",
+    "options": [
+      "No meaningful new information is provided",
+      "The reporter remains anonymous"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Reporting channels must allow:",
+    "options": [
+      "Written and oral reporting",
+      "Written reporting only"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Staff receiving misdirected reports must:",
+    "options": [
+      "Forward them appropriately without alteration",
+      "Archive them privately"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Competent authorities must publish:",
+    "options": [
+      "Conditions for whistleblower protection",
+      "Internal disciplinary procedures"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Confidentiality rules prohibit disclosure of:",
+    "options": [
+      "The identity of the reporting person",
+      "Final enforcement decisions"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Identity disclosure is permitted only when:",
+    "options": [
+      "Requested by journalists",
+      "Necessary and proportionate under Union or national law"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Processing personal data under the Directive must comply with:",
+    "options": [
+      "GDPR and applicable EU data protection law",
+      "National taxation frameworks"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Reports must be stored:",
+    "options": [
+      "Indefinitely",
+      "Only as long as necessary and proportionate"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Recording of reporting calls requires:",
+    "options": [
+      "Consent of the reporting person",
+      "Automatic mandatory recording"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Retaliation includes:",
+    "options": [
+      "Demotion, dismissal, or blacklisting",
+      "Voluntary resignation without pressure"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Industry blacklisting of a whistleblower constitutes:",
+    "options": [
+      "Legitimate competitive conduct",
+      "Retaliation"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Member States must ensure penalties are:",
+    "options": [
+      "Effective, proportionate and dissuasive",
+      "Symbolic only"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Penalties apply to persons who:",
+    "options": [
+      "Retaliate or breach confidentiality",
+      "Report in good faith"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Knowingly reporting false information may result in:",
+    "options": [
+      "Penalties",
+      "Automatic whistleblower protection"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Rights under the Directive:",
+    "options": [
+      "May be waived in contracts",
+      "Cannot be waived by agreement"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "prompt": "Member States may introduce:",
+    "options": [
+      "More favourable protections than required",
+      "Lower levels of protection"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Transposition of the Directive may not:",
+    "options": [
+      "Reduce existing levels of protection",
+      "Expand reporting rights"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Member States were required to transpose the Directive by:",
+    "options": [
+      "17 December 2021",
+      "1 January 2025"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Private entities with 50\u2013249 workers had extended implementation until:",
+    "options": [
+      "17 December 2023",
+      "17 December 2021"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "Member States must submit annual statistics on:",
+    "options": [
+      "Number of reports and investigations",
+      "Number of deployed AI systems"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "The Commission must submit an implementation report by:",
+    "options": [
+      "17 December 2023",
+      "1 August 2024"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "The Commission must assess impact and consider amendments by:",
+    "options": [
+      "17 December 2025",
+      "2024"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "prompt": "The Directive entered into force:",
+    "options": [
+      "On the twentieth day following publication",
+      "Immediately upon signature"
+    ],
+    "correctIndex": 0
+  }
+]

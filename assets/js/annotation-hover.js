@@ -144,5 +144,137 @@
             isHovering = false;
             reverseSequence();
         });
+        // --- NOKIA SNAKE ANNOTATION ---
+        (function () {
+            const hotspot = document.querySelector('.nokia-screen-hotspot');
+            const paths = document.querySelectorAll('.nokia-anno-curve');
+            const animPath = document.querySelector('.nokia-anno-mask-path');
+            const textBlock = document.querySelector('.nokia-annotation-text-block');
+
+            if (!hotspot || paths.length === 0 || !textBlock) {
+                return;
+            }
+
+            // Configuration for Nokia Monitor (Draws Right & Up - 1:1 Pixel Mapping)
+            // Monitor is ~170px wide, ~130px tall. SVG is 100% of that size.
+            // Center is roughly x: 85, y: 65
+            // Main monitor line is ~ 350px width, 323px height.
+            const config = {
+                start: { x: 85, y: 65 },
+                elbow: { x: 145, y: 65 },     // Go right 60px
+                end: { x: 360, y: -80 },      // Angle lower so text isn't cut off by the top of the page
+                textGap: 34,
+                textYOffset: -35
+            };
+
+            function updateLayout() {
+                const d = `M ${config.start.x} ${config.start.y} L ${config.elbow.x} ${config.elbow.y} L ${config.end.x} ${config.end.y}`;
+                paths.forEach(p => p.setAttribute('d', d));
+
+                // Move text closer to the arrow end
+                const textLeft = config.end.x + (config.textGap * 0.5);
+                const textTop = config.end.y + config.textYOffset;
+
+                textBlock.style.left = `${textLeft}px`;
+                textBlock.style.top = `${textTop}px`;
+
+                // Read the parent monitor's inline --r rotation (e.g. "-14deg") and invert it
+                const parentWithR = hotspot.closest('[style*="--r:"]');
+                let rotationDeg = 0;
+                if (parentWithR) {
+                    const styleAttr = parentWithR.getAttribute('style') || '';
+                    const match = styleAttr.match(/--r:\s*([^;]+)/);
+                    if (match && match[1]) {
+                        rotationDeg = parseFloat(match[1]);
+                    }
+                }
+
+                // Note: since this is an absolute positioned element inside a rotated parent,
+                // we rotate it by the opposite amount so it remains level with the page.
+                textBlock.style.setProperty('--counter-rot', `${-rotationDeg}deg`);
+                // Set initial state (just rotation, let the inner wrapper handle translation)
+                textBlock.style.transform = `rotate(${-rotationDeg}deg)`;
+                textBlock.style.transformOrigin = `top left`;
+            }
+
+            updateLayout();
+
+            const textContentLayer = textBlock.querySelector('.nokia-anno-content') || textBlock;
+            const textElements = textContentLayer.querySelectorAll('.anno-header, .anno-status, .anno-body div');
+            const charSpansMap = [];
+
+            textElements.forEach(el => {
+                const rawText = el.innerText;
+                el.innerHTML = '';
+                const spans = [];
+                rawText.split('').forEach(char => {
+                    const span = document.createElement('span');
+                    span.textContent = char;
+                    span.classList.add('type-char');
+                    el.appendChild(span);
+                    spans.push(span);
+                });
+                charSpansMap.push(spans);
+            });
+
+            if (animPath) {
+                const length = animPath.getTotalLength();
+                animPath.style.transition = 'none';
+                animPath.style.strokeDasharray = length + 200;
+                animPath.style.strokeDashoffset = length + 200;
+                animPath.getBoundingClientRect();
+                animPath.style.transition = '';
+            }
+
+            let typeTimeouts = [];
+            let isHovering = false;
+
+            function startSequence() {
+                if (!isHovering) return;
+
+                if (animPath) animPath.classList.add('active');
+                textBlock.classList.remove('hidden');
+
+                const lineDuration = 600;
+                clearTypeTimeouts();
+                let globalDelay = lineDuration;
+
+                charSpansMap.forEach((spans, blockIndex) => {
+                    if (blockIndex > 0) globalDelay += 50;
+
+                    spans.forEach((span, charIndex) => {
+                        const timeout = setTimeout(() => {
+                            if (isHovering) span.classList.add('visible');
+                        }, globalDelay + (charIndex * 15));
+                        typeTimeouts.push(timeout);
+                    });
+                    globalDelay += (spans.length * 15);
+                });
+            }
+
+            function reverseSequence() {
+                clearTypeTimeouts();
+                textBlock.classList.add('hidden');
+                charSpansMap.forEach(spans => {
+                    spans.forEach(span => span.classList.remove('visible'));
+                });
+                if (animPath) animPath.classList.remove('active');
+            }
+
+            function clearTypeTimeouts() {
+                typeTimeouts.forEach(t => clearTimeout(t));
+                typeTimeouts = [];
+            }
+
+            hotspot.addEventListener('mouseenter', () => {
+                isHovering = true;
+                startSequence();
+            });
+
+            hotspot.addEventListener('mouseleave', () => {
+                isHovering = false;
+                reverseSequence();
+            });
+        })();
     });
 })();

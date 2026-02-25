@@ -60,8 +60,17 @@
     font-family: 'Shippori Mincho', serif;
     text-align: left;
 
+
     /* Animation Sequence Defaults */
     opacity: 1;
+    /* Rotation is handled FULLY by JS to fix angled monitors. DO NOT ADD TRANSFORM HERE. */
+    transition: opacity 0.4s ease 0.3s;
+}
+
+/* Inner wrapper handles the slide-up animation independently */
+.nokia-anno-content {
+    transform: translateY(0);
+    transition: transform 0.4s ease 0.3s;
 }
 
 /* Header */
@@ -112,4 +121,18 @@
 .annotation-text-block.hidden {
     opacity: 0;
     transition: opacity 0.2s ease;
+}
+
+.annotation-text-block.hidden .nokia-anno-content {
+    transform: translateY(10px);
+}
+
+/* Hover active state (handled by JS toggling .hidden or via parent hover) */
+.monitor-casing:hover .annotation-text-block:not(.hidden) {
+    opacity: 1;
+    transition: opacity 0.4s ease 0.3s;
+}
+
+.monitor-casing:hover .annotation-text-block:not(.hidden) .nokia-anno-content {
+    transform: translateY(0);
 }

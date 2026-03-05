@@ -79,17 +79,34 @@ document.addEventListener("DOMContentLoaded", () => {
     let isLoaded = false;
 
     // Load Quiz Database
-    fetch("../../assets/data/quiz-bank.json")
-        .then(response => response.json())
-        .then(data => {
-            quizData = data;
+    function loadQuizData() {
+        // Check if a custom pack was injected by pack-creator
+        if (window.selectedQuestionPack && window.selectedQuestionPack.length > 0) {
+            quizData = window.selectedQuestionPack;
             remainingQuestions = [...quizData];
             isLoaded = true;
-            if (gameState === "MENU") {
-                document.getElementById("overlay-subtitle").innerText = "Press Space to Start";
-            }
-        })
-        .catch(err => console.error("Failed to load quiz bank:", err));
+            return;
+        }
+
+        // Default: load from quiz-bank.json
+        fetch("../../assets/data/quiz-bank.json")
+            .then(response => response.json())
+            .then(data => {
+                quizData = data;
+                remainingQuestions = [...quizData];
+                isLoaded = true;
+                if (gameState === "MENU") {
+                    document.getElementById("overlay-subtitle").innerText = "Press Space to Start";
+                }
+            })
+            .catch(err => console.error("Failed to load quiz bank:", err));
+    }
+
+    // Check if the pack overlay is still showing
+    function isPackOverlayActive() {
+        const overlay = document.getElementById('pack-overlay');
+        return overlay && overlay.style.display !== 'none';
+    }
 
     function spawnNextQuestion() {
         if (quizData.length === 0) return; // Prevent spawning if JSON hasn't loaded
@@ -182,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (gameState === "MENU" || gameState === "VICTORY") {
             if (e.code === "Space" || e.code === "Enter") {
-                if (!isLoaded) return;
+                if (!isLoaded || isPackOverlayActive()) return;
                 startGame();
             }
             return;
@@ -242,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.addEventListener('touchend', function (e) {
         if (gameState !== "RUNNING") {
             if (gameState === "MENU" || gameState === "VICTORY") {
-                if (isLoaded) startGame();
+                if (isLoaded && !isPackOverlayActive()) startGame();
             }
             else if (gameState === "GAME_OVER") resetToMenu();
             else if (gameState === "LEVEL_UP") startNextLevel();
@@ -321,15 +338,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Helper: detect if playing a custom quiz pack
+    function isCustomPack() {
+        return window.selectedQuestionPack && window.selectedQuestionPack.length > 0;
+    }
+
     function levelUp() {
         gameState = "LEVEL_UP";
         overlay.classList.remove("hidden");
 
-        const levelMessages = {
+        // --- EU AI Act themed messages (default pack) ---
+        const aiActMessages = {
             1: `10 correct answers.<br>You are now Mildly Compliant.<br><br>Press Space to continue your bureaucratic awakening.`,
             2: `You survived basic transparency obligations.<br>You are now Provisionally Lawful.<br><br>Press Space to escalate responsibility.`,
             3: `Annex III is no longer staring at you menacingly.<br>Status: Risk-Aware Entity.<br><br>Press Space before the Commission notices.`,
-            4: `You can now distinguish high-risk from “just vibes.”<br>Certification: Conformity-Curious.<br><br>Press Space to submit your mental CE mark.`,
+            4: `You can now distinguish high-risk from "just vibes."<br>Certification: Conformity-Curious.<br><br>Press Space to submit your mental CE mark.`,
             5: `You avoided prohibited practices. Impressive.<br>Title unlocked: Fundamental Rights Adjacent.<br><br>Press Space to continue regulatory ascension.`,
             6: `Systemic risk no longer scares you.<br>Rank achieved: FLOP Literate.<br><br>Press Space before we calculate your compute.`,
             7: `You now understand provider vs deployer liability.<br>Status: Structurally Sound Human.<br><br>Press Space to proceed with oversight.`,
@@ -337,8 +360,22 @@ document.addEventListener("DOMContentLoaded", () => {
             9: `You navigated sanctions without blinking.<br>Promotion: Dissuasion-Grade Intelligence.<br><br>Press Space for final review.`
         };
 
+        // --- Generic knowledge-themed messages (custom packs) ---
+        const customMessages = {
+            1: `10 correct answers. Not bad for a warm-up.<br>Status: Casually Informed.<br><br>Press Space to level up.`,
+            2: `You're starting to remember things you never thought you'd need.<br>Rank: Pub Quiz Contender.<br><br>Press Space to continue.`,
+            3: `Your brain is firing on all cylinders now.<br>Title unlocked: Knowledge Sponge.<br><br>Press Space to absorb more.`,
+            4: `The snake grows. Your confidence grows faster.<br>Designation: Walking Encyclopedia.<br><br>Press Space to keep climbing.`,
+            5: `Halfway through. You're officially dangerous at trivia night.<br>Status: Certified Know-It-All.<br><br>Press Space to prove it.`,
+            6: `Six levels deep and still standing.<br>Achievement: Relentless Learner.<br><br>Press Space to push further.`,
+            7: `Most people gave up five levels ago.<br>Title: Suspiciously Well-Read.<br><br>Press Space for the final stretch.`,
+            8: `Your snake is a worm of knowledge now.<br>Rank: Senior Scholar Serpent.<br><br>Press Space to enter the finals.`,
+            9: `One more level. Just one.<br>You can feel the victory screen from here.<br><br>Press Space for the grand finale.`
+        };
+
+        const messages = isCustomPack() ? customMessages : aiActMessages;
         document.getElementById("overlay-title").innerText = `Level ${level} Complete!`;
-        document.getElementById("overlay-subtitle").innerHTML = levelMessages[level] || `You answered 10 questions correctly.<br><br>Press Space to start Level ${level + 1}`;
+        document.getElementById("overlay-subtitle").innerHTML = messages[level] || `You answered 10 questions correctly.<br><br>Press Space to start Level ${level + 1}`;
         draw();
     }
 
@@ -377,12 +414,20 @@ document.addEventListener("DOMContentLoaded", () => {
     function victory() {
         gameState = "VICTORY";
         overlay.classList.remove("hidden");
-        document.getElementById("overlay-title").innerText = "AI Act Survival Complete";
 
         let html = `Score: ${score}<br>Level Reached: ${level}<br><br>`;
-        html += `Full regulatory survival achieved.<br>`;
-        html += `You demonstrated structural understanding of the EU AI Act.<br><br>`;
-        html += `Press Space to run the simulation again.`;
+
+        if (isCustomPack()) {
+            document.getElementById("overlay-title").innerText = "Quiz Mastery Complete";
+            html += `You devoured every question the LLM threw at you.<br>`;
+            html += `100 answers. 10 levels. One relentless snake.<br><br>`;
+            html += `Press Space to run it again.`;
+        } else {
+            document.getElementById("overlay-title").innerText = "AI Act Survival Complete";
+            html += `Full regulatory survival achieved.<br>`;
+            html += `You demonstrated structural understanding of the EU AI Act.<br><br>`;
+            html += `Press Space to run the simulation again.`;
+        }
 
         document.getElementById("overlay-subtitle").innerHTML = html;
         draw();
@@ -396,27 +441,52 @@ document.addEventListener("DOMContentLoaded", () => {
         let message = "";
         let instructions = "";
 
-        if (level <= 2) {
-            title = "Game Over — Compliance Initiated";
-            message = "You’ve begun understanding the risk framework.<br>Annex III requires more attention.";
-            instructions = "Press Space to try again.";
-        } else if (level <= 4) {
-            title = "Game Over — Risk Awareness Detected";
-            message = "You can distinguish prohibited practices.<br>But high-risk classification caught you.";
-            instructions = "Press Space to refine your compliance reflexes.";
-        } else if (level <= 6) {
-            title = "Game Over — Conformity In Progress";
-            message = "You understand intended purpose and systemic risk.<br>One misclassification ended the run.";
-            instructions = "Press Space to pursue audit readiness.";
-        } else if (level <= 8) {
-            title = "Game Over — Advanced Operator Interrupted";
-            message = "You navigate GPAI and timeline traps confidently.<br>Small errors still collapse systems.";
-            instructions = "Press Space to restore operational status.";
+        if (isCustomPack()) {
+            // --- Generic game over messages (custom packs) ---
+            if (level <= 2) {
+                title = "Game Over — Just Getting Started";
+                message = "The journey of a thousand questions begins with a single correct answer.<br>You'll get there.";
+                instructions = "Press Space to try again.";
+            } else if (level <= 4) {
+                title = "Game Over — Warming Up";
+                message = "You were finding your rhythm.<br>The snake believes in you.";
+                instructions = "Press Space to give it another go.";
+            } else if (level <= 6) {
+                title = "Game Over — Solid Run";
+                message = "Halfway there and counting.<br>Your knowledge is real, your reflexes just need tuning.";
+                instructions = "Press Space to sharpen up.";
+            } else if (level <= 8) {
+                title = "Game Over — So Close";
+                message = "You were deep in the zone.<br>A few more correct answers and you'd have made history.";
+                instructions = "Press Space to finish what you started.";
+            } else {
+                title = "Game Over — One Level Away";
+                message = "Level 9. You could taste the victory screen.<br>The snake mourns what could have been.";
+                instructions = "Press Space to claim your destiny.";
+            }
         } else {
-            // Level 9
-            title = "Game Over — Near Audit-Ready";
-            message = "You were one decision away from full survival.<br>The Commission was almost impressed.";
-            instructions = "Press Space to finalize mastery.";
+            // --- EU AI Act themed game over messages (default pack) ---
+            if (level <= 2) {
+                title = "Game Over — Compliance Initiated";
+                message = "You've begun understanding the risk framework.<br>Annex III requires more attention.";
+                instructions = "Press Space to try again.";
+            } else if (level <= 4) {
+                title = "Game Over — Risk Awareness Detected";
+                message = "You can distinguish prohibited practices.<br>But high-risk classification caught you.";
+                instructions = "Press Space to refine your compliance reflexes.";
+            } else if (level <= 6) {
+                title = "Game Over — Conformity In Progress";
+                message = "You understand intended purpose and systemic risk.<br>One misclassification ended the run.";
+                instructions = "Press Space to pursue audit readiness.";
+            } else if (level <= 8) {
+                title = "Game Over — Advanced Operator Interrupted";
+                message = "You navigate GPAI and timeline traps confidently.<br>Small errors still collapse systems.";
+                instructions = "Press Space to restore operational status.";
+            } else {
+                title = "Game Over — Near Audit-Ready";
+                message = "You were one decision away from full survival.<br>The Commission was almost impressed.";
+                instructions = "Press Space to finalize mastery.";
+            }
         }
 
         document.getElementById("overlay-title").innerText = title;
@@ -801,13 +871,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Initial setup
-    resizeCanvas();
-    initSnake();
-    draw();
+    // If the pack overlay is active, wait for it to be dismissed
+    function initGameWhenReady() {
+        if (isPackOverlayActive()) {
+            // Poll until overlay is gone
+            const poller = setInterval(() => {
+                if (!isPackOverlayActive()) {
+                    clearInterval(poller);
+                    loadQuizData();
+                    resizeCanvas();
+                    initSnake();
+                    draw();
+                    // Show game HUD & canvas
+                    document.getElementById('game-hud').style.display = '';
+                    document.getElementById('canvas-container').style.display = '';
+                    document.getElementById('game-controls-hint').style.display = '';
+                }
+            }, 100);
+        } else {
+            loadQuizData();
+            resizeCanvas();
+            initSnake();
+            draw();
+        }
+    }
+
+    initGameWhenReady();
 
     // Recheck layout after header is dynamically injected 
     setTimeout(() => {
-        if (gameState === "MENU") {
+        if (gameState === "MENU" && !isPackOverlayActive()) {
             resizeCanvas();
             draw();
         }

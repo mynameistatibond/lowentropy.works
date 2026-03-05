@@ -44,19 +44,117 @@
 
 
     <main class="project play-me-container">
-        <div id="game-hud">
+
+        <!-- ===================== PRE-START OVERLAY ===================== -->
+        <div id="pack-overlay">
+            <!-- State 1: Mode Select -->
+            <div id="pack-state-select" class="pack-state active">
+                <div class="pack-logo">🐍</div>
+                <h1 class="pack-title">Quiz Snake</h1>
+                <p class="pack-subtitle">Choose your mode</p>
+                <div class="pack-buttons">
+                    <button class="pack-btn pack-btn-primary" onclick="launchDefault()">
+                        <span class="pack-btn-icon">⚖️</span>
+                        <span class="pack-btn-label">Play AI EU Act Snake</span>
+                        <span class="pack-btn-desc">100 questions on EU AI regulation</span>
+                    </button>
+                    <button class="pack-btn pack-btn-secondary" onclick="showPackState('input')">
+                        <span class="pack-btn-icon">✨</span>
+                        <span class="pack-btn-label">Create Your Own Quiz Pack</span>
+                        <span class="pack-btn-desc">Generate questions from any source material</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- State 2: Source Input -->
+            <div id="pack-state-input" class="pack-state">
+                <div class="pack-review-nav">
+                    <button class="pack-nav-back" onclick="showPackState('select')">← Back to menu</button>
+                </div>
+                <h1 class="pack-title">Create Your Own Quiz Pack</h1>
+                <p class="pack-subtitle">Paste source material below. An LLM will read it and craft game-ready
+                    questions.</p>
+                <div class="pack-form">
+                    <textarea id="pack-source-text" class="pack-textarea" rows="10"
+                        placeholder="What works well:&#10;&#10;📄 Wikipedia article — copy the full page text&#10;📚 Lecture notes — paste a chapter or topic summary&#10;📰 News article — the full text of any article&#10;📖 Textbook section — a few pages on a specific topic&#10;📋 Study guide — your own notes or flashcard text&#10;&#10;Tips:&#10;• More text = more questions (up to 100)&#10;• Factual content works best (dates, names, concepts)&#10;• Minimum: a few paragraphs (~50 words)&#10;• The LLM will create A/B quiz questions from your material"></textarea>
+                    <div class="pack-form-actions">
+                        <button class="pack-btn pack-btn-primary pack-btn-inline" id="pack-generate-btn"
+                            onclick="generateCustomPack()">
+                            <span class="pack-btn-label">Generate Questions</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- State 3: Generating (loading) -->
+            <div id="pack-state-loading" class="pack-state">
+                <div class="pack-loading-floaters">
+                    <span class="floater" style="--delay: 0s; --x: -60px; --drift: 15px;">🧠</span>
+                    <span class="floater" style="--delay: 0.4s; --x: -20px; --drift: -20px;">📚</span>
+                    <span class="floater" style="--delay: 0.8s; --x: 20px; --drift: 12px;">✨</span>
+                    <span class="floater" style="--delay: 1.2s; --x: 60px; --drift: -18px;">🐍</span>
+                    <span class="floater" style="--delay: 1.6s; --x: 0px; --drift: 22px;">⚡</span>
+                </div>
+                <h2 class="pack-title" style="font-size:1.6rem;">Generating your quiz pack...</h2>
+                <p class="pack-subtitle">An LLM is tirelessly reading your text and turning it into quiz questions</p>
+            </div>
+
+            <!-- State 4: Review -->
+            <div id="pack-state-review" class="pack-state">
+
+                <!-- Top left: breadcrumb -->
+                <div class="pack-review-nav">
+                    <button class="pack-nav-back" onclick="showPackState('select')">← Back to menu</button>
+                </div>
+
+                <h1 class="pack-title">Your quiz pack is ready</h1>
+
+                <!-- Count + actions -->
+                <p class="pack-control-count"><span id="pack-count">100</span> questions generated</p>
+                <div class="pack-control-actions">
+                    <button class="pack-pill-btn" onclick="openEditor()">Review & edit</button>
+                    <button class="pack-pill-btn" onclick="showPackState('input')">Regenerate</button>
+                </div>
+
+                <!-- Quick preview (3 sample questions) -->
+                <div class="pack-preview" id="pack-preview"></div>
+
+                <!-- Full editable review (hidden by default) -->
+                <div id="pack-editor" class="pack-editor" style="display: none;">
+                    <div class="pack-editor-header">
+                        <h3 class="pack-editor-title">Review & Edit Questions</h3>
+                        <p class="pack-editor-hint">Edit text inline. Click ✓ to change the correct answer. Click ✕ to
+                            remove.</p>
+                    </div>
+                    <div id="pack-editor-list" class="pack-editor-list"></div>
+                    <div class="pack-review-cta" style="margin-top: 1rem;">
+                        <button class="pack-cta-btn" onclick="saveEditsAndPlay()">Save & Start Snake 🐍</button>
+                    </div>
+                    <div style="text-align: center; margin-top: 0.75rem;">
+                        <button class="pack-nav-back" onclick="closeEditor()">← Back to preview</button>
+                    </div>
+                </div>
+
+                <!-- Bottom CTA -->
+                <div class="pack-review-cta" id="pack-review-actions">
+                    <button class="pack-cta-btn" onclick="launchCustom()">Start Snake 🐍</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-hud" style="display:none;">
             <div id="hud-lives">Lives: <span id="lives-count">♥♥♥♥♥</span></div>
             <div id="hud-question">Loading question...</div>
             <div id="score-count">Level 1 | Score: 0</div>
         </div>
-        <div id="canvas-container">
+        <div id="canvas-container" style="display:none;">
             <canvas id="game-canvas"></canvas>
             <div id="game-overlay">
                 <h2 id="overlay-title">Quiz Snake</h2>
                 <p id="overlay-subtitle">Loading Questions...</p>
             </div>
         </div>
-        <div id="game-controls-hint">
+        <div id="game-controls-hint" style="display:none;">
             CONTROLS: move — arrows / WASD || pause — SPACE
         </div>
     </main>
@@ -88,8 +186,10 @@
     <script src="../../assets/js/consent.js"></script>
     <script src="../../assets/js/posthog.js"></script>
     <script src="../../assets/js/intercom.js"></script>
+    <!-- Pack Creator Logic -->
+    <script src="../../assets/js/pack-creator.js"></script>
     <!-- Quiz/Snake Logic -->
-    <script src="../../assets/js/quiz-snake.js?v=8"></script>
+    <script src="../../assets/js/quiz-snake.js?v=9"></script>
 
 
 </body>

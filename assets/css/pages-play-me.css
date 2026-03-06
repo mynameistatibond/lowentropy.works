@@ -102,15 +102,15 @@ body.game-page>div[data-include="footer"] {
 .key-hint {
     display: inline-block;
     background: transparent;
-    border: 2px solid var(--clr-border);
-    color: var(--clr-text);
+    border: 2px solid var(--clr-text, #111);
+    color: var(--clr-text, #111);
     padding: 0.1rem 0.6rem;
     margin: 0 0.2rem;
     border-radius: 6px;
     font-family: 'Shippori Mincho B1', serif;
     font-size: 0.9em;
     font-weight: 700;
-    box-shadow: 0 3px 0 var(--clr-border);
+    box-shadow: 0 3px 0 var(--clr-text, #111);
     transform: translateY(-2px);
     cursor: default;
     user-select: none;

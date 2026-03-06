@@ -49,7 +49,9 @@
  * In production, this would point to the deployed HuggingFace Space:
  * https://YOUR_USERNAME-YOUR_SPACE_NAME.hf.space/generate_quiz_pack
  */
-const QUIZ_API_URL = "http://localhost:8000/generate_quiz_pack";
+const QUIZ_API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? "http://localhost:8000/generate_quiz_pack"
+    : "https://mynameistatibond-fraud-detector.hf.space/generate_quiz_pack";
 
 /**
  * Number of questions to request from the LLM.

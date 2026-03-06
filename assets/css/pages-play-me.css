@@ -99,6 +99,23 @@ body.game-page>div[data-include="footer"] {
     color: var(--clr-text-muted);
 }
 
+.key-hint {
+    display: inline-block;
+    background: transparent;
+    border: 2px solid var(--clr-border);
+    color: var(--clr-text);
+    padding: 0.1rem 0.6rem;
+    margin: 0 0.2rem;
+    border-radius: 6px;
+    font-family: 'Shippori Mincho B1', serif;
+    font-size: 0.9em;
+    font-weight: 700;
+    box-shadow: 0 3px 0 var(--clr-border);
+    transform: translateY(-2px);
+    cursor: default;
+    user-select: none;
+}
+
 #game-controls-hint {
     display: flex;
     justify-content: center;

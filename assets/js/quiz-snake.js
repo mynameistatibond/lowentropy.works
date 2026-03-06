@@ -85,6 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
             quizData = window.selectedQuestionPack;
             remainingQuestions = [...quizData];
             isLoaded = true;
+            if (gameState === "MENU") {
+                document.getElementById("overlay-subtitle").innerHTML = 'Press <span class="key-hint">Space</span> to start';
+            }
             return;
         }
 
@@ -96,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 remainingQuestions = [...quizData];
                 isLoaded = true;
                 if (gameState === "MENU") {
-                    document.getElementById("overlay-subtitle").innerText = "Press Space to Start";
+                    document.getElementById("overlay-subtitle").innerHTML = 'Press <span class="key-hint">Space</span> to start';
                 }
             })
             .catch(err => console.error("Failed to load quiz bank:", err));
@@ -319,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState = "MENU";
         overlay.classList.remove("hidden");
         document.getElementById("overlay-title").innerText = "Quiz Snake";
-        document.getElementById("overlay-subtitle").innerText = "Press Space to Start";
+        document.getElementById("overlay-subtitle").innerHTML = 'Press <span class="key-hint">Space</span> to start';
         draw();
     }
 
@@ -328,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
             gameState = "PAUSED";
             overlay.classList.remove("hidden");
             document.getElementById("overlay-title").innerText = "Paused";
-            document.getElementById("overlay-subtitle").innerText = "Press Space to Resume";
+            document.getElementById("overlay-subtitle").innerHTML = 'Press <span class="key-hint">Space</span> to resume';
             draw();
         } else if (gameState === "PAUSED") {
             gameState = "RUNNING";
@@ -375,7 +378,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const messages = isCustomPack() ? customMessages : aiActMessages;
         document.getElementById("overlay-title").innerText = `Level ${level} Complete!`;
-        document.getElementById("overlay-subtitle").innerHTML = messages[level] || `You answered 10 questions correctly.<br><br>Press Space to start Level ${level + 1}`;
+
+        // Wrap "Press Space" in all level up messages
+        let msg = messages[level] || `You answered 10 questions correctly.<br><br>Press Space to start Level ${level + 1}`;
+        msg = msg.replace(/Press Space/gi, "Press <span class='key-hint'>Space</span>");
+
+        document.getElementById("overlay-subtitle").innerHTML = msg;
         draw();
     }
 

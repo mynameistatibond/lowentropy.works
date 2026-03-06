@@ -228,6 +228,115 @@
                 }
             }
         </script>
+
+        <!-- Second Prototype viewer -->
+        <div id="proto-wrap2" style="
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+            border: 1px solid var(--clr-divider);
+            transition: max-width 0.3s ease;
+        ">
+
+            <!-- Floating toolbar -->
+            <div style="
+                position: absolute;
+                top: 10px;
+                right: 12px;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background: rgba(255,255,255,0.92);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                border: 1px solid rgba(0,0,0,0.10);
+                border-radius: 8px;
+                padding: 5px 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            ">
+                <span style="font-size:11px; color:#888; letter-spacing:.03em; margin-right:2px;">Interactive
+                    prototype</span>
+
+                <!-- Expand/Collapse -->
+                <button id="proto-expand-btn2" title="Expand to full width" onclick="toggleExpand2()" style="
+                        border: none; background: none; cursor: pointer;
+                        width: 28px; height: 28px; border-radius: 6px;
+                        display: flex; align-items: center; justify-content: center;
+                        color: #444; transition: background 0.15s;
+                    " onmouseover="this.style.background='rgba(0,0,0,0.06)'" onmouseout="this.style.background='none'">
+                    <!-- Expand icon -->
+                    <svg id="icon-expand2" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round">
+                        <polyline points="15 3 21 3 21 9" />
+                        <polyline points="9 21 3 21 3 15" />
+                        <line x1="21" y1="3" x2="14" y2="10" />
+                        <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                    <!-- Collapse icon (hidden by default) -->
+                    <svg id="icon-collapse2" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+                        <polyline points="4 14 10 14 10 20" />
+                        <polyline points="20 10 14 10 14 4" />
+                        <line x1="10" y1="14" x2="3" y2="21" />
+                        <line x1="21" y1="3" x2="14" y2="10" />
+                    </svg>
+                </button>
+
+                <!-- Separator -->
+                <div style="width:1px; height:16px; background:rgba(0,0,0,0.12); margin:0 2px;"></div>
+
+                <!-- Open in new tab -->
+                <a href="./aria-iu.html" target="_blank" title="Open full screen in new tab" style="
+                        border: none; background: none; cursor: pointer;
+                        width: 28px; height: 28px; border-radius: 6px;
+                        display: flex; align-items: center; justify-content: center;
+                        color: #444; text-decoration: none; transition: background 0.15s;
+                    " onmouseover="this.style.background='rgba(0,0,0,0.06)'" onmouseout="this.style.background='none'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Blank iframe — replace src when ready -->
+            <iframe id="proto-frame2" src="./aria-iu.html" width="100%" height="820px"
+                style="border: none; display: block;" title="ARIA IU Prototype"></iframe>
+        </div>
+
+        <script>
+            var expanded2 = false;
+            function toggleExpand2() {
+                var wrap = document.getElementById('proto-wrap2');
+                var frame = document.getElementById('proto-frame2');
+                var iconExpand = document.getElementById('icon-expand2');
+                var iconCollapse = document.getElementById('icon-collapse2');
+                expanded2 = !expanded2;
+                if (expanded2) {
+                    wrap.style.maxWidth = '100%';
+                    wrap.style.borderRadius = '0';
+                    frame.style.height = 'calc(100vh - 80px)';
+                    iconExpand.style.display = 'none';
+                    iconCollapse.style.display = '';
+                    document.getElementById('proto-expand-btn2').title = 'Collapse';
+                } else {
+                    wrap.style.maxWidth = '1200px';
+                    wrap.style.borderRadius = '10px';
+                    frame.style.height = '820px';
+                    iconExpand.style.display = '';
+                    iconCollapse.style.display = 'none';
+                    document.getElementById('proto-expand-btn2').title = 'Expand to full width';
+                }
+            }
+        </script>
+
         <!-- User Flow Overview -->
         <div
             style="max-width: 46rem; margin: 4rem auto 0; padding: 0 1.2rem 5rem; font-size: 0.875rem; line-height: 1.7; color: var(--clr-text);">

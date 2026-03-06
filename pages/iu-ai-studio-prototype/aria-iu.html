@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIA - AI Readiness & Integration Advisor</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:ital,wght@0,300..700;1,300..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* CSS Variables based on ARIA Guidelines */
+        :root {
+            /* Colors */
+            --aria-primary: #FFF661;
+            --aria-secondary-yellow: #FFF852;
+            --aria-peach-start: #FFBBA0;
+            --aria-peach-end: #FF917E;
+            --aria-cream: #FFFABF;
+            --aria-orange: #ea580c;
+
+            --aria-heading: #1F1E1E;
+            --aria-body: #191414;
+            --aria-card-bg: #FFFAF6;
+            --aria-bg: #FFFFFF;
+
+            --aria-border: #e8e8e8;
+            --aria-border-hover: #d1d1d1;
+
+            --teams-bg: #ebebeb;
+            --teams-border: #d1d1d1;
+
+            /* Typography */
+            --font-heading: 'Red Hat Text', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+
+            /* Shapes */
+            --border-radius-base: 12px;
+            --border-radius-large: 24px;
+            --border-radius-button: 8px;
+        }
+
+        /* Reset and Base Styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            background: var(--teams-bg);
+            height: 100vh;
+            overflow: hidden;
+            color: var(--aria-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        svg {
+            fill: currentColor;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .heading-font {
+            font-family: var(--font-heading);
+            color: var(--aria-heading);
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Teams App Shell */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Left Teams Rail */
+        .teams-sidebar {
+            width: 68px;
+            background-color: var(--teams-bg);
+            border-right: 1px solid var(--teams-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 10px;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .teams-nav-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            color: #616161;
+            cursor: pointer;
+            font-size: 10px;
+            gap: 4px;
+            border-left: 3px solid transparent;
+        }
+
+        .teams-nav-item svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .teams-nav-item:hover {
+            color: #404040;
+        }
+
+        .teams-nav-item.active {
+            background-color: #ffffff;
+            color: #4B53BC;
+            border-left-color: #4B53BC;
+        }
+
+        /* Main Content Pane */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--aria-bg);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ARIA Brand Top Bar */
+        .app-header {
+            height: 50px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--aria-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            flex-shrink: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+
+        .app-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--aria-heading);
+            letter-spacing: -0.01em;
+        }
+
+        .app-logo {
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, var(--aria-peach-start), var(--aria-peach-end));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .app-header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+            color: #616161;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--aria-heading);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #e0e0e0;
+            color: var(--aria-heading);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        /* Inner Scroll Area */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-top: 50px;
+            position: relative;
+        }
+
+        /* Hero Gradient Decoration */
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 380px;
+            background: linear-gradient(160deg, rgba(255, 187, 160, 0.85) 0%, rgba(255, 145, 126, 0.85) 100%),
+                url('bg-hero-2.png');
+            background-size: cover;
+            background-position: center bottom;
+            opacity: 0.3;
+            z-index: 0;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typography Utilities */
+        .tagline {
+            font-size: 14px;
+            color: #666;
+            font-family: var(--font-body);
+            letter-spacing: 0.02em;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        .greeting {
+            margin-bottom: 8px;
+            font-size: 32px;
+        }
+
+        .sub-greeting {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        /* Role Badge */
+        .role-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: var(--border-radius-button);
+            font-family: var(--font-heading);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--aria-heading);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .role-switch {
+            font-size: 13px;
+            color: #666;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .role-switch:hover {
+            color: var(--aria-heading);
+        }
+
+        /* Intent Chips Layout */
+        .intent-section {
+            margin-top: 16px;
+        }
+
+        .intent-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .chip-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .intent-chip {
+            background: var(--aria-card-bg);
+            border: 1px solid var(--aria-border);
+            border-radius: var(--border-radius-base);
+            padding: 20px 24px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: none;
+        }
+
+        .intent-chip:hover {
+            border-color: var(--aria-border-hover);
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .intent-chip-title {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--aria-heading);
+        }
+
+        .intent-chip-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* See All / Custom Task */
+        .see-all-btn {
+            background: transparent;
+            border: none;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 12px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: underline;
+            margin-bottom: 32px;
+            font-family: var(--font-body);
+        }
+
+        .see-all-btn:hover {
+            color: var(--aria-heading);
+        }
+
+        .custom-task-box {
+            background: #fff;
+            border: 1px solid var(--aria-border);
+            border-radius: var(--border-radius-base);
+            padding: 20px;
+        }
+
+        .custom-task-label {
+            font-family: var(--font-heading);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .custom-task-input {
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius-button);
+            padding: 16px;
+            font-family: var(--font-body);
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        .custom-task-input:focus {
+            border-color: #aaa;
+            background: #fff;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--border-radius-button);
+            font-family: var(--font-heading);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Primary CTA: Yellow fill with dark text */
+        .btn-primary {
+            background: var(--aria-primary);
+            color: #111;
+        }
+
+        .btn-primary:hover {
+            background: #f2ea4c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 246, 97, 0.3);
+        }
+
+        /* Secondary: White bg, thin border */
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--aria-heading);
+            border-color: #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        /* Danger / Escalate */
+        .btn-danger {
+            background: #fff;
+            color: #d9381e;
+            border-color: #f7b2a6;
+        }
+
+        .btn-danger:hover {
+            background: #fdf2f0;
+        }
+
+        /* Standard Breadcrumbs */
+        .breadcrumb {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-family: var(--font-body);
+        }
+
+        .breadcrumb a {
+            color: #555;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: var(--aria-heading);
+            font-weight: 500;
+        }
+
+        /* General Forms & Modals inside Workflows */
+        .workflow-title {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .workflow-desc {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 32px;
+        }
+
+        .form-card {
+            background: var(--aria-card-bg);
+            border: 1px solid var(--aria-border);
+            border-radius: var(--border-radius-base);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--aria-heading);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius-button);
+            font-size: 14px;
+            font-family: var(--font-body);
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #999;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        select.form-control {
+            appearance: none;
+            background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 16px center;
+            background-size: 12px;
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 10px;
+            padding: 16px;
+            background: #fff;
+            border-radius: var(--border-radius-button);
+            border: 1px solid #eee;
+        }
+
+        .checkbox-group input {
+            margin-top: 3px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #333;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-group label strong {
+            color: var(--aria-heading);
+        }
+
+        /* Output Card */
+        .output-card {
+            background: #fff;
+            border: 1px solid var(--aria-border);
+            border-radius: var(--border-radius-base);
+            padding: 32px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+            margin-top: 32px;
+        }
+
+        .output-content {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            padding: 24px;
+            background: #fafafa;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+            margin-bottom: 24px;
+        }
+
+        .output-content h4 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            color: var(--aria-heading);
+        }
+
+        .output-content p {
+            margin-bottom: 16px;
+        }
+
+        .output-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .output-footer-note {
+            font-size: 13px;
+            color: #888;
+            font-style: italic;
+            border-top: 1px dashed #eee;
+            padding-top: 16px;
+            margin-top: 24px;
+        }
+
+        /* Centered Risk Card View */
+        .risk-card-container {
+            display: flex;
+            justify-content: center;
+            padding-top: 40px;
+        }
+
+        .risk-card {
+            background: #fff;
+            border: 1px solid var(--aria-border);
+            border-radius: var(--border-radius-large);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+        }
+
+        .risk-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: var(--font-heading);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-medium {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+
+        /* Yellow/Amber */
+        .badge-high {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Red */
+        .badge-low {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Green */
+
+        .risk-category {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .risk-body {
+            padding: 32px;
+        }
+
+        .risk-rationale-title {
+            font-family: var(--font-heading);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .risk-rationale-list {
+            margin: 0 0 32px 0;
+            padding-left: 20px;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .risk-rationale-list li {
+            margin-bottom: 8px;
+        }
+
+        .risk-decision-block {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #aaa;
+            margin-bottom: 32px;
+        }
+
+        .risk-decision-block.structured {
+            border-left-color: #f59e0b;
+        }
+
+        .risk-decision-block.restricted {
+            border-left-color: #ef4444;
+        }
+
+        .risk-decision-block.allowed {
+            border-left-color: #10b981;
+        }
+
+        .decision-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .decision-text {
+            font-family: var(--font-heading);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--aria-heading);
+        }
+
+        .risk-actions {
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        .risk-actions .row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .risk-actions .row .btn {
+            flex: 1;
+        }
+
+        /* Role Switcher Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.15s ease;
+        }
+
+        .modal {
+            background: #fff;
+            width: 400px;
+            border-radius: var(--border-radius-large);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+        }
+
+        .modal h3 {
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .modal p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .role-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-option:hover {
+            border-color: #aaa;
+            background: #fafafa;
+        }
+
+        .role-option.active {
+            border-color: var(--aria-heading);
+            background: #fdfdfd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .role-icon {
+            font-size: 20px;
+        }
+
+        .role-text {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 300;
+        }
+
+        .toast {
+            background: #222;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+            font-family: var(--font-body);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Left Teams Rail Mockup -->
+        <div class="teams-sidebar">
+            <div class="teams-nav-item">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16zm-1-5h2v2h-2v-2zm0-8h2v6h-2V7z" />
+                </svg>
+                Activity
+            </div>
+            <div class="teams-nav-item">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                </svg>
+                Chat
+            </div>
+            <div class="teams-nav-item">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                </svg>
+                Teams
+            </div>
+            <div class="teams-nav-item active" style="margin-top: 20px;">
+                <img src="bg-hero-1.png" alt="ARIA App Icon" style="width: 24px; height: 24px; object-fit: contain;">
+                ARIA
+            </div>
+            <div class="teams-nav-item" style="margin-top: auto; margin-bottom: 20px;">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                </svg>
+                Apps
+            </div>
+        </div>
+
+        <!-- Main Content Pane -->
+        <div class="main-area">
+
+            <!-- Header -->
+            <div class="app-header">
+                <div class="app-header-left" style="display: flex; align-items: center; gap: 8px;">
+                    <img src="bg-hero-1.png" alt="ARIA Mascot" style="height: 32px; object-fit: contain;">
+                    ARIA
+                    <span
+                        style="font-size:12px; color:#666; font-family:var(--font-body); font-weight:400; margin-left:8px; border-left:1px solid #ccc; padding-left:12px;">Your
+                        safe front door to AI at IU</span>
+                </div>
+                <div class="app-header-right">
+                    <img src="IU Careers Logo.svg" alt="IU Careers"
+                        style="height: 22px; padding-right: 16px; border-right: 1px solid #ddd; margin-right: 4px;">
+                    <div class="user-info">
+                        <span class="user-name">Prof. Dr. Müller</span>
+                    </div>
+                    <div class="user-avatar">PM</div>
+                </div>
+            </div>
+
+            <div class="content-scroll">
+                <div class="hero-bg"></div>
+
+                <!-- ===================== SCREEN 1 & 2: INTENT SELECTION ===================== -->
+                <div id="screen-home" class="screen active">
+
+                    <div class="role-wrapper" style="position: relative; z-index: 2;">
+                        <div class="role-badge" id="current-role-badge">🎓 Academic</div>
+                        <button class="role-switch" onclick="openRoleModal()">Switch role</button>
+                        <span style="font-size: 11px; color:#aaa; margin-left:8px;">Auto-detected via Azure AD</span>
+                    </div>
+
+                    <h1 class="greeting">Hi Prof. Müller</h1>
+                    <p class="sub-greeting" id="greeting-dynamic">I've loaded your Academic workflows.</p>
+
+                    <div class="intent-section">
+                        <h2>What do you want to use AI for today?</h2>
+
+                        <div class="chip-grid" id="chip-grid-academic">
+                            <div class="intent-chip" onclick="showRiskCard('ACAD_FEEDBACK')">
+                                <span class="intent-chip-title">Draft feedback on student work</span>
+                            </div>
+                            <div class="intent-chip" onclick="showRiskCard('ACAD_QUIZ')">
+                                <span class="intent-chip-title">Create quiz from lecture content</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Summarize lecture for accessibility</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening Policy Browser...')">
+                                <span class="intent-chip-title">Check if my task is policy-safe</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Build slides from lecture notes</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Create lesson plan from learning goals</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Turn content into discussion prompts</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Draft course announcement / student email</span>
+                            </div>
+                        </div>
+
+                        <div class="chip-grid hidden" id="chip-grid-ops">
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Summarize a policy document</span>
+                            </div>
+                            <div class="intent-chip" onclick="showRiskCard('OPS_HIRING')">
+                                <span class="intent-chip-title">Review candidate application (anonymized)</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Draft internal communication</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening Policy Browser...')">
+                                <span class="intent-chip-title">Check if my task is policy-safe</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Turn policy into employee FAQ</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Create onboarding checklist / 30-60-90 plan</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Draft job description (role template)</span>
+                            </div>
+                            <div class="intent-chip" onclick="showRiskCard('OPS_REJECTION')">
+                                <span class="intent-chip-title">Draft candidate rejection email (structured
+                                    feedback)</span>
+                            </div>
+                        </div>
+
+                        <div class="chip-grid hidden" id="chip-grid-leader">
+                            <div class="intent-chip"
+                                onclick="showToast('Opening Approved Workflow... (Safe to proceed)')">
+                                <span class="intent-chip-title">Create a decision brief from notes</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Summarize a long document</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Draft stakeholder communication</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening Policy Browser...')">
+                                <span class="intent-chip-title">Check if my task is policy-safe</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Turn meeting notes into action plan</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Summarize risks &amp; options (pros/cons)</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Create a 1-page leadership update</span>
+                            </div>
+                            <div class="intent-chip" onclick="showToast('Opening in Copilot... (Safe to proceed)')">
+                                <span class="intent-chip-title">Turn KPIs into executive narrative</span>
+                            </div>
+                        </div>
+
+                        <button class="see-all-btn" onclick="navTo('screen-library')">See all workflows &rarr;</button>
+
+                        <div class="custom-task-box">
+                            <label class="custom-task-label">Other</label>
+                            <textarea class="custom-task-input" id="custom-task-textarea"
+                                placeholder="Describe what you want to do with AI in plain language..."></textarea>
+                            <button class="btn btn-primary" style="margin-top: 12px; width: 100%;"
+                                onclick="submitCustomTask()">Check &amp; route me</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 3: RISK DECISION CARD (ACADEMIC - FEEDBACK) ===================== -->
+                <div id="screen-risk-acad-feedback" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Risk Assessment</span>
+                    </div>
+
+                    <div class="risk-card-container">
+                        <div class="risk-card">
+                            <div class="risk-header">
+                                <div class="risk-badge badge-medium">Medium Risk</div>
+                                <div class="risk-category">Assessment & Grading</div>
+                            </div>
+                            <div class="risk-body">
+                                <div class="risk-rationale-title">Why this risk level:</div>
+                                <ul class="risk-rationale-list">
+                                    <li>Involves evaluating student performance and academic content.</li>
+                                    <li>Generates feedback that could implicitly affect academic standing.</li>
+                                    <li>Requires strict human-in-the-loop oversight per IU integrity policy.</li>
+                                </ul>
+
+                                <div class="risk-decision-block structured">
+                                    <div class="decision-label">Guidance</div>
+                                    <div class="decision-text">Use approved structured workflow</div>
+                                </div>
+
+                                <div class="risk-actions">
+                                    <button class="btn btn-primary" onclick="navTo('screen-wf-acad-01')">Open Approved
+                                        Workflow</button>
+                                    <button class="btn btn-secondary"
+                                        onclick="showToast('Exiting to home view')">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 3: RISK DECISION CARD (OPS - HIRING) ===================== -->
+                <div id="screen-risk-ops-hiring" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Risk Assessment</span>
+                    </div>
+
+                    <div class="risk-card-container">
+                        <div class="risk-card">
+                            <div class="risk-header">
+                                <div class="risk-badge badge-high">High Risk</div>
+                                <div class="risk-category">Candidate / Hiring</div>
+                            </div>
+                            <div class="risk-body">
+                                <div class="risk-rationale-title">Why this risk level:</div>
+                                <ul class="risk-rationale-list">
+                                    <li>Processes sensitive applicant personal data.</li>
+                                    <li>Involves HR evaluation logic subject to equality/diversity guidelines.</li>
+                                    <li>High risk of implicit bias introduced by unrestrained LLMs.</li>
+                                </ul>
+
+                                <div class="risk-decision-block restricted">
+                                    <div class="decision-label">Guidance</div>
+                                    <div class="decision-text">Restricted unless anonymized</div>
+                                </div>
+
+                                <p style="font-size:14px; color:#555; margin-bottom: 24px; line-height:1.5;">You cannot
+                                    process raw applications via Copilot. You must use the approved anonymized workflow
+                                    or escalate to HR compliance.</p>
+
+                                <div class="risk-actions">
+                                    <button class="btn btn-primary" onclick="navTo('screen-wf-ops-01')">Use Anonymized
+                                        Workflow</button>
+                                    <button class="btn btn-secondary btn-danger"
+                                        onclick="showToast('Your request has been flagged for HR review.')">Escalate to
+                                        Recruiting Compliance</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 3: RISK DECISION CARD (LEADER - PERF REVIEW) ===================== -->
+                <div id="screen-risk-lead-perf" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')" style="cursor: pointer;">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Risk Assessment</span>
+                    </div>
+
+                    <div class="risk-card-container">
+                        <div class="risk-card">
+                            <div class="risk-header">
+                                <div class="risk-badge badge-high">High Risk</div>
+                                <div class="risk-category">HR / Personnel</div>
+                            </div>
+                            <div class="risk-body">
+                                <div class="risk-rationale-title">Why this risk level:</div>
+                                <ul class="risk-rationale-list">
+                                    <li>Drafting performance reviews processes highly sensitive employee data.</li>
+                                    <li>Unrestrained LLMs pose a risk of implicit bias in official personnel
+                                        evaluations.</li>
+                                    <li>HR policy requires specific, approved templates and structured oversight.</li>
+                                </ul>
+
+                                <div class="risk-decision-block restricted" style="border-left-color: #ef4444;">
+                                    <div class="decision-label">Guidance</div>
+                                    <div class="decision-text" style="color:#b91c1c;">Use HR-approved structured
+                                        workflow
+                                    </div>
+                                </div>
+
+                                <p style="font-size:14px; color:#555; margin-bottom: 24px; line-height:1.5;">This task
+                                    cannot be handled through general AI generation. Use the approved HR workflow. Final
+                                    output requires manager validation and may require HR review before use.</p>
+
+                                <div class="risk-actions">
+                                    <button class="btn btn-primary"
+                                        onclick="showToast('Opening controlled HR workflow...')">Open controlled HR
+                                        workflow</button>
+                                    <div style="display: flex; gap: 12px; margin-top: 4px;">
+                                        <button class="btn btn-secondary"
+                                            style="flex: 1; padding: 10px; font-size: 13px;"
+                                            onclick="showToast('Opening HR policy guidance...')">View HR policy
+                                            guidance</button>
+                                        <button class="btn btn-secondary"
+                                            style="flex: 1; padding: 10px; font-size: 13px;"
+                                            onclick="navTo('screen-home')">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN: ESCALATION CONFIRMATION ===================== -->
+                <div id="screen-escalation-confirm" class="screen">
+                    <div class="form-card"
+                        style="text-align: center; padding: 60px 40px; margin-top: 40px; border: 1px solid #fecaca; background: #fff;">
+                        <svg width="48" height="48" viewBox="0 0 24 24"
+                            style="color: #ea580c; margin-bottom: 24px; fill: none; stroke: currentColor; stroke-width: 2;">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <h2 style="font-size: 24px; margin-bottom: 16px;">Flagged for HR review</h2>
+                        <p
+                            style="font-size: 15px; color: #555; line-height: 1.6; max-width: 400px; margin: 0 auto 32px;">
+                            Your request to draft a performance review has been securely routed to the <strong>HR Policy
+                                Owner</strong> for governance review.
+                        </p>
+                        <p style="font-size: 14px; color: #888; margin-bottom: 32px;">
+                            You will receive guidance via Teams message within 24 working hours.
+                        </p>
+                        <button class="btn btn-primary" onclick="navTo('screen-home')">Return to Home</button>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 3: RISK DECISION CARD (LOW RISK REDIRECT) ===================== -->
+                <div id="screen-risk-acad-quiz" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')" style="cursor: pointer;">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Approved Workflow Gate</span>
+                    </div>
+
+                    <div class="risk-card-container">
+                        <div class="risk-card">
+                            <div class="risk-header">
+                                <div class="risk-badge badge-low">Low Risk</div>
+                                <div class="risk-category">General Productivity</div>
+                            </div>
+                            <div class="risk-body">
+                                <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                                    <div
+                                        style="flex: 1; padding: 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+                                        <div
+                                            style="font-weight: 600; font-size: 13px; margin-bottom: 8px; color: #15803d; display: flex; align-items: center; gap: 6px;">
+                                            <!-- Check icon -->
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="3">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            Allowed inputs
+                                        </div>
+                                        <div style="font-size: 13px; color: #166534; line-height: 1.5;">IU-approved
+                                            lecture notes or your own authored materials.</div>
+                                    </div>
+
+                                    <div
+                                        style="flex: 1; padding: 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;">
+                                        <div
+                                            style="font-weight: 600; font-size: 13px; margin-bottom: 8px; color: #b91c1c; display: flex; align-items: center; gap: 6px;">
+                                            <!-- X icon -->
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="3">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                            Not allowed
+                                        </div>
+                                        <div style="font-size: 13px; color: #991b1b; line-height: 1.5;">Student
+                                            submissions, grades, or any identifiable personal data.</div>
+                                    </div>
+                                </div>
+
+                                <div class="risk-decision-block allowed">
+                                    <div class="decision-label">Recommended</div>
+                                    <div class="decision-text" style="color:#047857;">Use official Microsoft Education
+                                        Quiz
+                                        Tool</div>
+                                </div>
+
+                                <p style="font-size:13px; color:#555; margin-bottom: 24px; font-style: italic;">
+                                    <strong>Quality reminder:</strong> Review generated questions for correctness, bias,
+                                    and appropriate difficulty level before distributing to students.
+                                </p>
+
+                                <div class="risk-actions">
+                                    <button class="btn btn-primary"
+                                        onclick="showToast('Redirecting to MS Education Quiz Tool...')">Continue to
+                                        Microsoft Education Quiz Tool</button>
+                                    <div style="display: flex; gap: 12px; margin-top: 4px;">
+                                        <button class="btn btn-secondary"
+                                            style="flex: 1; padding: 10px; font-size: 13px;"
+                                            onclick="showToast('Opening external guidance page...')">View
+                                            guidance</button>
+                                        <button class="btn btn-secondary"
+                                            style="flex: 1; padding: 10px; font-size: 13px;"
+                                            onclick="navTo('screen-home')">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 4A: APPROVED WORKFLOW (ACADEMIC - RUBRIC) ===================== -->
+                <div id="screen-wf-acad-01" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Rubric Feedback Assistant</span>
+                    </div>
+
+                    <h1 class="workflow-title">Rubric-Based Feedback Draft</h1>
+                    <p class="workflow-desc">Use this structured pathway to generate compliant, rubric-aligned feedback.
+                        Final evaluation remains your responsibility.</p>
+
+                    <div class="form-card">
+                        <div class="form-group">
+                            <label class="form-label">Student Submission Excerpt</label>
+                            <textarea class="form-control" placeholder="Paste anonymized excerpt here..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="margin-bottom: 4px;">Rubric Criteria</label>
+                            <p style="font-size:13px; color:#666; margin-bottom:12px;">Define up to 3 evaluation areas.
+                            </p>
+                            <div class="row" style="margin-bottom: 8px;">
+                                <div class="col"><input type="text" class="form-control"
+                                        value="Argument clarity & thesis"></div>
+                            </div>
+                            <div class="row" style="margin-bottom: 8px;">
+                                <div class="col"><input type="text" class="form-control"
+                                        value="Evidence quality & citations"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col"><input type="text" class="form-control" value="Structural flow"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col">
+                                <label class="form-label">Feedback Tone</label>
+                                <select class="form-control">
+                                    <option>Constructive & Encouraging</option>
+                                    <option>Direct & Formal</option>
+                                </select>
+                            </div>
+                            <div class="col"></div>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="acad-privacy-check">
+                            <label for="acad-privacy-check"><strong>Privacy confirmation:</strong> I confirm student
+                                identifiers (names, ID numbers) have been removed from this text.</label>
+                        </div>
+                    </div>
+
+                    <div class="btn-group" style="display:flex; gap:12px;">
+                        <button class="btn btn-primary" onclick="generateAcademicOutput()">Generate Draft
+                            Feedback</button>
+                        <button class="btn btn-secondary" onclick="navTo('screen-home')">Cancel</button>
+                    </div>
+
+                    <div id="acad-output-section" class="output-card hidden">
+                        <h3 style="margin-bottom:16px;">Draft Feedback Review</h3>
+                        <div class="output-content">
+                            <div contenteditable="true" title="Click to edit draft"
+                                style="outline: none; padding: 12px; margin: -12px; border-radius: 6px; transition: all 0.2s; border: 1px dashed transparent;"
+                                onmouseover="this.style.borderColor='#ccc'"
+                                onmouseout="this.style.borderColor='transparent'"
+                                onfocus="this.style.background='#fff'; this.style.borderColor='#4B53BC'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)';">
+                                <h4>Argument clarity & thesis</h4>
+                                <p>The central thesis is present but could be articulated more clearly in the
+                                    introduction.
+                                    Consider explicitly stating the relationship between the two main variables before
+                                    proceeding to the literature review. This will help ground the reader's
+                                    expectations.
+                                </p>
+                                <h4>Evidence quality & citations</h4>
+                                <p>You have integrated a solid range of contemporary sources. The use of Smith (2024) is
+                                    highly relevant. However, in paragraph 3, the claim regarding market elasticity
+                                    requires
+                                    a supporting citation. Overall, good engagement with the academic discourse.</p>
+                            </div>
+                            <div class="output-footer-note" style="margin-top: 24px;">Note: This AI assistant does not
+                                provide a numeric grade or
+                                pass/fail evaluation.</div>
+                        </div>
+
+                        <div class="checkbox-group" style="margin-bottom:24px; background:#fafafa;">
+                            <input type="checkbox" id="acad-validation-check"
+                                onchange="toggleCopyButton('acad-validation-check', 'acad-copy-btn')">
+                            <label for="acad-validation-check"><strong>Human Validation Required:</strong> I have
+                                reviewed and adjusted this feedback. I recognize final evaluation is my sole
+                                responsibility.</label>
+                        </div>
+
+                        <button class="btn btn-primary" id="acad-copy-btn" disabled
+                            style="opacity:0.5; cursor:not-allowed;"
+                            onclick="showToast('Feedback copied to clipboard!'); navTo('screen-home');">Copy
+                            Output</button>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 4A: APPROVED WORKFLOW (OPS - HIRING) ===================== -->
+                <div id="screen-wf-ops-01" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Anonymized Candidate Summary</span>
+                    </div>
+
+                    <h1 class="workflow-title">Candidate Application Review</h1>
+                    <p class="workflow-desc">Use this restricted pathway to generate objective applicant summaries.</p>
+
+                    <div
+                        style="background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:16px; border-radius:8px; margin-bottom:24px; font-size:14px; font-weight:500; display:flex; gap:12px; align-items:center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z" />
+                        </svg>
+                        Warning: Remove all personal identifiers (names, gender pronouns, addresses) before pasting.
+                    </div>
+
+                    <div class="form-card">
+                        <div class="form-group">
+                            <label class="form-label">Anonymized Application Excerpt</label>
+                            <textarea class="form-control"
+                                placeholder="Candidate's experience, cover letter, or resume text..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Role Profile</label>
+                            <input type="text" class="form-control" value="Senior Operations Manager">
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="ops-privacy-check">
+                            <label for="ops-privacy-check"><strong>Anonymization confirmed:</strong> I verify that
+                                absolutely no names, demographics, or contact details are included above.</label>
+                        </div>
+                    </div>
+
+                    <div class="btn-group" style="display:flex; gap:12px;">
+                        <button class="btn btn-primary" onclick="generateOpsOutput()">Generate Summary</button>
+                        <button class="btn btn-secondary" onclick="navTo('screen-home')">Cancel</button>
+                    </div>
+
+                    <div id="ops-output-section" class="output-card hidden">
+                        <h3 style="margin-bottom:16px;">Structured Summary</h3>
+                        <div class="output-content">
+                            <div contenteditable="true" title="Click to edit summary"
+                                style="outline: none; padding: 12px; margin: -12px; border-radius: 6px; transition: all 0.2s; border: 1px dashed transparent;"
+                                onmouseover="this.style.borderColor='#ccc'"
+                                onmouseout="this.style.borderColor='transparent'"
+                                onfocus="this.style.background='#fff'; this.style.borderColor='#4B53BC'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)';">
+                                <h4>Relevant Experience</h4>
+                                <p>The candidate demonstrates 8 years of direct operations management, notably leading a
+                                    team of 45 at a mid-sized logistics firm.</p>
+                                <h4>Key Competencies Identified</h4>
+                                <p>Strong indicators of process optimization, budget management ($4M P&L), and
+                                    cross-functional leadership.</p>
+                            </div>
+                            <div class="output-footer-note" style="margin-top: 24px;">Note: This is an unverified AI
+                                summary and must be validated
+                                against original documents.</div>
+                        </div>
+
+                        <div class="checkbox-group" style="margin-bottom:24px; background:#fafafa;">
+                            <input type="checkbox" id="ops-validation-check"
+                                onchange="toggleCopyButton('ops-validation-check', 'ops-copy-btn')">
+                            <label for="ops-validation-check"><strong>Validator Sign-off:</strong> I confirm final
+                                hiring judgment remains mine alone, and this summary will not be used natively as
+                                justification.</label>
+                        </div>
+
+                        <button class="btn btn-primary" id="ops-copy-btn" disabled
+                            style="opacity:0.5; cursor:not-allowed;"
+                            onclick="showToast('Summary copied!'); navTo('screen-home');">Copy Output</button>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 3: RISK DECISION CARD (OPS - REJECTION) ===================== -->
+                <div id="screen-risk-ops-rejection" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')" style="cursor: pointer;">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Risk Assessment</span>
+                    </div>
+
+                    <div class="risk-card-container">
+                        <div class="risk-card">
+                            <div class="risk-header">
+                                <div class="risk-badge"
+                                    style="background:var(--aria-orange); color:#fff; border: 1px solid var(--aria-orange);">
+                                    Medium / High Risk</div>
+                                <div class="risk-category">Candidate / Hiring</div>
+                            </div>
+                            <div class="risk-body">
+                                <div class="risk-rationale-title">Why this risk level:</div>
+                                <ul class="risk-rationale-list">
+                                    <li>Hiring communication affects candidate experience and fairness.</li>
+                                    <li>Output must be tied strictly to job-relevant criteria.</li>
+                                    <li>Human review is required before sending.</li>
+                                </ul>
+
+                                <div class="risk-decision-block restricted"
+                                    style="border-left-color: var(--aria-orange);">
+                                    <div class="decision-label" style="color:var(--aria-orange);">Guidance</div>
+                                    <div class="decision-text" style="color:var(--aria-orange);">Use HR-approved
+                                        structured
+                                        workflow</div>
+                                </div>
+
+                                <p style="font-size:14px; color:#555; margin-bottom: 24px; line-height:1.5;">This task
+                                    cannot be handled through general AI generation. Use the approved HR workflow. Final
+                                    output requires manager validation and may require HR review before use.</p>
+
+                                <div class="risk-actions">
+                                    <button class="btn btn-primary" onclick="navTo('screen-wf-ops-rejection')">Open
+                                        controlled HR workflow</button>
+                                    <div style="display: flex; gap: 12px; margin-top: 4px;">
+                                        <button class="btn btn-secondary"
+                                            style="flex: 1; padding: 10px; font-size: 13px;"
+                                            onclick="showToast('Opening HR policy guidance...')">View HR policy
+                                            guidance</button>
+                                        <button class="btn btn-secondary"
+                                            style="flex: 1; padding: 10px; font-size: 13px;"
+                                            onclick="navTo('screen-home')">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SCREEN 4: STRUCTURED WORKFLOW (OPS - REJECTION) ===================== -->
+                <div id="screen-wf-ops-rejection" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')" style="cursor: pointer;">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <a onclick="navTo('screen-risk-ops-rejection')" style="cursor: pointer;">Risk Assessment</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Rejection Workflow</span>
+                    </div>
+
+                    <h1 class="workflow-title">Draft Candidate Rejection Email</h1>
+                    <p class="workflow-desc">Use this structured pathway to generate compliant, job-relevant
+                        communication.
+                    </p>
+
+                    <div class="form-card">
+                        <div class="row form-group">
+                            <div class="col">
+                                <label class="form-label">Candidate First Name</label>
+                                <input type="text" class="form-control" placeholder="Optional - e.g. Anna">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Stage Reached</label>
+                                <select class="form-control">
+                                    <option>CV Screening</option>
+                                    <option>First Interview</option>
+                                    <option>Final Interview</option>
+                                    <option>Assessment Task</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col">
+                                <label class="form-label">Role / Position</label>
+                                <input type="text" class="form-control" placeholder="e.g. Senior Data Analyst">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Closing Tone</label>
+                                <select class="form-control">
+                                    <option>Professional Neutral</option>
+                                    <option>Warm & Encouraging</option>
+                                    <option>Brief & Direct</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="margin-bottom: 4px;">Evaluation Criteria Used</label>
+                            <p style="font-size:13px; color:#666; margin-bottom:12px;">Keeps feedback anchored to
+                                job-relevant standards.</p>
+                            <input type="text" class="form-control"
+                                placeholder="e.g. role-specific experience, stakeholder communication">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="margin-bottom: 4px;">Strengths Observed (from approved
+                                categories)</label>
+                            <input type="text" class="form-control"
+                                placeholder="e.g. Strong technical skills, good communication">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="margin-bottom: 4px;">What should we positively
+                                acknowledge?</label>
+                            <input type="text" class="form-control"
+                                placeholder="e.g. strong motivation, thoughtful case study">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="margin-bottom: 4px;">Areas Not Aligned with Role
+                                Needs</label>
+                            <p style="font-size:13px; color:#666; margin-bottom:12px;">Describe specific gaps in
+                                requirements (avoid protected characteristics).</p>
+                            <textarea class="form-control" rows="3"
+                                placeholder="e.g. We were seeking stronger alignment in managerial experience..."></textarea>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col" style="flex: 2;">
+                                <label class="form-label">Internal Notes (not included in email)</label>
+                                <input type="text" class="form-control"
+                                    placeholder="Optional context for system governance pull">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Output Language</label>
+                                <select class="form-control">
+                                    <option>English</option>
+                                    <option>German</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group" style="display:flex; gap:12px; margin-top:24px;">
+                        <button class="btn btn-primary"
+                            onclick="document.getElementById('ops-rej-output-section').classList.remove('hidden'); showToast('Generating draft based on constraints...')">Generate
+                            Draft Email</button>
+                        <button class="btn btn-secondary" onclick="navTo('screen-home')">Cancel</button>
+                    </div>
+
+                    <div id="ops-rej-output-section" class="output-card hidden">
+                        <h3 style="margin-bottom:16px;">Draft Output Review</h3>
+                        <div class="output-content">
+                            <div contenteditable="true" title="Click to edit draft"
+                                style="outline: none; padding: 12px; margin: -12px; border-radius: 6px; transition: all 0.2s; border: 1px dashed transparent;"
+                                onmouseover="this.style.borderColor='#ccc'"
+                                onmouseout="this.style.borderColor='transparent'"
+                                onfocus="this.style.background='#fff'; this.style.borderColor='#4B53BC'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)';">
+                                <p>Dear [Candidate Name],</p>
+                                <p>Thank you for taking the time to interview for the [Role / Position] role. We
+                                    appreciate
+                                    your interest in joining our team and enjoyed learning about your background.</p>
+                                <p>The interview team was impressed by your [Strengths Observed], which are clear
+                                    assets.
+                                    However, after careful consideration, we have decided to move forward with
+                                    candidates
+                                    whose backgrounds align more closely with our specific needs for this position,
+                                    particularly regarding [Areas Not Aligned].</p>
+                                <p>We wish you the best of luck in your job search and future professional endeavors.
+                                </p>
+                                <p>Sincerely,</p>
+                                <p>The Hiring Team</p>
+                            </div>
+                            <div class="output-footer-note" style="margin-top: 24px;">Note: This draft has been
+                                structured
+                                according to HR communication guidelines.</div>
+                        </div>
+
+                        <div class="checkbox-group" style="margin-bottom:12px; background:#fafafa;">
+                            <input type="checkbox" id="ops-rej-validation-1" onchange="toggleRejButtons()">
+                            <label for="ops-rej-validation-1"><strong>Content Validation:</strong> I confirm this
+                                feedback
+                                is based only on job-relevant criteria.</label>
+                        </div>
+                        <div class="checkbox-group" style="margin-bottom:24px; background:#fafafa;">
+                            <input type="checkbox" id="ops-rej-validation-2" onchange="toggleRejButtons()">
+                            <label for="ops-rej-validation-2"><strong>Compliance Check:</strong> I confirm no protected
+                                or
+                                irrelevant personal data is included.</label>
+                        </div>
+
+                        <div class="btn-group" style="display:flex; gap:12px;">
+                            <button class="btn btn-primary" id="ops-rej-review-btn" disabled
+                                style="opacity:0.5; cursor:not-allowed;"
+                                onclick="showToast('Submitted for HR review.'); navTo('screen-home');">Submit for HR
+                                review</button>
+                            <button class="btn btn-secondary" id="ops-rej-confirm-btn" disabled
+                                style="opacity:0.5; cursor:not-allowed;"
+                                onclick="showToast('Manager confirmation recorded.'); navTo('screen-home');">Manager
+                                confirmation required before use</button>
+                            <button class="btn btn-primary" id="ops-rej-copy-btn" disabled
+                                style="opacity:0.5; cursor:not-allowed;"
+                                onclick="showToast('Draft copied to clipboard!'); navTo('screen-home');">Copy
+                                Output</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="screen-library" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="navTo('screen-home')">Home</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                        <span>Workflow Library</span>
+                    </div>
+
+                    <h1 class="workflow-title">Approved Workflows Library</h1>
+                    <p class="workflow-desc">Browse, search, and access all IU-approved AI workflows.</p>
+
+                    <div class="form-card" style="padding: 24px;">
+                        <div class="row" style="align-items: center;">
+                            <div class="col" style="flex: 2;">
+                                <input type="text" class="form-control"
+                                    placeholder="Search workflows... (e.g. grading, summary)">
+                            </div>
+                            <div class="col">
+                                <select class="form-control">
+                                    <option>Filter by Role: All</option>
+                                    <option>🎓 Academic</option>
+                                    <option>⚙️ Ops / HR</option>
+                                    <option>🏢 Leadership</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-control">
+                                    <option>Filter by Risk: All Levels</option>
+                                    <option>Low Risk</option>
+                                    <option>Medium Risk</option>
+                                    <option>High Risk</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workflow Cards list -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                        <!-- Card 1 -->
+                        <div class="intent-chip"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                                    <span class="intent-chip-title">Rubric-Based Feedback Draft</span>
+                                    <span class="risk-badge badge-medium"
+                                        style="font-size: 10px; padding: 4px 8px;">Medium</span>
+                                    <span style="font-size: 11px; color: #888;">🎓 Academic</span>
+                                </div>
+                                <div class="intent-chip-desc">Use this structured pathway to generate compliant,
+                                    rubric-aligned feedback on student work.</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="showRiskCard('ACAD_FEEDBACK')">Open</button>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="intent-chip"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                                    <span class="intent-chip-title">Anonymized Candidate Summary</span>
+                                    <span class="risk-badge badge-high"
+                                        style="font-size: 10px; padding: 4px 8px;">High</span>
+                                    <span style="font-size: 11px; color: #888;">⚙️ Ops / HR</span>
+                                </div>
+                                <div class="intent-chip-desc">Restricted pathway to generate objective applicant
+                                    summaries using anonymized data.</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="showRiskCard('OPS_HIRING')">Open</button>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="intent-chip"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                                    <span class="intent-chip-title">Create Quiz from Lecture Content</span>
+                                    <span class="risk-badge badge-low"
+                                        style="font-size: 10px; padding: 4px 8px;">Low</span>
+                                    <span style="font-size: 11px; color: #888;">🎓 Academic</span>
+                                </div>
+                                <div class="intent-chip-desc">Generate a draft quiz based entirely on your uploaded
+                                    lecture notes or syllabus.</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="showRiskCard('ACAD_QUIZ')">Open</button>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="intent-chip"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                                    <span class="intent-chip-title">Draft a Performance Review</span>
+                                    <span class="risk-badge badge-high"
+                                        style="font-size: 10px; padding: 4px 8px;">High</span>
+                                    <span style="font-size: 11px; color: #888;">🏢 Leadership</span>
+                                </div>
+                                <div class="intent-chip-desc">Processes sensitive personnel data. HR-approved templates
+                                    only.</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="showRiskCard('LEAD_PERF')">Open</button>
+                        </div>
+
+                        <!-- Card 5 -->
+                        <div class="intent-chip"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                                    <span class="intent-chip-title">Draft Course Announcement</span>
+                                    <span class="risk-badge badge-low"
+                                        style="font-size: 10px; padding: 4px 8px;">Low</span>
+                                    <span style="font-size: 11px; color: #888;">🎓 Academic</span>
+                                </div>
+                                <div class="intent-chip-desc">Generate safe, policy-aligned communications for your
+                                    students.</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="showToast('Opening in Copilot... (Safe to proceed)')">Open</button>
+                        </div>
+
+                        <!-- Card 6 -->
+                        <div class="intent-chip"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                                    <span class="intent-chip-title">Create Onboarding Checklist</span>
+                                    <span class="risk-badge badge-low"
+                                        style="font-size: 10px; padding: 4px 8px;">Low</span>
+                                    <span style="font-size: 11px; color: #888;">⚙️ Ops / HR</span>
+                                </div>
+                                <div class="intent-chip-desc">Generate standard onboarding processes and a 30-60-90 day
+                                    plan.</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="showToast('Opening in Copilot... (Safe to proceed)')">Open</button>
+                        </div>
+
+                        <!-- Card 7 -->
+                        <div class="intent-chip"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                                    <span class="intent-chip-title">1-Page Leadership Update</span>
+                                    <span class="risk-badge badge-low"
+                                        style="font-size: 10px; padding: 4px 8px;">Low</span>
+                                    <span style="font-size: 11px; color: #888;">🏢 Leadership</span>
+                                </div>
+                                <div class="intent-chip-desc">Summarize recent updates and KPIs into an executive
+                                    format.</div>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="showToast('Opening in Copilot... (Safe to proceed)')">Open</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div> <!-- End Scroll Area -->
+        </div> <!-- End Main Pane -->
+
+        <!-- ===================== ROLE SWITCHER MODAL ===================== -->
+        <div class="modal-overlay" id="role-modal">
+            <div class="modal">
+                <h3>Switch Role Context</h3>
+                <p>ARIA adapts its workflows to your functional role.</p>
+
+                <div class="role-option active" onclick="switchRole('academic', '🎓 Academic', 'Academic')">
+                    <span class="role-icon">🎓</span>
+                    <span class="role-text">Academic Staff / Faculty</span>
+                </div>
+                <div class="role-option" onclick="switchRole('ops', '⚙️ Ops / HR', 'Ops & HR')">
+                    <span class="role-icon">⚙️</span>
+                    <span class="role-text">Operations & HR</span>
+                </div>
+                <div class="role-option" onclick="switchRole('leader', '🏢 Leadership', 'Leadership')">
+                    <span class="role-icon">🏢</span>
+                    <span class="role-text">Leadership / Director</span>
+                </div>
+
+                <button class="btn btn-secondary" style="width:100%; margin-top:16px;"
+                    onclick="closeRoleModal()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- ===================== TOAST CONTAINER ===================== -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <script>
+            // Navigation logic
+            function navTo(screenId) {
+                document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+                document.querySelector('.content-scroll').scrollTo(0, 0);
+            }
+
+            // Role Switching
+            function openRoleModal() {
+                document.getElementById('role-modal').classList.add('active');
+            }
+
+            function closeRoleModal() {
+                document.getElementById('role-modal').classList.remove('active');
+            }
+
+            function switchRole(roleId, badgeText, greetingTerm) {
+                // Update styling active state on options
+                document.querySelectorAll('.role-option').forEach(el => el.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+
+                // Update UI elements
+                document.getElementById('current-role-badge').innerText = badgeText;
+                document.getElementById('greeting-dynamic').innerText = `I've loaded your ${greetingTerm} workflows.`;
+
+                // Toggle specific intent boards
+                document.getElementById('chip-grid-academic').classList.add('hidden');
+                document.getElementById('chip-grid-ops').classList.add('hidden');
+                document.getElementById('chip-grid-leader').classList.add('hidden');
+
+                if (roleId === 'academic') {
+                    document.getElementById('chip-grid-academic').classList.remove('hidden');
+                } else if (roleId === 'ops') {
+                    document.getElementById('chip-grid-ops').classList.remove('hidden');
+                } else if (roleId === 'leader') {
+                    document.getElementById('chip-grid-leader').classList.remove('hidden');
+                } else {
+                    document.getElementById('chip-grid-academic').classList.remove('hidden');
+                }
+
+                closeRoleModal();
+                showToast('Role updated successfully.');
+            }
+
+            // Risk Card routing
+            function showRiskCard(flow) {
+                if (flow === 'ACAD_FEEDBACK') {
+                    navTo('screen-risk-acad-feedback');
+                } else if (flow === 'OPS_HIRING') {
+                    navTo('screen-risk-ops-hiring');
+                } else if (flow === 'LEAD_PERF') {
+                    navTo('screen-risk-lead-perf');
+                } else if (flow === 'ACAD_QUIZ') {
+                    navTo('screen-risk-acad-quiz');
+                } else if (flow === 'OPS_REJECTION') {
+                    navTo('screen-risk-ops-rejection');
+                }
+            }
+
+            // Custom Task Submission Logic
+            function submitCustomTask() {
+                const inputVal = document.getElementById('custom-task-textarea').value.trim().toLowerCase();
+
+                if (!inputVal) {
+                    showToast('Please describe your task first.');
+                    return;
+                }
+
+                // Keyword based simulated classifier
+                if (inputVal.includes('performance') || inputVal.includes('review') || inputVal.includes('fire')) {
+                    showToast('Classifying intent: High Risk (HR/Personnel)');
+                    setTimeout(() => showRiskCard('LEAD_PERF'), 1200);
+                } else if (inputVal.includes('hire') || inputVal.includes('applicant') || inputVal.includes('candidate')) {
+                    showToast('Classifying intent: High Risk (Hiring)');
+                    setTimeout(() => showRiskCard('OPS_HIRING'), 1200);
+                } else if (inputVal.includes('grade') || inputVal.includes('student') || inputVal.includes('feedback')) {
+                    showToast('Classifying intent: Medium Risk (Assessment)');
+                    setTimeout(() => showRiskCard('ACAD_FEEDBACK'), 1200);
+                } else {
+                    showToast('Classifying intent: Low Risk (General Productivity)');
+                    setTimeout(() => navTo('screen-library'), 1200); // Route generic queries to library
+                }
+            }
+
+            // Workflow Form Validation & Output Generation
+            function generateAcademicOutput() {
+                const privCheck = document.getElementById('acad-privacy-check');
+                if (!privCheck.checked) {
+                    showToast('⚠️ Please confirm privacy anonymization first.');
+                    return;
+                }
+                document.getElementById('acad-output-section').classList.remove('hidden');
+                // scroll down
+                setTimeout(() => {
+                    const scrollArea = document.querySelector('.content-scroll');
+                    scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+                }, 50);
+            }
+
+            function generateOpsOutput() {
+                const privCheck = document.getElementById('ops-privacy-check');
+                if (!privCheck.checked) {
+                    showToast('⚠️ Please confirm anonymization first.');
+                    return;
+                }
+                document.getElementById('ops-output-section').classList.remove('hidden');
+                // scroll down
+                setTimeout(() => {
+                    const scrollArea = document.querySelector('.content-scroll');
+                    scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+                }, 50);
+            }
+
+            // Toggle Buttons for Rejection Workflow
+            function toggleRejButtons() {
+                var check1 = document.getElementById('ops-rej-validation-1').checked;
+                var check2 = document.getElementById('ops-rej-validation-2').checked;
+                var reviewBtn = document.getElementById('ops-rej-review-btn');
+                var confirmBtn = document.getElementById('ops-rej-confirm-btn');
+                var copyBtn = document.getElementById('ops-rej-copy-btn');
+
+                if (check1 && check2) {
+                    reviewBtn.disabled = false;
+                    reviewBtn.style.opacity = '1';
+                    reviewBtn.style.cursor = 'pointer';
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = '1';
+                    confirmBtn.style.cursor = 'pointer';
+                    copyBtn.disabled = false;
+                    copyBtn.style.opacity = '1';
+                    copyBtn.style.cursor = 'pointer';
+                } else {
+                    reviewBtn.disabled = true;
+                    reviewBtn.style.opacity = '0.5';
+                    reviewBtn.style.cursor = 'not-allowed';
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.opacity = '0.5';
+                    confirmBtn.style.cursor = 'not-allowed';
+                    copyBtn.disabled = true;
+                    copyBtn.style.opacity = '0.5';
+                    copyBtn.style.cursor = 'not-allowed';
+                }
+            }
+
+            function toggleCopyButton(checkId, btnId) {
+                const check = document.getElementById(checkId);
+                const btn = document.getElementById(btnId);
+                if (check.checked) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                } else {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                }
+            }
+
+            // Toast logic
+            function showToast(message) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> ${message}`;
+
+                container.appendChild(toast);
+
+                // Trigger animation
+                setTimeout(() => toast.classList.add('show'), 10);
+
+                // Remove after 3s
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        </script>
+
+</body>
+
+</html>
